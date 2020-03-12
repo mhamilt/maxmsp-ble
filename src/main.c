@@ -144,6 +144,14 @@ void onPrintMessage(t_myExtern_tilde *x)
     
 }
 
+void onAnyMessage(t_myExtern_tilde *x, t_symbol *s, long argc, t_atom *argv)
+{
+    object_post( (t_object*)x,
+                 "This method was invoked by sending the ’%s’ message to this object.",
+                  s->s_name);
+    // argc and argv are the arguments, as described in above.
+}
+
 //------------------------------------------------------------------------------
 
 /* This method is called first. */
@@ -160,10 +168,11 @@ int C74_EXPORT main(void)
                            A_DEFLONG,
                            0);
     /* to couple an inlet to a method */
-//    class_addmethod(c, (method)onBang, "bang", 0);
+    class_addmethod(c, (method)onBang, "bang", 0);
     //    class_addmethod(c, (method)onList, "list", A_GIMME, 0);
     //    class_addmethod(c, (method)inletAssistant,"assist", A_CANT,0);
     //    class_addmethod(c, (method)onPrintMessage, "print", 0);
+    class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
     class_addmethod(c, (method)prepareToPlay, "dsp64", A_CANT, 0);
     class_dspinit(c);
     class_register(CLASS_BOX, c);
