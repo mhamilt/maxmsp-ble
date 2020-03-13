@@ -7,18 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5868BA8E241A6C1600152060 /* maxmspsdk.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */; };
+		5848C4AE241B9ED700406164 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4AD241B9ED700406164 /* main.c */; };
 		58DE3CB5241A627E00056E4B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5802D04D241A613300FC7563 /* main.c */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2FBBEAE508F335360078DB84 /* mymspextern~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mymspextern~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5802D04D241A613300FC7563 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		5848C4AB241B9E3500406164 /* mspcpp~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mspcpp~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5848C4AD241B9ED700406164 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		5848C4B0241BA55500406164 /* switch_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = switch_string.h; sourceTree = "<group>"; };
 		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		2FBBEADC08F335360078DB84 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5848C4A6241B9E3500406164 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -32,6 +42,7 @@
 			isa = PBXGroup;
 			children = (
 				5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */,
+				5848C4AC241B9EB100406164 /* mspcpp */,
 				5802D04C241A613300FC7563 /* src */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 			);
@@ -42,6 +53,7 @@
 			isa = PBXGroup;
 			children = (
 				2FBBEAE508F335360078DB84 /* mymspextern~.mxo */,
+				5848C4AB241B9E3500406164 /* mspcpp~.mxo */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,10 +67,34 @@
 			path = ../src;
 			sourceTree = "<group>";
 		};
+		5848C4AC241B9EB100406164 /* mspcpp */ = {
+			isa = PBXGroup;
+			children = (
+				5848C4AF241BA07A00406164 /* cpp_files */,
+				5848C4AD241B9ED700406164 /* main.c */,
+				5848C4B0241BA55500406164 /* switch_string.h */,
+			);
+			path = mspcpp;
+			sourceTree = "<group>";
+		};
+		5848C4AF241BA07A00406164 /* cpp_files */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = cpp_files;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
 		2FBBEAD708F335360078DB84 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5848C4A1241B9E3500406164 /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -87,6 +123,25 @@
 			productReference = 2FBBEAE508F335360078DB84 /* mymspextern~.mxo */;
 			productType = "com.apple.product-type.bundle";
 		};
+		5848C4A0241B9E3500406164 /* mspcpp~ */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5848C4A8241B9E3500406164 /* Build configuration list for PBXNativeTarget "mspcpp~" */;
+			buildPhases = (
+				5848C4A1241B9E3500406164 /* Headers */,
+				5848C4A2241B9E3500406164 /* Resources */,
+				5848C4A4241B9E3500406164 /* Sources */,
+				5848C4A6241B9E3500406164 /* Frameworks */,
+				5848C4A7241B9E3500406164 /* Rez */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "mspcpp~";
+			productName = iterator;
+			productReference = 5848C4AB241B9E3500406164 /* mspcpp~.mxo */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -110,6 +165,7 @@
 			projectRoot = "";
 			targets = (
 				2FBBEAD608F335360078DB84 /* max-external */,
+				5848C4A0241B9E3500406164 /* mspcpp~ */,
 			);
 		};
 /* End PBXProject section */
@@ -119,7 +175,13 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5868BA8E241A6C1600152060 /* maxmspsdk.xcconfig in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5848C4A2241B9E3500406164 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -127,6 +189,13 @@
 
 /* Begin PBXRezBuildPhase section */
 		2FBBEADF08F335360078DB84 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5848C4A7241B9E3500406164 /* Rez */ = {
 			isa = PBXRezBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -141,6 +210,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				58DE3CB5241A627E00056E4B /* main.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5848C4A4241B9E3500406164 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5848C4AE241B9ED700406164 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -244,6 +321,35 @@
 			};
 			name = Deployment;
 		};
+		5848C4A9241B9E3500406164 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
+			buildSettings = {
+				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
+				INFOPLIST_FILE = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		5848C4AA241B9E3500406164 /* Deployment */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
+			buildSettings = {
+				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
+				INFOPLIST_FILE = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Deployment;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -261,6 +367,15 @@
 			buildConfigurations = (
 				2FBBEAE108F335360078DB84 /* Development */,
 				2FBBEAE208F335360078DB84 /* Deployment */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Development;
+		};
+		5848C4A8241B9E3500406164 /* Build configuration list for PBXNativeTarget "mspcpp~" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5848C4A9241B9E3500406164 /* Development */,
+				5848C4AA241B9E3500406164 /* Deployment */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Development;
