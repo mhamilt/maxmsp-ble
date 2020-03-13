@@ -12,7 +12,23 @@ cd "/path/to/Max Folder/developing"
 git clone --recurse-submodules https://github.com/mhamilt/maxmsp-external-template.git
 ```
 
-You should be able to build straight away form the xcode project contained in the `xcode` directory.
+You should be able to build straight away from the xcode project contained in the `xcode` directory.
+
+### Setup
+
+#### maxmspsdk.xcconfig
+
+The `maxmspsdk.xcconfig` in the `xcode` sets a couple of global paths in the xcode project. Some of these variables you can change others you should leave alone. The ones to change are
+
+- `PRODUCT_VERSION`: which version of the max sdk are you using?
+- `DSTROOT`: destination of the built external (project relative directory)
+
+#### Change sdk Version
+
+```sh
+cd max-sdk
+git checkout v7.0.3 # or v7.1.0 v7.3.3 v8.0.3
+```
 
 ## Projects
 
