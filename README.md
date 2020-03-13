@@ -22,7 +22,7 @@ The xcode project has multiple targets to demonstrate how to approach building a
 
 The vanilla C approach. There are plenty of examples in the sdk, but this target aims to take a more modern approach.  Documentation has been added inline as well as some slightly less obtuse variable name choices which will hopefully reduce the barrier of entry.
 
-## mspcpp
+### mspcpp
 
 If you have already coded a ton of DSP C++ classes for something like JUCE, you may want to start here.
 
