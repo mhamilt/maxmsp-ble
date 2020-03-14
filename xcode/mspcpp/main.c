@@ -1,190 +1,252 @@
-//------------------------------------------------------------------------------
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <string.h>
-#include <time.h>
-#include <float.h>
-#include <ctype.h>
-//------------------------------------------------------------------------------
+/*
+ A template for a basic max external object with more explicit documentation
+ 
+ See Readme of repository for build instructions.
+ Create an Issue on the repository if anything is amiss or you have any suggestion
+ - mhamilt Mar 2020
+ */
+
 #include "ext.h"
 #include "ext_obex.h"
 #include "z_dsp.h"
 #include "buffer.h"
-#include "switch_string.h"
+#include "MattsOscsCinterface.h"
 //------------------------------------------------------------------------------
 
-void* myExtern_tildeClass;
+/// void* to the complete new Max External class so that it can be used in the class methods
+/// This will be set to t_class* in the main function
+/// @code t_class* c = class_new(...);
+/// myExternClass = c;
+void* myExternClass;
 
 //------------------------------------------------------------------------------
-typedef struct myObj
+/// DSP object properties
+typedef struct _MyDspStruct
 {
     float a;
-} t_myObj;
+} MyDspStruct;
 
 /** @struct
  The MaxMSP object
+ @field t_pxobject x_obj
+ @field t_symbol* x_arrayname
+ @field SineOsc* x_osc pointer to our DSP object. use this with the interfacing C functions
+ @field short inletConnection number of connections
  */
-typedef struct _myExtern_tilde
+typedef struct _MaxExternalObject
 {
+    ///
     t_pxobject x_obj;
+    ///
     t_symbol* x_arrayname;
-    t_myObj a;
-} t_myExtern_tilde;
+    /// pointer to our DSP object. use this with the interfacing C functions
+    SineOsc* x_osc;
+    ///
+    short inletConnection;
+} MaxExternalObject;
 //------------------------------------------------------------------------------
-/// Called After Main
+/// External Object Constructor: use this to setup any variables / properties of your DSP Struct or MaxExternalObject
+/// Arguement list should be as long as the list of type arguments passed in the class_new call below.
+/// @param arg1 first argument to object: should match type given in class_new(...)
+/// @returns a void* to an instance of the MaxExternalObject
 void* myExternalConstructor(long arg1)
 {
+    //--------------------------------------------------------------------------
     if (!arg1)
     {
         post("no arguement\n");
     }
     
-    post("Start\n");
-    t_myExtern_tilde* x = (t_myExtern_tilde *)object_alloc(myExtern_tildeClass);
-    dsp_setup((t_pxobject*)x, 1);
+    //--------------------------------------------------------------------------
+    MaxExternalObject* maxObjectPtr = (MaxExternalObject*)object_alloc(myExternClass);
+    maxObjectPtr->x_osc = newSineOsc();
     
-    outlet_new((t_object*)x, "signal");    //----------------------------------------------------------------------------
-    return (x);
+    dsp_setup((t_pxobject*)maxObjectPtr, 1);
+    //--------------------------------------------------------------------------
+    // inlet_new((t_object*)maxObjectPtr, "signal");
+    outlet_new((t_object*)maxObjectPtr, "signal");
+    //--------------------------------------------------------------------------
+    return maxObjectPtr;
 }
 
 //------------------------------------------------------------------------------
-
-void myExternDestructor(t_myExtern_tilde *x)
+///
+void myExternDestructor(MaxExternalObject* maxObjectPtr)
 {
-    dsp_free((t_pxobject*)x);
+    dsp_free((t_pxobject*)maxObjectPtr);
 }
 //------------------------------------------------------------------------------
 
 /// @brief This is the function called by MAX/MSP when the cursor is over an inlet or
 /// outlet.
-/// @param x object pointer
-/// @param box <#box description#>
+/// @param maxObjectPtr object pointer
+/// @param box still don't know what this is
 /// @param message either inlet  1 or outlet 2
 /// @param arg inlet / outlet index
 /// @param dstString pointer to destination: limited to 60 chars.
-void inletAssistant(t_myExtern_tilde *x, void *box, long message,
-                    long arg, char *dstString)
+void inletAssistant(MaxExternalObject* maxObjectPtr,
+                    void *box,
+                    long message,
+                    long arg,
+                    char *dstString)
 {
-    //    if (message == 2)
-    //        sprintf(dstString, "(signal) granulated output");
-    //    else
-    //    {
-    //        switch (arg) {
-    //            case 0:
-    //                sprintf(dstString, "(bang/list/message) bang starts granulation...");
-    //                break;
-    //            case 1:
-    //                sprintf(dstString, "(float) Transposition offset in semitones");
-    //                break;
-    //        }
-    //    }
+    const long  inletMessage = 1;
+    const long outletMessage = 2;
+    
+    switch (message)
+    {
+        case inletMessage:
+            switch (arg)
+            {
+                case 0:
+                    sprintf(dstString, "inlet 1");
+                    break;
+                case 1:
+                    sprintf(dstString, "inlet 2");
+                    break;
+                default:
+                    sprintf(dstString, "some other inlet");
+            }
+            break;
+        case outletMessage:
+            switch (arg)
+            {
+                case 0:
+                    sprintf(dstString, "outlet 1");
+                    break;
+                case 1:
+                    sprintf(dstString, "outlet 2");
+                    break;
+                default:
+                    sprintf(dstString, "some other outlet");
+            }
+            break;
+    }
 }
 
 //------------------------------------------------------------------------------
-void mspExternalProcessBlock(t_myExtern_tilde* x, t_object* dsp64, double** ins,
-                             long numins, double** outs, long numouts,
+#pragma mark DSP Loop
+/// Main DSP process block, do your DSP here
+/// @param maxObjectPtr
+/// @param dsp64
+/// @param ins double pointer array to sample inlets
+/// @param numins
+/// @param outs double pointer array to sample outlets
+/// @param numouts
+/// @param sampleframes samples per channel
+/// @param flags
+/// @param userparam no idea
+void mspExternalProcessBlock(MaxExternalObject* maxObjectPtr, t_object* dsp64,
+                             double** ins, long numins, double** outs, long numouts,
                              long sampleframes, long flags, void* userparam)
 
 {
-    double* in = ins[0];
-    
+    //--------------------------------------------------------------------------
+    // DSP loop
     for (int i = 0; i < numouts; ++i)
     {
-        //        g->channelBuffers[i] = (mdefloat*)outs[i];
+        for (int s = 0; s < sampleframes; ++s)
+        {
+            outs[0][s] = SineOsc_process(maxObjectPtr->x_osc) * 0.1;
+        }
     }
 }
+
 //------------------------------------------------------------------------------
 
-/** This gets called third, when the audio engine starts (after _new!). */
-
-/// <#Description#>
-/// @param x <#x description#>
-/// @param dsp64 <#dsp64 description#>
-/// @param count <#count description#>
-/// @param samplerate <#samplerate description#>
-/// @param vectorsize <#vectorsize description#>
-/// @param flags <#flags description#>
-void prepareToPlay(t_myExtern_tilde* x, t_object* dsp64, short* count,
+/// Audio DSP setup
+/// @param maxObjectPtr object pointer
+/// @param dsp64
+/// @param count array containing number of connections to an inlet with index [i]
+/// @param samplerate
+/// @param vectorsize
+/// @param flags
+void prepareToPlay(MaxExternalObject* maxObjectPtr, t_object* dsp64, short* count,
                    double samplerate, long vectorsize, long flags)
 {
+    maxObjectPtr->inletConnection = count[0];
+    SineOsc_setup(maxObjectPtr->x_osc, samplerate, 440.0);
     object_method(dsp64,
                   gensym("dsp_add64"),
-                  x,
+                  maxObjectPtr,
                   mspExternalProcessBlock,
                   0,
                   NULL);
 }
 //------------------------------------------------------------------------------
 
-/** This gets called when we receive a bang */
-
-void onBang(t_myExtern_tilde *x)
+/// This gets called when we receive a bang
+/// @param maxObjectPtr object pointer
+void onBang(MaxExternalObject* maxObjectPtr)
 {
     post("I got a bang!\n");
 }
 //------------------------------------------------------------------------------
 
-/** this gets called when a list is sent to the object */
+/// This gets called when a list is sent to the object
+/// @param maxObjectPtr object pointer
+/// @param s message selector contains the text of a message and a pointer to the message object
+/// @param argc number of atoms in the argv array
+/// @param argv array of atoms holding the arguments.
+void onList(MaxExternalObject* maxObjectPtr,
+            t_symbol *s,
+            short argc,
+            t_atom *argv)
+{
+    post("I got a list!\n");
+}
 
-void onList(t_myExtern_tilde *x, t_symbol *s,
-            short argc, t_atom *argv)
-{
-    
-}
 //------------------------------------------------------------------------------
-void onPrintMessage(t_myExtern_tilde *x)
+
+void onPrintMessage(MaxExternalObject* x)
 {
-    
+    post("Print some info about the object\n");
 }
+
 //------------------------------------------------------------------------------
-/// <#Description#>
-/// @param x <#x description#>
-/// @param s <#s description#>
-/// @param argc <#argc description#>
-/// @param argv <#argv description#>
-void onAnyMessage(t_myExtern_tilde *x, t_symbol *s, long argc, t_atom *argv)
+
+/// If any message is recieved an we have not already dealt with it
+/// @param maxObjectPtr object pointer
+/// @param s message selector contains the text of a message and a pointer to the message object
+/// @param argc number of atoms in the argv array
+/// @param argv array of atoms holding the arguments.
+void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_atom *argv)
 {
-    object_post( (t_object*)x,
+    object_post( (t_object*)maxObjectPtr,
                 "This method was invoked by sending the ’%s’ message to this object.",
                 s->s_name);
-    
-    switchs(s->s_name)
-    {
-        cases("help")
-            post("you asked for help");
-            break;
-        defaults
-            post("No match\n");
-            break;
-    } switchs_end;
 }
 
 //------------------------------------------------------------------------------
-
-/* This method is called first. */
-
-int C74_EXPORT main(void)
-
+/// Bundle all class_addmethod calls into one function.
+/// @param c max external class pointer
+void coupleMethodsToExternal( t_class* c)
 {
-    post("START!\n");
+    class_addmethod(c, (method)onBang, "bang", 0);
+    class_addmethod(c, (method)onList, "list", A_GIMME, 0);
+    class_addmethod(c, (method)inletAssistant,"assist", A_CANT,0);
+    class_addmethod(c, (method)onPrintMessage, "print", 0);
+    class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
+    class_addmethod(c, (method)prepareToPlay, "dsp64", A_CANT, 0);
+}
+//------------------------------------------------------------------------------
+int C74_EXPORT main(void)
+{
     t_class* c = class_new("mspcpp~",
                            (method)myExternalConstructor,
                            (method)myExternDestructor,
-                           (short)sizeof(t_myExtern_tilde),
+                           (short)sizeof(MaxExternalObject),
                            0L,
                            A_DEFLONG,
                            0);
-    /* to couple an inlet to a method */
-    class_addmethod(c, (method)onBang, "bang", 0);
-    //    class_addmethod(c, (method)onList, "list", A_GIMME, 0);
-    //    class_addmethod(c, (method)inletAssistant,"assist", A_CANT,0);
-    //    class_addmethod(c, (method)onPrintMessage, "print", 0);
-    class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
-    class_addmethod(c, (method)prepareToPlay, "dsp64", A_CANT, 0);
+    
+    coupleMethodsToExternal(c);
+    
     class_dspinit(c);
     class_register(CLASS_BOX, c);
-    myExtern_tildeClass = c;
+    
+    myExternClass = c;
+    
     return 0;
 }
 //------------------------------------------------------------------------------

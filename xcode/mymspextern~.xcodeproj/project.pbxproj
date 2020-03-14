@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		5848C4AE241B9ED700406164 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4AD241B9ED700406164 /* main.c */; };
+		5848C4B3241C4D1E00406164 /* MattsOscs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4B1241C4D1E00406164 /* MattsOscs.cpp */; };
+		5848C4B4241C4D1E00406164 /* MattsOscs.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5848C4B2241C4D1E00406164 /* MattsOscs.hpp */; };
+		5848C4B7241C4DB300406164 /* MattsOscsCinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */; };
+		5848C4B8241C4DB300406164 /* MattsOscsCinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */; };
 		58DE3CB5241A627E00056E4B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5802D04D241A613300FC7563 /* main.c */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
 /* End PBXBuildFile section */
 
@@ -17,6 +21,10 @@
 		5848C4AB241B9E3500406164 /* mspcpp~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mspcpp~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
 		5848C4AD241B9ED700406164 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		5848C4B0241BA55500406164 /* switch_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = switch_string.h; sourceTree = "<group>"; };
+		5848C4B1241C4D1E00406164 /* MattsOscs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscs.cpp; sourceTree = "<group>"; };
+		5848C4B2241C4D1E00406164 /* MattsOscs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MattsOscs.hpp; sourceTree = "<group>"; };
+		5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscsCinterface.cpp; sourceTree = "<group>"; };
+		5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MattsOscsCinterface.h; sourceTree = "<group>"; };
 		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -80,6 +88,10 @@
 		5848C4AF241BA07A00406164 /* cpp_files */ = {
 			isa = PBXGroup;
 			children = (
+				5848C4B1241C4D1E00406164 /* MattsOscs.cpp */,
+				5848C4B2241C4D1E00406164 /* MattsOscs.hpp */,
+				5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */,
+				5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */,
 			);
 			path = cpp_files;
 			sourceTree = "<group>";
@@ -98,6 +110,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5848C4B8241C4DB300406164 /* MattsOscsCinterface.h in Headers */,
+				5848C4B4241C4D1E00406164 /* MattsOscs.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -218,6 +232,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5848C4AE241B9ED700406164 /* main.c in Sources */,
+				5848C4B7241C4DB300406164 /* MattsOscsCinterface.cpp in Sources */,
+				5848C4B3241C4D1E00406164 /* MattsOscs.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
