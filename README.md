@@ -1,5 +1,40 @@
 # maxmsp-external-template
+
 Template Projects for building external objects in MaxMSP
+
+<!-- TOC depthFrom:1 depthTo:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [maxmsp-external-template](#maxmsp-external-template)
+	- [Setup](#setup)
+	- [Cloning this Repository](#cloning-this-repository)
+	- [Configuration](#configuration)
+		- [maxmspsdk.xcconfig](#maxmspsdkxcconfig)
+		- [Change sdk Version](#change-sdk-version)
+	- [Projects](#projects)
+		- [max-external](#max-external)
+		- [mspcpp](#mspcpp)
+
+<!-- /TOC -->
+
+## Setup
+
+If you want to get started making an external follow these steps. If you want to contribute to this repo, please feel free to fork.
+
+1.  Log in to GitHub.
+    (If you do not have an account, you can quickly create one for free.)
+    You must be logged in for the remaining steps to work.
+
+2.  Go to <a href="https://github.com/new/import" target="_blank">GitHub's importer</a>.
+
+3.  Paste the url of this repo as the old repository to clone:
+    <https://github.com/Edinburgh-College-of-Art/maxmsp-external-template>.
+
+4.  Select the owner for your new repository.
+    (This will probably be you, but may instead be an organisation you belong to.)
+
+5.  Choose a name for your repository. Probably should be the intended name of your external.
+
+6.  You can now [clone this repository](#cloning-this-repository)
 
 ## Cloning this Repository
 
@@ -9,21 +44,21 @@ Clone this repo into your Max folder's `developing` directory
 
 ```sh
 cd "/path/to/Max Folder/developing"
-git clone --recurse-submodules https://github.com/mhamilt/maxmsp-external-template.git
+git clone --recurse-submodules REPOSITORY_URL
 ```
 
-You should be able to build straight away from the xcode project contained in the `xcode` directory.
+You should be able to build straight away from the Xcode project contained in the `xcode` directory.
 
-### Setup
+## Configuration
 
-#### maxmspsdk.xcconfig
+### maxmspsdk.xcconfig
 
-The `maxmspsdk.xcconfig` in the `xcode` sets a couple of global paths in the xcode project. Some of these variables you can change others you should leave alone. The ones to change are
+The `maxmspsdk.xcconfig` in the `xcode` directory sets a couple of global paths in the Xcode project. Some of these variables you can change others you should leave alone. The ones to change are
 
-- `PRODUCT_VERSION`: which version of the max sdk are you using?
+- `PRODUCT_VERSION`: which version of the max-sdk are you using?
 - `DSTROOT`: destination of the built external (project relative directory)
 
-#### Change sdk Version
+### Change sdk Version
 
 ```sh
 cd max-sdk
@@ -36,7 +71,7 @@ The xcode project has multiple targets to demonstrate how to approach building a
 
 ### max-external
 
-The vanilla C approach. There are plenty of examples in the sdk, but this target aims to take a more modern approach.  Documentation has been added inline as well as some slightly less obtuse variable name choices which will hopefully reduce the barrier of entry.
+The vanilla C approach. There are plenty of examples in the sdk, but this target aims to take a more modern approach. Documentation has been added inline as well as some slightly less obtuse variable name choices which will hopefully reduce the barrier of entry.
 
 ### mspcpp
 
