@@ -10,7 +10,6 @@
 #include "ext_obex.h"
 #include "z_dsp.h"
 #include "buffer.h"
-#include "MattsOscsCinterface.h"
 //------------------------------------------------------------------------------
 
 /// void* to the complete new Max External class so that it can be used in the class methods
@@ -28,21 +27,14 @@ typedef struct _MyDspStruct
 
 /** @struct
  The MaxMSP object
- @field t_pxobject x_obj
- @field t_symbol* x_arrayname
- @field SineOsc* x_osc pointer to our DSP object. use this with the interfacing C functions
- @field short inletConnection number of connections
  */
 typedef struct _MaxExternalObject
 {
-    ///
     t_pxobject x_obj;
-    ///
     t_symbol* x_arrayname;
-    /// pointer to our DSP object. use this with the interfacing C functions
-    SineOsc* x_osc;
-    ///
+    MyDspStruct a;
     short inletConnection;
+    double gain;
 } MaxExternalObject;
 //------------------------------------------------------------------------------
 /// External Object Constructor: use this to setup any variables / properties of your DSP Struct or MaxExternalObject
@@ -56,23 +48,22 @@ void* myExternalConstructor(long arg1)
     {
         post("no arguement\n");
     }
-    
     //--------------------------------------------------------------------------
     MaxExternalObject* maxObjectPtr = (MaxExternalObject*)object_alloc(myExternClass);
-    maxObjectPtr->x_osc = newSineOsc();
-    
     dsp_setup((t_pxobject*)maxObjectPtr, 1);
     //--------------------------------------------------------------------------
     // inlet_new((t_object*)maxObjectPtr, "signal");
     outlet_new((t_object*)maxObjectPtr, "signal");
     //--------------------------------------------------------------------------
+    maxObjectPtr->gain = 1.0;
     return maxObjectPtr;
 }
 
 //------------------------------------------------------------------------------
-///
+/// @brief what happens when the object is deleted
 void myExternDestructor(MaxExternalObject* maxObjectPtr)
 {
+    post("END");
     dsp_free((t_pxobject*)maxObjectPtr);
 }
 //------------------------------------------------------------------------------
@@ -142,16 +133,29 @@ void mspExternalProcessBlock(MaxExternalObject* maxObjectPtr, t_object* dsp64,
 
 {
     //--------------------------------------------------------------------------
-    // DSP loop
-    for (int i = 0; i < numouts; ++i)
+    // pass through
+    double* in = ins[0];
+    
+    if(!maxObjectPtr->inletConnection)
     {
         for (int s = 0; s < sampleframes; ++s)
         {
-            outs[0][s] = SineOsc_process(maxObjectPtr->x_osc) * 0.1;
+            in[s] = 0.0;
         }
     }
+    
+    //--------------------------------------------------------------------------
+    // DSP loops
+    
+    for (int s = 0; s < sampleframes; ++s)
+    {
+        outs[0][s] = tanh(in[s] * maxObjectPtr->gain);
+    }
+    for (int i = 1; i < numouts; ++i)
+    {
+        outs[i] = outs[0];
+    }
 }
-
 //------------------------------------------------------------------------------
 
 /// Audio DSP setup
@@ -165,7 +169,7 @@ void prepareToPlay(MaxExternalObject* maxObjectPtr, t_object* dsp64, short* coun
                    double samplerate, long vectorsize, long flags)
 {
     maxObjectPtr->inletConnection = count[0];
-    SineOsc_setup(maxObjectPtr->x_osc, samplerate, 440.0);
+    
     object_method(dsp64,
                   gensym("dsp_add64"),
                   maxObjectPtr,
@@ -181,6 +185,14 @@ void onBang(MaxExternalObject* maxObjectPtr)
 {
     post("I got a bang!\n");
 }
+
+/// This gets called when we receive a float
+/// @param maxObjectPtr object pointer
+/// @param floatIn 
+void onFloat(MaxExternalObject* maxObjectPtr, double floatIn)
+{
+    maxObjectPtr->gain = floatIn;
+}
 //------------------------------------------------------------------------------
 
 /// This gets called when a list is sent to the object
@@ -193,13 +205,16 @@ void onList(MaxExternalObject* maxObjectPtr,
             short argc,
             t_atom *argv)
 {
-    post("I got a list!\n");
+    for (int i = 0; i < argc; ++i)
+    {
+        atom_getfloatarg(i, argc, argv);
+    }
 }
 
 //------------------------------------------------------------------------------
 
 void onPrintMessage(MaxExternalObject* x)
-{
+{    
     post("Print some info about the object\n");
 }
 
@@ -224,6 +239,7 @@ void coupleMethodsToExternal( t_class* c)
 {
     class_addmethod(c, (method)onBang, "bang", 0);
     class_addmethod(c, (method)onList, "list", A_GIMME, 0);
+    class_addmethod(c, (method)onFloat, "float", A_FLOAT, 0);
     class_addmethod(c, (method)inletAssistant,"assist", A_CANT,0);
     class_addmethod(c, (method)onPrintMessage, "print", 0);
     class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
@@ -232,7 +248,8 @@ void coupleMethodsToExternal( t_class* c)
 //------------------------------------------------------------------------------
 int C74_EXPORT main(void)
 {
-    t_class* c = class_new("mspcpp~",
+    post("hello");
+    t_class* c = class_new("mymspextern~",
                            (method)myExternalConstructor,
                            (method)myExternDestructor,
                            (short)sizeof(MaxExternalObject),

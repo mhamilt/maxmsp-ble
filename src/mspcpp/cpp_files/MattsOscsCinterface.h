@@ -16,6 +16,7 @@ typedef struct SineOsc SineOsc;
 SineOsc* newSineOsc();
 
 void SineOsc_setup(SineOsc* v, float sr, float freq);
+void SineOsc_setFrequency(SineOsc* v, float freq);
 double SineOsc_process(SineOsc* v);
 
 void deleteSineOsc(SineOsc* v);

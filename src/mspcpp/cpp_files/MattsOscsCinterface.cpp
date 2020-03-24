@@ -20,6 +20,11 @@ extern "C"
         v->setup(sr, freq);
     }
     
+    void SineOsc_setFrequency(SineOsc* v, float freq)
+    {
+        v->setFrequency(freq);
+    }
+    
     double SineOsc_process(SineOsc* v)
     {
         return v->process();

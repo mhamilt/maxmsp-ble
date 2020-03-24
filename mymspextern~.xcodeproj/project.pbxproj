@@ -7,51 +7,31 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		5848C4AE241B9ED700406164 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4AD241B9ED700406164 /* main.c */; };
-		5848C4B3241C4D1E00406164 /* MattsOscs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4B1241C4D1E00406164 /* MattsOscs.cpp */; };
-		5848C4B4241C4D1E00406164 /* MattsOscs.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5848C4B2241C4D1E00406164 /* MattsOscs.hpp */; };
-		5848C4B7241C4DB300406164 /* MattsOscsCinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */; };
-		5848C4B8241C4DB300406164 /* MattsOscsCinterface.h in Headers */ = {isa = PBXBuildFile; fileRef = 5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */; };
-		58DE3CB5241A627E00056E4B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 5802D04D241A613300FC7563 /* main.c */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
+		58567A42242A0A0A00271066 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58567A39242A0A0A00271066 /* main.c */; };
+		58567A49242A0A0A00271066 /* MattsOscsCinterface.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58567A3E242A0A0A00271066 /* MattsOscsCinterface.cpp */; };
+		58567A4B242A0A0A00271066 /* MattsOscs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 58567A3F242A0A0A00271066 /* MattsOscs.cpp */; };
+		58567A4F242A0A0A00271066 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58567A41242A0A0A00271066 /* main.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		2FBBEAE508F335360078DB84 /* mymspextern~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mymspextern~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5802D04D241A613300FC7563 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		5848C4AB241B9E3500406164 /* mspcpp~.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "mspcpp~.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5848C4AD241B9ED700406164 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		5848C4B0241BA55500406164 /* switch_string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = switch_string.h; sourceTree = "<group>"; };
-		5848C4B1241C4D1E00406164 /* MattsOscs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscs.cpp; sourceTree = "<group>"; };
-		5848C4B2241C4D1E00406164 /* MattsOscs.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = MattsOscs.hpp; sourceTree = "<group>"; };
-		5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscsCinterface.cpp; sourceTree = "<group>"; };
-		5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MattsOscsCinterface.h; sourceTree = "<group>"; };
+		58567A39242A0A0A00271066 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		58567A3C242A0A0A00271066 /* MattsOscsCinterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MattsOscsCinterface.h; sourceTree = "<group>"; };
+		58567A3D242A0A0A00271066 /* MattsOscs.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MattsOscs.hpp; sourceTree = "<group>"; };
+		58567A3E242A0A0A00271066 /* MattsOscsCinterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscsCinterface.cpp; sourceTree = "<group>"; };
+		58567A3F242A0A0A00271066 /* MattsOscs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MattsOscs.cpp; sourceTree = "<group>"; };
+		58567A40242A0A0A00271066 /* switch_string.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = switch_string.h; sourceTree = "<group>"; };
+		58567A41242A0A0A00271066 /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		2FBBEADC08F335360078DB84 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5848C4A6241B9E3500406164 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		089C166AFE841209C02AAC07 /* iterator */ = {
 			isa = PBXGroup;
 			children = (
+				58567A37242A0A0A00271066 /* src */,
 				5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */,
-				5848C4AC241B9EB100406164 /* mspcpp */,
-				5802D04C241A613300FC7563 /* src */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 			);
 			name = iterator;
@@ -66,66 +46,52 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		5802D04C241A613300FC7563 /* src */ = {
+		58567A37242A0A0A00271066 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				5802D04D241A613300FC7563 /* main.c */,
+				58567A38242A0A0A00271066 /* mymspextern */,
+				58567A3A242A0A0A00271066 /* mspcpp */,
 			);
-			name = src;
-			path = ../src;
+			path = src;
 			sourceTree = "<group>";
 		};
-		5848C4AC241B9EB100406164 /* mspcpp */ = {
+		58567A38242A0A0A00271066 /* mymspextern */ = {
 			isa = PBXGroup;
 			children = (
-				5848C4AF241BA07A00406164 /* cpp_files */,
-				5848C4AD241B9ED700406164 /* main.c */,
-				5848C4B0241BA55500406164 /* switch_string.h */,
+				58567A39242A0A0A00271066 /* main.c */,
+			);
+			path = mymspextern;
+			sourceTree = "<group>";
+		};
+		58567A3A242A0A0A00271066 /* mspcpp */ = {
+			isa = PBXGroup;
+			children = (
+				58567A3B242A0A0A00271066 /* cpp_files */,
+				58567A40242A0A0A00271066 /* switch_string.h */,
+				58567A41242A0A0A00271066 /* main.c */,
 			);
 			path = mspcpp;
 			sourceTree = "<group>";
 		};
-		5848C4AF241BA07A00406164 /* cpp_files */ = {
+		58567A3B242A0A0A00271066 /* cpp_files */ = {
 			isa = PBXGroup;
 			children = (
-				5848C4B1241C4D1E00406164 /* MattsOscs.cpp */,
-				5848C4B2241C4D1E00406164 /* MattsOscs.hpp */,
-				5848C4B5241C4DB300406164 /* MattsOscsCinterface.cpp */,
-				5848C4B6241C4DB300406164 /* MattsOscsCinterface.h */,
+				58567A3C242A0A0A00271066 /* MattsOscsCinterface.h */,
+				58567A3D242A0A0A00271066 /* MattsOscs.hpp */,
+				58567A3E242A0A0A00271066 /* MattsOscsCinterface.cpp */,
+				58567A3F242A0A0A00271066 /* MattsOscs.cpp */,
 			);
 			path = cpp_files;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		2FBBEAD708F335360078DB84 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5848C4A1241B9E3500406164 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				5848C4B8241C4DB300406164 /* MattsOscsCinterface.h in Headers */,
-				5848C4B4241C4D1E00406164 /* MattsOscs.hpp in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
 		2FBBEAD608F335360078DB84 /* max-external */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2FBBEAE008F335360078DB84 /* Build configuration list for PBXNativeTarget "max-external" */;
 			buildPhases = (
-				2FBBEAD708F335360078DB84 /* Headers */,
-				2FBBEAD808F335360078DB84 /* Resources */,
 				2FBBEADA08F335360078DB84 /* Sources */,
-				2FBBEADC08F335360078DB84 /* Frameworks */,
 				2FBBEADF08F335360078DB84 /* Rez */,
 			);
 			buildRules = (
@@ -141,10 +107,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5848C4A8241B9E3500406164 /* Build configuration list for PBXNativeTarget "mspcpp~" */;
 			buildPhases = (
-				5848C4A1241B9E3500406164 /* Headers */,
-				5848C4A2241B9E3500406164 /* Resources */,
 				5848C4A4241B9E3500406164 /* Sources */,
-				5848C4A6241B9E3500406164 /* Frameworks */,
 				5848C4A7241B9E3500406164 /* Rez */,
 			);
 			buildRules = (
@@ -184,23 +147,6 @@
 		};
 /* End PBXProject section */
 
-/* Begin PBXResourcesBuildPhase section */
-		2FBBEAD808F335360078DB84 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		5848C4A2241B9E3500406164 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXResourcesBuildPhase section */
-
 /* Begin PBXRezBuildPhase section */
 		2FBBEADF08F335360078DB84 /* Rez */ = {
 			isa = PBXRezBuildPhase;
@@ -223,7 +169,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				58DE3CB5241A627E00056E4B /* main.c in Sources */,
+				58567A42242A0A0A00271066 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,9 +177,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5848C4AE241B9ED700406164 /* main.c in Sources */,
-				5848C4B7241C4DB300406164 /* MattsOscsCinterface.cpp in Sources */,
-				5848C4B3241C4D1E00406164 /* MattsOscs.cpp in Sources */,
+				58567A4F242A0A0A00271066 /* main.c in Sources */,
+				58567A4B242A0A0A00271066 /* MattsOscs.cpp in Sources */,
+				58567A49242A0A0A00271066 /* MattsOscsCinterface.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -271,7 +217,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Development;
 		};
@@ -304,7 +250,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Deployment;
 		};
@@ -320,7 +266,7 @@
 				INFOPLIST_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Development;
 		};
@@ -335,7 +281,7 @@
 				INFOPLIST_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Deployment;
 		};
@@ -351,7 +297,7 @@
 				INFOPLIST_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Development;
 		};
@@ -366,7 +312,7 @@
 				INFOPLIST_FILE = "";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "../macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
 			};
 			name = Deployment;
 		};
