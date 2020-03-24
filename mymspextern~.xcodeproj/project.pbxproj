@@ -91,9 +91,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 2FBBEAE008F335360078DB84 /* Build configuration list for PBXNativeTarget "max-external" */;
 			buildPhases = (
+				589FD427242A26FE00C7C9DC /* ShellScript */,
 				2FBBEADA08F335360078DB84 /* Sources */,
 				2FBBEADF08F335360078DB84 /* Rez */,
-				589FD427242A26FE00C7C9DC /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -181,7 +181,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\ngit pull --recurse-submodules\n";
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nif [[ ! \"$(ls -A max-sdk)\" ]]; then git submodule update --init;fi\n\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
