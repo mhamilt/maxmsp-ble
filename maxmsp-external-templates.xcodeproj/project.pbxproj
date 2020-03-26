@@ -45,6 +45,14 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		583DCAC5242CB50400F108D5 /* utilities */ = {
+			isa = PBXGroup;
+			children = (
+				58567A40242A0A0A00271066 /* switch_string.h */,
+			);
+			path = utilities;
+			sourceTree = "<group>";
+		};
 		58567A37242A0A0A00271066 /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -66,8 +74,8 @@
 		58567A3A242A0A0A00271066 /* mspcpp */ = {
 			isa = PBXGroup;
 			children = (
+				583DCAC5242CB50400F108D5 /* utilities */,
 				58567A3B242A0A0A00271066 /* cpp_files */,
-				58567A40242A0A0A00271066 /* switch_string.h */,
 				58567A41242A0A0A00271066 /* main.c */,
 			);
 			path = mspcpp;
@@ -108,6 +116,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5848C4A8241B9E3500406164 /* Build configuration list for PBXNativeTarget "mspcpp~" */;
 			buildPhases = (
+				583DCAC6242CB76F00F108D5 /* ShellScript */,
 				5848C4A4241B9E3500406164 /* Sources */,
 				5848C4A7241B9E3500406164 /* Rez */,
 			);
@@ -128,7 +137,7 @@
 			attributes = {
 				LastUpgradeCheck = 1130;
 			};
-			buildConfigurationList = 2FBBEACF08F335010078DB84 /* Build configuration list for PBXProject "mymspextern~" */;
+			buildConfigurationList = 2FBBEACF08F335010078DB84 /* Build configuration list for PBXProject "maxmsp-external-templates" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -166,6 +175,23 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		583DCAC6242CB76F00F108D5 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n\nif [[ ! \"$(ls -A max-sdk)\" ]]; then git submodule update --init;fi\n\n";
+		};
 		589FD427242A26FE00C7C9DC /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -283,12 +309,20 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_PRIVATE_MODULE = NO;
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				INFOPLIST_FILE = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					MaxAudioAPI,
+					"-framework",
+					JitterAPI,
+					"$(C74_SYM_LINKER_FLAGS)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
 				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
@@ -301,11 +335,19 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_PRIVATE_MODULE = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				INFOPLIST_FILE = "";
+				OTHER_LDFLAGS = (
+					"-framework",
+					MaxAudioAPI,
+					"-framework",
+					JitterAPI,
+					"$(C74_SYM_LINKER_FLAGS)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
 				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
@@ -346,7 +388,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2FBBEACF08F335010078DB84 /* Build configuration list for PBXProject "mymspextern~" */ = {
+		2FBBEACF08F335010078DB84 /* Build configuration list for PBXProject "maxmsp-external-templates" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2FBBEAD008F335010078DB84 /* Development */,

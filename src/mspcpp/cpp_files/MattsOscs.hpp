@@ -33,4 +33,5 @@ public:
     double process() override;
 };
 
+
 #endif /* MattsOscs_hpp */

@@ -9,7 +9,7 @@
 #include "MattsOscsCinterface.h"
 
 extern "C"
-    {
+{
     SineOsc* newSineOsc()
     {
         return new SineOsc();
@@ -34,4 +34,4 @@ extern "C"
     {
         delete v;
     }
-    }
+}

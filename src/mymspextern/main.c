@@ -5,7 +5,6 @@
  Create an Issue on the repository if anything is amiss or you have any suggestion
  - mhamilt Mar 2020
  */
-
 #include "ext.h"
 #include "ext_obex.h"
 #include "z_dsp.h"

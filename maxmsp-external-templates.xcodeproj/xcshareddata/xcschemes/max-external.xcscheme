@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5848C4A0241B9E3500406164"
-               BuildableName = "mspcpp~.mxo"
-               BlueprintName = "mspcpp~"
-               ReferencedContainer = "container:mymspextern~.xcodeproj">
+               BlueprintIdentifier = "2FBBEAD608F335360078DB84"
+               BuildableName = "mymspextern~.mxo"
+               BlueprintName = "max-external"
+               ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5848C4A0241B9E3500406164"
-            BuildableName = "mspcpp~.mxo"
-            BlueprintName = "mspcpp~"
-            ReferencedContainer = "container:mymspextern~.xcodeproj">
+            BlueprintIdentifier = "2FBBEAD608F335360078DB84"
+            BuildableName = "mymspextern~.mxo"
+            BlueprintName = "max-external"
+            ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>
