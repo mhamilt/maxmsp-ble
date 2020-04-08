@@ -315,7 +315,7 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "max-sdk/source/Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",
 					MaxAudioAPI,
@@ -325,7 +325,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
-				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = macosx;
 			};
 			name = Development;
 		};
@@ -340,7 +340,7 @@
 				CLANG_WARN_PRIVATE_MODULE = NO;
 				COPY_PHASE_STRIP = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "max-sdk/source/Info.plist";
 				OTHER_LDFLAGS = (
 					"-framework",
 					MaxAudioAPI,
@@ -350,7 +350,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "mymspextern~";
-				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = macosx;
 			};
 			name = Deployment;
 		};
@@ -363,10 +363,10 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "max-sdk/source/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = macosx;
 			};
 			name = Development;
 		};
@@ -378,10 +378,10 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				COPY_PHASE_STRIP = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "max-sdk/source/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = "macos-sdk/MacOSX10.11.sdk";
+				SDKROOT = macosx;
 			};
 			name = Deployment;
 		};
