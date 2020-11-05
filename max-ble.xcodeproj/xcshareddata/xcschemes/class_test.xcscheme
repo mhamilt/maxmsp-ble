@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5848C4A0241B9E3500406164"
-               BuildableName = "mspcpp~.mxo"
-               BlueprintName = "mspcpp~"
-               ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
+               BlueprintIdentifier = "58F0AC18242E46E2004FE028"
+               BuildableName = "class_test"
+               BlueprintName = "class_test"
+               ReferencedContainer = "container:max-ble.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -40,6 +40,16 @@
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
       allowLocationSimulation = "YES">
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "58F0AC18242E46E2004FE028"
+            BuildableName = "class_test"
+            BlueprintName = "class_test"
+            ReferencedContainer = "container:max-ble.xcodeproj">
+         </BuildableReference>
+      </BuildableProductRunnable>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Deployment"
@@ -47,15 +57,16 @@
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
       debugDocumentVersioning = "YES">
-      <MacroExpansion>
+      <BuildableProductRunnable
+         runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5848C4A0241B9E3500406164"
-            BuildableName = "mspcpp~.mxo"
-            BlueprintName = "mspcpp~"
-            ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
+            BlueprintIdentifier = "58F0AC18242E46E2004FE028"
+            BuildableName = "class_test"
+            BlueprintName = "class_test"
+            ReferencedContainer = "container:max-ble.xcodeproj">
          </BuildableReference>
-      </MacroExpansion>
+      </BuildableProductRunnable>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Development">

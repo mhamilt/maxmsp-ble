@@ -14,10 +14,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "2FBBEAD608F335360078DB84"
-               BuildableName = "mymspextern~.mxo"
-               BlueprintName = "max-external"
-               ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
+               BlueprintIdentifier = "58F0ABFA242E3110004FE028"
+               BuildableName = "max-ble.mxo"
+               BlueprintName = "max-ble"
+               ReferencedContainer = "container:max-ble.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -50,10 +50,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "2FBBEAD608F335360078DB84"
-            BuildableName = "mymspextern~.mxo"
-            BlueprintName = "max-external"
-            ReferencedContainer = "container:maxmsp-external-templates.xcodeproj">
+            BlueprintIdentifier = "58F0ABFA242E3110004FE028"
+            BuildableName = "max-ble.mxo"
+            BlueprintName = "max-ble"
+            ReferencedContainer = "container:max-ble.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </ProfileAction>

@@ -9,12 +9,13 @@
 // Copyright © 2012, Cycling '74
 
 
+
 // Name & Version
 PRODUCT_NAME = $(PROJECT_NAME)
 //PRODUCT_VERSION = 7.0.3
-PRODUCT_VERSION = 7.1.0
+//PRODUCT_VERSION = 7.1.0
 //PRODUCT_VERSION = 7.3.3
-//PRODUCT_VERSION = 8.0.3
+PRODUCT_VERSION = 0.1.0
 ARCHS = i386 x86_64
 
 
@@ -22,14 +23,13 @@ ARCHS = i386 x86_64
 C74SUPPORT = max-sdk/source/c74support
 HEADER_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
 FRAMEWORK_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
-DSTROOT = ../../externals/
+DSTROOT = build/
 // (This next path is relative to DSTROOT)
 INSTALL_PATH = /
 
-
 // Special Files
-GCC_PREFIX_HEADER = $(C74SUPPORT)/max-includes/macho-prefix.pch
-INFOPLIST_FILE = max-sdk/source/Info.plist
+GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch"
+INFOPLIST_FILE = "./max-sdk/source/Info.plist"
 
 
 // Architecture and Deployment
@@ -37,13 +37,13 @@ ARCHS = i386 x86_64
 
 // The following section sets the Mac SDK version to be used.
 // For most projects this has little to no impact because there are no direct dependencies on OS function calls.
-// In those projects with OS function calls, it should be okay to use the most recent SDK version because the 
+// In those projects with OS function calls, it should be okay to use the most recent SDK version because the
 // MACOSX_DEPLOYMENT_TARGET will disable functionality that is unavailable in the older target OS.
 // For this reason, the SDKROOT variable is commented out, telling Xcode to use the default (which is the most recent SDK).
 //
 // SDKROOT = macosx10.6
 
-MACOSX_DEPLOYMENT_TARGET = 10.7
+MACOSX_DEPLOYMENT_TARGET = 10.11
 
 
 // Compiler Version -- leave them all commented out to get the default version provided by Xcode
