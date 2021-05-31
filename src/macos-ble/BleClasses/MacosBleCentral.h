@@ -24,6 +24,9 @@
 @property (strong, nonatomic) CBPeripheral *peripheral;
 @property (strong, atomic) CBService *currentService;
 @property (strong, nonatomic) dispatch_queue_t bleQueue;
+@property (nonatomic) NSUInteger connectDeviceIndex;
+@property (nonatomic) BOOL scanType;
+@property (nonatomic) BOOL shouldConnect;
 @property (copy) NSString *manufacturer;
 @property (atomic) int latestValue;
 //------------------------------------------------------------------------------
@@ -32,7 +35,10 @@
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue
                 serviceToScan: (CBUUID *) scanServiceId
          characteristicToRead: (CBUUID *) characteristicId;
+- (void)scan;
+- (void)stop;
 - (void)scanForDeviceWithName: (NSString *) name;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
+- (void)getFoundDeviceList;
 //------------------------------------------------------------------------------
 @end

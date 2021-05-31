@@ -12,12 +12,14 @@
 #endif
 
 //typedef CFTypeRef MacosBleCentralRef;
-MacosBleCentralRef MacosBleCentralRefCreate(void);
-void MacosBleCentralRefScanFor(MacosBleCentralRef t, const char* name);
-int MacosBleCentralRefGetLatestValue(MacosBleCentralRef t);
-void MacosBleCentralRefSetMaxObjRef(MacosBleCentralRef t, MaxExternalObject* maxObjRef);
+//MacosBleCentralRef MacosBleCentralRefCreate(void);
 typedef const void MacosBleCentralC; // 'const void *' is more CF-like, but either is fine
-MacosBleCentralC* newMacosBleCentralC(void);
-void MacosBleCentralC_scanFor(MacosBleCentralC *t, const char* name);
-void MacosBleCentralC_release(MacosBleCentralC *t);
+MacosBleCentralC* newBleCentralC(void);
+void bleCentralCScan            (MacosBleCentralC *t);
+void bleCentralCStopScan        (MacosBleCentralC *t);
+void bleCentralCScanFor         (MacosBleCentralC *t, const char* name);
+void bleCentralCRelease         (MacosBleCentralC *t);
+int  bleCentralCGetLatestValue  (MacosBleCentralC *t);
+void bleCentralCSetMaxObjRef    (MacosBleCentralC *t, MaxExternalObject* maxObjRef);
+void bleCentralCGetDeviceList   (MacosBleCentralC *t);
  

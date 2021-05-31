@@ -7,6 +7,8 @@
 //------------------------------------------------------------------------------
 - (instancetype)init
 {
+    _shouldConnect = NO;
+    _scanType = NO;
     dispatch_queue_t newQueue = dispatch_queue_create("max_masp_ble",  DISPATCH_QUEUE_SERIAL);
     return [self initWithQueue:newQueue];
 }
@@ -45,16 +47,44 @@
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    const char* deviceName = [[aPeripheral name] cStringUsingEncoding:NSASCIIStringEncoding];
-    post("Found: %s\n", deviceName);
+    NSData* manuData = advertisementData[CBAdvertisementDataManufacturerDataKey];
     
-    if ([[aPeripheral name] isEqualToString: _deviceName])
+    if(manuData)
     {
-        post("Connecting\n");
-        _peripheral = aPeripheral;
-        [_manager connectPeripheral:aPeripheral options:nil];
-        [_manager stopScan];
+        if (![discoveredPeripherals containsObject: advertisementData[CBAdvertisementDataManufacturerDataKey]])
+        {
+            post("------------------------");
+            post("Name: %s ", [[aPeripheral name] UTF8String]);
+            post("RSSI: %s", [RSSI.description UTF8String]);
+            post("Manu Data: %s", [manuData.description UTF8String]);
+            [discoveredPeripherals addObject:manuData];
+        }
     }
+    
+    if (_shouldConnect)
+    {
+        if (_scanType)
+        {
+            if (manuData == discoveredPeripherals[_connectDeviceIndex])
+            {
+                post("Connecting\n");
+                _peripheral = aPeripheral;
+                [_manager connectPeripheral: aPeripheral options:nil];
+                [_manager stopScan];
+            }
+        }
+        else
+        {
+            if ([[aPeripheral name] isEqualToString: _deviceName])
+            {
+                post("Connecting\n");
+                _peripheral = aPeripheral;
+                [_manager connectPeripheral:aPeripheral options:nil];
+                [_manager stopScan];
+            }
+        }
+    }
+    
 }
 
 //------------------------------------------------------------------------------
@@ -72,7 +102,7 @@
     
     if ([manager state] == CBCentralManagerStatePoweredOn)
     {
-        [self startScan];
+        //        [self startScan];
     }
 }
 //------------------------------------------------------------------------------
@@ -93,20 +123,44 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     NSLog(@"Fail to connect to peripheral: %@ with error = %@", aPeripheral, [error localizedDescription]);
 }
 
+- (void) scan;
+{
+    [self startScan];
+}
 
+
+- (void) stop;
+{
+    _shouldConnect = NO;
+    [_manager stopScan];
+}
 //------------------------------------------------------------------------------
 - (void) scanForDeviceWithName:(NSString *) name
 {
-    post("Search for %s", [name cStringUsingEncoding:NSASCIIStringEncoding]);
+    post("Search for %s", [name UTF8String]);
     _deviceName = name;
+    _shouldConnect = YES;
+    _scanType = NO;
 }
 
+- (void) scanForDeviceWithManuData:(NSData *) data
+{
+    post("Search for %s", [data.description UTF8String]);
+    _connectDeviceIndex = [self.discoveredPeripherals indexOfObject:data];
+    if(_connectDeviceIndex != NSNotFound)
+    {
+        [self startScan];
+        _shouldConnect = YES;
+        _scanType = YES;
+    }
+    
+}
 
 - (void) startScan
 {
     post("Start scanning\n");
-        [_manager scanForPeripheralsWithServices: nil
-                                         options: nil];
+    [_manager scanForPeripheralsWithServices: nil
+                                     options: nil];
 }
 //------------------------------------------------------------------------------
 #pragma mark Peripheral Methods
@@ -161,9 +215,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 // Invoked upon completion of a -[readValueForCharacteristic:] request or on the reception of a notification/indication.
 - (void) peripheral: (CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-//    post("didUpdateValueForCharacteristic\n");
     _latestValue = *(int*)characteristic.value.bytes;
-//    post("%d\n",_latestValue);
     onBleNotify(maxObjectRef, _latestValue);
 }
 //------------------------------------------------------------------------------
@@ -181,11 +233,19 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     post("Service Modified\n");
     [_manager cancelPeripheralConnection:peripheral];
-    [self startScan];
+    //    [self startScan];
 }
 //------------------------------------------------------------------------------
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
 {
     maxObjectRef = extMaxObjectRef;
+}
+
+- (void)getFoundDeviceList
+{    
+    for(NSData* manuData in discoveredPeripherals)
+    {
+        post("%s\n", [[manuData description] UTF8String]);
+    }
 }
 @end
