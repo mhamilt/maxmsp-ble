@@ -19,9 +19,15 @@ void bleCentralCStopScan(MacosBleCentralC *t)
     [(__bridge MacosBleCentral *)t stop];
 }
 //------------------------------------------------------------------------------
-void bleCentralCScanFor(MacosBleCentralC *t, const char* name)
+void bleCentralCScanForDeviceWithName(MacosBleCentralC *t, const char* name)
 {
     [(__bridge MacosBleCentral *)t scanForDeviceWithName: [NSString stringWithCString:name encoding:NSASCIIStringEncoding] ];
+}
+
+
+void bleCentralCScanForFoundDevice (MacosBleCentralC *t, int deviceIndex)
+{
+    [(__bridge MacosBleCentral *)t scanForFoundDevice: deviceIndex];
 }
 //------------------------------------------------------------------------------
 void bleCentralCRelease(MacosBleCentralC *t)

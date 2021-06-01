@@ -43,7 +43,9 @@ typedef enum : NSUInteger {
          characteristicToRead: (CBUUID *) characteristicId;
 - (void)scan;
 - (void)stop;
-- (void)scanForDeviceWithName: (NSString *) name;
+- (void)scanForDeviceWithName:     (NSString *) name;
+- (void)scanForDeviceWithManuData: (NSData *)   data;
+- (void)scanForFoundDevice: (int) deviceIndex;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)getFoundDeviceList;
 //------------------------------------------------------------------------------

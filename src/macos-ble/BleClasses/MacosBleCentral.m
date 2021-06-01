@@ -159,8 +159,18 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         _shouldConnect = YES;
         _connectMode = BLE_CONNECT_WITH_MANU_DATA;
     }
-    
 }
+- (void) scanForFoundDevice: (int) deviceIndex
+{
+    _connectDeviceIndex = deviceIndex;
+    if (_connectDeviceIndex < discoveredPeripherals.count)
+    {
+        [self startScan];
+        _shouldConnect = YES;
+        _connectMode = BLE_CONNECT_WITH_MANU_DATA;
+    }
+}
+
 
 - (void) startScan
 {
