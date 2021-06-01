@@ -10,6 +10,12 @@
 #define post printf
 #endif
 
+typedef enum : NSUInteger {
+    BLE_CONNECT_WITH_MANU_DATA,
+    BLE_CONNECT_WITH_DEVICE_NAME
+} BleConnectMode;
+
+
 @interface MacosBleCentral: NSObject
 <CBCentralManagerDelegate, CBPeripheralDelegate>
 {
@@ -25,7 +31,7 @@
 @property (strong, atomic) CBService *currentService;
 @property (strong, nonatomic) dispatch_queue_t bleQueue;
 @property (nonatomic) NSUInteger connectDeviceIndex;
-@property (nonatomic) BOOL scanType;
+@property (nonatomic) BleConnectMode connectMode;
 @property (nonatomic) BOOL shouldConnect;
 @property (copy) NSString *manufacturer;
 @property (atomic) int latestValue;

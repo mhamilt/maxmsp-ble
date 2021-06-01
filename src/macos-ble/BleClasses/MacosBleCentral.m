@@ -8,8 +8,9 @@
 - (instancetype)init
 {
     _shouldConnect = NO;
-    _scanType = NO;
-    dispatch_queue_t newQueue = dispatch_queue_create("max_masp_ble",  DISPATCH_QUEUE_SERIAL);
+    _connectMode = NO;
+    dispatch_queue_t newQueue = dispatch_queue_create("max_masp_ble",
+                                                      DISPATCH_QUEUE_SERIAL);
     return [self initWithQueue:newQueue];
 }
 //------------------------------------------------------------------------------
@@ -61,28 +62,33 @@
         }
     }
     
+    
+    
     if (_shouldConnect)
     {
-        if (_scanType)
+        switch (_connectMode)
         {
-            if (manuData == discoveredPeripherals[_connectDeviceIndex])
-            {
-                post("Connecting\n");
-                _peripheral = aPeripheral;
-                [_manager connectPeripheral: aPeripheral options:nil];
-                [_manager stopScan];
-            }
+            case BLE_CONNECT_WITH_MANU_DATA:
+                if (manuData == discoveredPeripherals[_connectDeviceIndex])
+                {
+                    post("Connecting\n");
+                    _peripheral = aPeripheral;
+                    [_manager connectPeripheral: aPeripheral options:nil];
+                    [_manager stopScan];
+                }
+                break;
+            case BLE_CONNECT_WITH_DEVICE_NAME:
+                if ([[aPeripheral name] isEqualToString: _deviceName])
+                {
+                    post("Connecting\n");
+                    _peripheral = aPeripheral;
+                    [_manager connectPeripheral:aPeripheral options:nil];
+                    [_manager stopScan];
+                }
+            default:
+                break;
         }
-        else
-        {
-            if ([[aPeripheral name] isEqualToString: _deviceName])
-            {
-                post("Connecting\n");
-                _peripheral = aPeripheral;
-                [_manager connectPeripheral:aPeripheral options:nil];
-                [_manager stopScan];
-            }
-        }
+        
     }
     
 }
@@ -140,7 +146,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     post("Search for %s", [name UTF8String]);
     _deviceName = name;
     _shouldConnect = YES;
-    _scanType = NO;
+    _connectMode = BLE_CONNECT_WITH_DEVICE_NAME;
 }
 
 - (void) scanForDeviceWithManuData:(NSData *) data
@@ -151,7 +157,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     {
         [self startScan];
         _shouldConnect = YES;
-        _scanType = YES;
+        _connectMode = BLE_CONNECT_WITH_MANU_DATA;
     }
     
 }
@@ -242,10 +248,11 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 }
 
 - (void)getFoundDeviceList
-{    
+{
     for(NSData* manuData in discoveredPeripherals)
     {
         post("%s\n", [[manuData description] UTF8String]);
     }
 }
+
 @end
