@@ -29,6 +29,16 @@ void bleCentralCScanForFoundDevice (MacosBleCentralC *t, int deviceIndex)
 {
     [(__bridge MacosBleCentral *)t scanForFoundDevice: deviceIndex];
 }
+
+void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex)
+{
+    [(__bridge MacosBleCentral *)t connectToFoundDevice: deviceIndex];
+}
+
+void bleCentralCClearDiscovered (MacosBleCentralC *t)
+{
+    [(__bridge MacosBleCentral *)t clearDicoveredPeripherals];
+}
 //------------------------------------------------------------------------------
 void bleCentralCRelease(MacosBleCentralC *t)
 {
@@ -49,4 +59,9 @@ void bleCentralCSetMaxObjRef(MacosBleCentralRef t, MaxExternalObject* maxObjRef)
 void bleCentralCGetDeviceList (MacosBleCentralC *t)
 {
    [(__bridge MacosBleCentral *)t getFoundDeviceList];
+}
+
+void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit)
+{
+    [(__bridge MacosBleCentral *)t setRssiSensitivity:rssiLimit]  ;
 }

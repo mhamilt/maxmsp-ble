@@ -33,8 +33,11 @@ typedef enum : NSUInteger {
 @property (nonatomic) NSUInteger connectDeviceIndex;
 @property (nonatomic) BleConnectMode connectMode;
 @property (nonatomic) BOOL shouldConnect;
+@property (nonatomic) BOOL ignoreUnconnectable;
+@property (nonatomic) int rssiSensitivity;
 @property (copy) NSString *manufacturer;
 @property (atomic) int latestValue;
+@property (strong, nonatomic)NSDictionary* bleUUIDs;
 //------------------------------------------------------------------------------
 - (instancetype)init;
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue;
@@ -45,8 +48,12 @@ typedef enum : NSUInteger {
 - (void)stop;
 - (void)scanForDeviceWithName:     (NSString *) name;
 - (void)scanForDeviceWithManuData: (NSData *)   data;
-- (void)scanForFoundDevice: (int) deviceIndex;
+- (void)scanForFoundDevice:   (int) deviceIndex;
+- (void)connectToFoundDevice: (int) deviceIndex;
+- (void)clearDicoveredPeripherals;
+- (void)setRssiSensitivity:(int)rssiSensitivity;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)getFoundDeviceList;
+- (void)setbleUUIDs;
 //------------------------------------------------------------------------------
 @end

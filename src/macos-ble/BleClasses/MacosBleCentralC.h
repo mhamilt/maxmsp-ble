@@ -17,12 +17,12 @@ typedef const void MacosBleCentralC; // 'const void *' is more CF-like, but eith
 MacosBleCentralC* newBleCentralC(void);
 void bleCentralCScan            (MacosBleCentralC *t);
 void bleCentralCStopScan        (MacosBleCentralC *t);
-void bleCentralCScanForDeviceWithName (MacosBleCentralC *t,
-                                       const char* name);
-void bleCentralCScanForFoundDevice (MacosBleCentralC *t,
-                                    int deviceIndex);
+void bleCentralCScanForDeviceWithName (MacosBleCentralC *t, const char* name);
+void bleCentralCScanForFoundDevice   (MacosBleCentralC *t, int deviceIndex);
+void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCRelease         (MacosBleCentralC *t);
 int  bleCentralCGetLatestValue  (MacosBleCentralC *t);
 void bleCentralCSetMaxObjRef    (MacosBleCentralC *t, MaxExternalObject* maxObjRef);
 void bleCentralCGetDeviceList   (MacosBleCentralC *t);
- 
+void bleCentralCClearDiscovered (MacosBleCentralC *t);
+void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit);
