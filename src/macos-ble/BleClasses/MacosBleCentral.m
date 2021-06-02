@@ -235,17 +235,15 @@ didDiscoverServices: (NSError *)error
     
     for (CBCharacteristic *aChar in service.characteristics)
     {
-        if ([aChar.UUID isEqual: characteristicUuid])
-        {
-            post("start notifying\n");
-            [aPeripheral setNotifyValue:YES forCharacteristic:aChar];
-        }
         if (aChar.properties & CBCharacteristicPropertyRead)
         {
-            const char *charUUID = [aChar.UUID.UUIDString UTF8String];
-            const char *charDescription = ((_bleUUIDs[@"characteristic"][ aChar.UUID.UUIDString ]) ? [_bleUUIDs[@"characteristic"][ aChar.UUID.UUIDString ] UTF8String] : "");
+            [aPeripheral readValueForCharacteristic:aChar];
+        }
+        if ([aChar.UUID isEqual: characteristicUuid])
+        {
             
-            post("Characteristic %s: %s\n", charUUID, charDescription);
+            post("start notifying\n");
+            [aPeripheral setNotifyValue:YES forCharacteristic:aChar];
         }
     }
 }
@@ -260,8 +258,34 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 // Invoked upon completion of a -[readValueForCharacteristic:] request or on the reception of a notification/indication.
 - (void) peripheral: (CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    _latestValue = *(int*)characteristic.value.bytes;
-    onBleNotify(maxObjectRef, _latestValue);
+    
+    const char *charUUID = [characteristic.UUID.UUIDString UTF8String];
+    NSString* charDescription = _bleUUIDs[@"characteristic"][ characteristic.UUID.UUIDString ];
+    
+    if(!error)
+    {
+        
+        NSString* valueString = nil;
+        
+        if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
+            valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+        else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
+        {            
+            valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
+        }
+        else
+            valueString = characteristic.value.description;
+        
+        
+        if (charDescription)
+            post("%s: %s\n", charDescription.UTF8String, valueString.UTF8String );
+        else
+            post("Characteristic %s: %s\n", charUUID, valueString.UTF8String);
+    }
+    else
+        post("Error %s\n",[[error localizedDescription] UTF8String]);
+    //    _latestValue = *(int*)characteristic.value.bytes;
+    //    onBleNotify(maxObjectRef, _latestValue);
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor error:(NSError *)error
