@@ -10,8 +10,15 @@ typedef struct _MaxExternalObject
     t_pxobject x_obj;
     t_symbol* x_arrayname;
     MacosBleCentralRef bleCentral;
-    void* int_out;
-    void* bang_out[6];
+    void *list_outlet1;
+    size_t maxListSize;
+    t_atom* outputList;
+    void* anyOut;
+    t_atom* myList;
+    long listSize;
+    char listAllocSuccess;
+//    t_atom* outputList;
 } MaxExternalObject;
 
 void onBleNotify(MaxExternalObject* maxObjectPtr, int output);
+void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);

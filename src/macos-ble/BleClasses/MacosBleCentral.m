@@ -26,12 +26,11 @@
     self = [super init];
     if (self)
     {
-        post("Start BLE\n");
+        post("Start BLE\n");        
         _shouldConnect = NO;
         _connectMode = NO;
         _ignoreUnconnectable = NO;
         _rssiSensitivity = 90;
-        [self setbleUUIDs];
         self.discoveredPeripherals = [[NSMutableArray alloc] init];
         _latestValue = 0;
         _bleQueue = centralDelegateQueue;
@@ -112,11 +111,8 @@
 //------------------------------------------------------------------------------
 - (void)centralManagerDidUpdateState:(CBCentralManager *)manager
 {
-    post("State Update");
-    
     if ([manager state] == CBCentralManagerStatePoweredOn)
     {
-        //        [self startScan];
     }
 }
 //------------------------------------------------------------------------------
@@ -146,8 +142,17 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) stop;
 {
+    post("Stop scanning\n");
     _shouldConnect = NO;
     [_manager stopScan];
+}
+
+
+- (void) startScan
+{
+    post("Start scanning\n");
+    [_manager scanForPeripheralsWithServices: nil
+                                     options: nil];
 }
 //------------------------------------------------------------------------------
 - (void) scanForDeviceWithName:(NSString *) name
@@ -196,12 +201,6 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     _rssiSensitivity = rssiSensitivity;
 }
 
-- (void) startScan
-{
-    post("Start scanning\n");
-    [_manager scanForPeripheralsWithServices: nil
-                                     options: nil];
-}
 //------------------------------------------------------------------------------
 #pragma mark Peripheral Methods
 
@@ -228,10 +227,15 @@ didDiscoverServices: (NSError *)error
 // Perform appropriate operations on interested characteristics
 - (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
-    const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
-    const char *sericeDescription = ((_bleUUIDs[@"service"][ [[service UUID] UUIDString] ]) ? [_bleUUIDs[@"service"][ [[service UUID] UUIDString] ] UTF8String] : "");
     
-    post("Service %s: %s\n", serviceUUID, sericeDescription);
+    const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
+    NSString* sericeDescription = nil;
+    if (@available(macOS 10.13, *))
+    {
+        sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
+    }
+    
+    post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
     
     for (CBCharacteristic *aChar in service.characteristics)
     {
@@ -239,12 +243,7 @@ didDiscoverServices: (NSError *)error
         {
             [aPeripheral readValueForCharacteristic:aChar];
         }
-        if ([aChar.UUID isEqual: characteristicUuid])
-        {
-            
-            post("start notifying\n");
-            [aPeripheral setNotifyValue:YES forCharacteristic:aChar];
-        }
+        
     }
 }
 //------------------------------------------------------------------------------
@@ -258,34 +257,40 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 // Invoked upon completion of a -[readValueForCharacteristic:] request or on the reception of a notification/indication.
 - (void) peripheral: (CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    
-    const char *charUUID = [characteristic.UUID.UUIDString UTF8String];
-    NSString* charDescription = _bleUUIDs[@"characteristic"][ characteristic.UUID.UUIDString ];
-    
     if(!error)
-    {
+    {        
+        const char *charUUID = [characteristic.UUID.UUIDString UTF8String];
+        NSString* charDescription = nil;
+        
+        if (@available(macOS 10.13, *))
+        {
+            charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+        }
         
         NSString* valueString = nil;
         
         if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
             valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
         else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
-        {            
             valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
-        }
         else
             valueString = characteristic.value.description;
-        
         
         if (charDescription)
             post("%s: %s\n", charDescription.UTF8String, valueString.UTF8String );
         else
             post("Characteristic %s: %s\n", charUUID, valueString.UTF8String);
+                
+        charDataCopy = characteristic.value.copy;
+        
+        onCharacteristicRead(maxObjectRef,
+                             characteristic.service.UUID.UUIDString.UTF8String,
+                             characteristic.UUID.UUIDString.UTF8String,
+                             (uint8_t*)charDataCopy.bytes,
+                             characteristic.value.length);
     }
     else
         post("Error %s\n",[[error localizedDescription] UTF8String]);
-    //    _latestValue = *(int*)characteristic.value.bytes;
-    //    onBleNotify(maxObjectRef, _latestValue);
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor error:(NSError *)error
@@ -293,16 +298,16 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     post("didDiscoverDescriptorsForCharacteristic");
 }
 //------------------------------------------------------------------------------
-- (void)peripheral: (CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+- (void) peripheral: (CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     post("didUpdateNotificationStateForCharacteristic");
 }
 //------------------------------------------------------------------------------
-- (void)peripheral: (CBPeripheral *)peripheral didModifyServices:(NSArray<CBService *> *)invalidatedServices
+- (void) peripheral: (CBPeripheral *)peripheral
+  didModifyServices: (NSArray<CBService *> *)invalidatedServices
 {
     post("Service Modified\n");
     [_manager cancelPeripheralConnection:peripheral];
-    //    [self startScan];
 }
 //------------------------------------------------------------------------------
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
@@ -318,9 +323,22 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     }
 }
 
-- (void)setbleUUIDs
++ (void) printCharacteristicProperties:(CBCharacteristicProperties*) properties
 {
-    _bleUUIDs =
+    
+}
+
+
++ (NSString*)getCBUUIDDescription: (CBAttribute*) attribute
+API_AVAILABLE(macos(10.13))
+{
+    NSString* attributeType = nil;
+    if ([attribute isKindOfClass:[CBService class]])
+        attributeType = @"service";
+    else if ([attribute isKindOfClass:[CBCharacteristic class]])
+        attributeType = @"characteristic";
+    
+    NSDictionary* uuidDescriptions =
     @{
         @"service":
             @{
@@ -748,6 +766,8 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
                 @"2BC3": @"Mute"
         }
     };
+    return uuidDescriptions[attributeType][attribute.UUID.UUIDString];
 }
+
 
 @end

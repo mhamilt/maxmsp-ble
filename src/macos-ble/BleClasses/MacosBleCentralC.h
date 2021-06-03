@@ -26,3 +26,4 @@ void bleCentralCSetMaxObjRef    (MacosBleCentralC *t, MaxExternalObject* maxObjR
 void bleCentralCGetDeviceList   (MacosBleCentralC *t);
 void bleCentralCClearDiscovered (MacosBleCentralC *t);
 void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit);
+void bleCentralCRequestCubeData (MacosBleCentralC *t);

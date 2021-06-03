@@ -65,3 +65,9 @@ void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit)
 {
     [(__bridge MacosBleCentral *)t setRssiSensitivity:rssiLimit]  ;
 }
+
+
+void bleCentralCRequestCubeData (MacosBleCentralC *t)
+{
+    
+}

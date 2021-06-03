@@ -16,12 +16,14 @@ typedef enum : NSUInteger {
 } BleConnectMode;
 
 
+/// <#Description#>
 @interface MacosBleCentral: NSObject
 <CBCentralManagerDelegate, CBPeripheralDelegate>
 {
     CBUUID *serviceUuid;
     CBUUID *characteristicUuid;
     MaxExternalObject* maxObjectRef;
+    NSData *charDataCopy;
 }
 //------------------------------------------------------------------------------
 @property (retain) NSMutableArray *discoveredPeripherals;
@@ -37,7 +39,6 @@ typedef enum : NSUInteger {
 @property (nonatomic) int rssiSensitivity;
 @property (copy) NSString *manufacturer;
 @property (atomic) int latestValue;
-@property (strong, nonatomic)NSDictionary* bleUUIDs;
 //------------------------------------------------------------------------------
 - (instancetype)init;
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue;
@@ -54,6 +55,5 @@ typedef enum : NSUInteger {
 - (void)setRssiSensitivity:(int)rssiSensitivity;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)getFoundDeviceList;
-- (void)setbleUUIDs;
 //------------------------------------------------------------------------------
 @end

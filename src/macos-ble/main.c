@@ -19,7 +19,13 @@ void* myExternalConstructor()
     MaxExternalObject* maxObjectPtr = (MaxExternalObject*)object_alloc(myExternClass);
     maxObjectPtr->bleCentral = newBleCentralC();
     bleCentralCSetMaxObjRef(maxObjectPtr->bleCentral, maxObjectPtr);
+    maxObjectPtr->maxListSize = 30;
     
+    maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
+    atom_alloc_array(3,
+                     &maxObjectPtr->listSize,
+                     &maxObjectPtr->myList,
+                     &maxObjectPtr->listAllocSuccess);
     return maxObjectPtr;
 }
 //------------------------------------------------------------------------------
@@ -124,7 +130,6 @@ void coupleMethodsToExternal( t_class* c)
     class_addmethod(c, (method)onList, "list", A_GIMME, 0);
     class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
 }
-
 
 int C74_EXPORT main(void)
 {
