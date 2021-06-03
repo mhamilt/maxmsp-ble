@@ -4,7 +4,7 @@ A BLE Object for Max
 
 ## Install
 
-Add the file to ~/Documents/Max 8/Library or define your own folder via Search Path
+Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
 
 ## Building
 
