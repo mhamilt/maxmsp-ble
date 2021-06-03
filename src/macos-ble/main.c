@@ -22,10 +22,12 @@ void* myExternalConstructor()
     maxObjectPtr->maxListSize = 30;
     
     maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
-    atom_alloc_array(3,
+    atom_alloc_array(maxObjectPtr->maxListSize,
                      &maxObjectPtr->listSize,
                      &maxObjectPtr->myList,
                      &maxObjectPtr->listAllocSuccess);
+    
+    
     return maxObjectPtr;
 }
 //------------------------------------------------------------------------------
