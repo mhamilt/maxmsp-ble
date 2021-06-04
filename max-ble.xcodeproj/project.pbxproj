@@ -127,6 +127,7 @@
 				58F0ABFC242E3110004FE028 /* Sources */,
 				58F0AC00242E3110004FE028 /* Rez */,
 				58F0AC0C242E3238004FE028 /* Frameworks */,
+				58E51D25266AE63000497992 /* Post Script */,
 			);
 			buildRules = (
 			);
@@ -180,6 +181,24 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		58E51D25266AE63000497992 /* Post Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Post Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"${DSTROOT}/${WRAPPER_NAME}\"\ncp -r \"${DSTROOT}/${WRAPPER_NAME}\" package/max-ble/externals \n";
+		};
 		58F0ABFB242E3110004FE028 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -195,7 +214,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if [[ ! \"$(ls -A max-sdk)\" ]]; then \ngit submodule update --init;\necho \"error: Max SDK not present, try building again\"\nexit 1\nfi\n";
+			shellScript = "echo start\nif [[ ! \"$(ls -A max-sdk)\" ]]; then \ngit submodule update --init;\necho \"error: Max SDK not present, try building again\"\nexit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -301,7 +320,7 @@
 				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_WARN_PRIVATE_MODULE = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = "";
@@ -343,7 +362,7 @@
 				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_WARN_PRIVATE_MODULE = NO;
 				CLANG_WARN__ARC_BRIDGE_CAST_NONARC = YES;
-				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Manual;
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = "";

@@ -10,7 +10,8 @@
             ActionType = "Xcode.IDEStandardExecutionActionsCore.ExecutionActionType.ShellScriptAction">
             <ActionContent
                title = "Run Script"
-               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;if [[ $(whoami) == &quot;mhamilt7&quot; ]]; then # make sure it&apos;s me&#10;  codesign --force --deep -s &quot;Developer ID Application: Matthew Hamilton (XZ388CS8AV)&quot; &quot;/Users/mhamilt7/Documents/Max 7/externals/max-ble.mxo&quot;&#10;fi&#10;">
+               scriptText = "# Type a script or drag a script file from your workspace to insert its path.&#10;if [[ $(whoami) == &quot;mhamilt7&quot; ]]; then # make sure it&apos;s me&#10;#  codesign --force --deep -s &quot;Developer ID Application: Matthew Hamilton (XZ388CS8AV)&quot; &quot;/Users/mhamilt7/Documents/Max 8/Library/max-ble.mxo&quot;&#10;#cp -r &quot;/Users/mhamilt7/Documents/Max 8/Library/max-ble.mxo&quot; package/max-ble/externals &#10;fi&#10;"
+               shellToInvoke = "/bin//bash">
             </ActionContent>
          </ExecutionAction>
       </PostActions>
