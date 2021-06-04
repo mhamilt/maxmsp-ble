@@ -24,6 +24,7 @@
 		5849241D2444B0C000FB0C24 /* MaxObject.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = MaxObject.c; sourceTree = "<group>"; };
 		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 		587196D324324E410059E189 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = DEVELOPER_DIR; };
+		588E2DD9266A059B0016428B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		589D3E792448204C00FFA01E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		58E0BF0226652DA700DCB7A0 /* SwitchString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchString.h; sourceTree = "<group>"; };
 		58F0AC04242E3110004FE028 /* max-ble.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "max-ble.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -51,6 +52,7 @@
 		089C166AFE841209C02AAC07 /* iterator */ = {
 			isa = PBXGroup;
 			children = (
+				588E2DD9266A059B0016428B /* Info.plist */,
 				58567A37242A0A0A00271066 /* src */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 				58F0AC0D242E3241004FE028 /* Frameworks */,
@@ -288,6 +290,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -308,7 +311,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				OTHER_LDFLAGS = (
@@ -318,7 +321,7 @@
 					JitterAPI,
 					"$(C74_SYM_LINKER_FLAGS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mhamilt.max-ble";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
@@ -329,6 +332,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
@@ -348,7 +352,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				INFOPLIST_FILE = "";
+				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				ONLY_ACTIVE_ARCH = NO;
@@ -359,7 +363,7 @@
 					JitterAPI,
 					"$(C74_SYM_LINKER_FLAGS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.mhamilt.max-ble";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
