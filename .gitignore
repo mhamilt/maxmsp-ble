@@ -370,3 +370,5 @@ MigrationBackup/
 maxmsp-external-templates.xcodeproj/project.xcworkspace/xcuserdata/mhamilt7.xcuserdatad/UserInterfaceState.xcuserstate
 *.xcuserstate
 *xcuserdata/
+
+package/
