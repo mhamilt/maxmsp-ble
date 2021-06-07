@@ -26,13 +26,14 @@
     self = [super init];
     if (self)
     {
-        post("Start BLE\n");        
+        post("Start BLE\n");
         _shouldConnect = NO;
         _connectMode = NO;
         _ignoreUnconnectable = NO;
         _rssiSensitivity = 90;
         self.discoveredPeripherals = [[NSMutableArray alloc] init];
         _latestValue = 0;
+        shouldReport = YES;
         _bleQueue = centralDelegateQueue;
         serviceUuid = scanServiceId;
         characteristicUuid = characteristicId;
@@ -59,12 +60,15 @@
             && !(!connectable && _ignoreUnconnectable)
             && (abs([RSSI intValue]) < abs(_rssiSensitivity)))
         {
-            post("------------------------");
-            post("Name: %s ", [[aPeripheral name] UTF8String]);
-            post("RSSI: %s", [RSSI.description UTF8String]);
-            post("Index: %d", discoveredPeripherals.count);
-            if (@available(macOS 10.13, *)) {
-                post("Identifier: %s", [aPeripheral.identifier.UUIDString UTF8String]);
+            if(shouldReport)
+            {
+                post("------------------------");
+                post("Name: %s ", [[aPeripheral name] UTF8String]);
+                post("RSSI: %s", [RSSI.description UTF8String]);
+                post("Index: %d", discoveredPeripherals.count);
+                if (@available(macOS 10.13, *)) {
+                    post("Identifier: %s", [aPeripheral.identifier.UUIDString UTF8String]);
+                }
             }
             
             [discoveredPeripherals addObject:aPeripheral];
@@ -78,7 +82,9 @@
             case BLE_CONNECT_WITH_MANU_DATA:
                 if (manuData == discoveredPeripherals[_connectDeviceIndex])
                 {
-                    post("Connecting\n");
+                    if(shouldReport)
+                        post("Connecting\n");
+                    
                     _peripheral = aPeripheral;
                     [_manager connectPeripheral: aPeripheral options:nil];
                     [_manager stopScan];
@@ -87,9 +93,11 @@
             case BLE_CONNECT_WITH_DEVICE_NAME:
                 if ([[aPeripheral name] isEqualToString: _deviceName])
                 {
-                    post("Connecting\n");
+                    if(shouldReport)
+                        post("Connecting\n");
+                    
                     _peripheral = aPeripheral;
-                    [_manager connectPeripheral:aPeripheral options:nil];
+                    [_manager connectPeripheral: aPeripheral options:nil];
                     [_manager stopScan];
                 }
             default:
@@ -129,9 +137,12 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 - (void) centralManager: (CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
                   error:(NSError *)error
 {
-    post("Connection Failed\n");
-    NSLog(@"Fail to connect to peripheral: %@ with error = %@", aPeripheral, [error localizedDescription]);
-    post("Failed to connect to peripheral: %s", aPeripheral, [[error localizedDescription] UTF8String]);
+    if(shouldReport)
+    {
+        post("Connection Failed\n");
+        NSLog(@"Fail to connect to peripheral: %@ with error = %@", aPeripheral, [error localizedDescription]);
+        post("Failed to connect to peripheral: %s", aPeripheral, [[error localizedDescription] UTF8String]);
+    }
 }
 
 - (void) scan;
@@ -235,7 +246,8 @@ didDiscoverServices: (NSError *)error
         sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
     }
     
-    post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
+    if(shouldReport)
+        post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
     
     for (CBCharacteristic *aChar in service.characteristics)
     {
@@ -258,13 +270,18 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 - (void) peripheral: (CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
     if(!error)
-    {        
-        const char *charUUID = [characteristic.UUID.UUIDString UTF8String];
+    {
+        
         NSString* charDescription = nil;
         
         if (@available(macOS 10.13, *))
         {
             charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+        }
+        
+        if(!charDescription)
+        {
+            charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
         }
         
         NSString* valueString = nil;
@@ -276,11 +293,35 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
         else
             valueString = characteristic.value.description;
         
-        if (charDescription)
-            post("%s: %s\n", charDescription.UTF8String, valueString.UTF8String );
-        else
-            post("Characteristic %s: %s\n", charUUID, valueString.UTF8String);
-                
+        if(shouldReport)
+        {
+            NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@"Properties: "];
+            
+            if (characteristic.properties & CBCharacteristicPropertyBroadcast)
+                [propertiesDescription appendString:@"Broadcast, "];
+            if (characteristic.properties & CBCharacteristicPropertyRead)
+                [propertiesDescription appendString:@"Read, "];
+            if (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
+                [propertiesDescription appendString:@"Write Without Response, "];
+            if (characteristic.properties & CBCharacteristicPropertyWrite)
+                [propertiesDescription appendString:@"Write, "];
+            if (characteristic.properties & CBCharacteristicPropertyNotify)
+                [propertiesDescription appendString:@"Notify, "];
+            if (characteristic.properties & CBCharacteristicPropertyIndicate)
+                [propertiesDescription appendString:@"Indicate, "];
+            if (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites)
+                [propertiesDescription appendString:@"SignedWrites, "];
+            if (characteristic.properties & CBCharacteristicPropertyExtendedProperties)
+                [propertiesDescription appendString:@"ExtendedProperties, "];
+            if (characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired)
+                [propertiesDescription appendString:@"NotifyEncryptionRequired, "];
+            if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
+                [propertiesDescription appendString:@"IndicateEncryptionRequired"];
+            
+            if(shouldReport)
+                post("%s: %s : %s", charDescription.UTF8String, valueString.UTF8String, propertiesDescription.UTF8String);
+            
+        }
         charDataCopy = characteristic.value.copy;
         
         onCharacteristicRead(maxObjectRef,
@@ -290,7 +331,12 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
                              characteristic.value.length);
     }
     else
-        post("Error %s\n",[[error localizedDescription] UTF8String]);
+    {
+        if(shouldReport)
+        {
+            post("Error %s\n",[[error localizedDescription] UTF8String]);
+        }
+    }
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor error:(NSError *)error
@@ -313,6 +359,11 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
 {
     maxObjectRef = extMaxObjectRef;
+}
+
+- (void)setReporting: (int) reportingMode
+{
+    shouldReport = (BOOL)reportingMode;
 }
 
 - (void)getFoundDeviceList

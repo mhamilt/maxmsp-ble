@@ -24,6 +24,7 @@ typedef enum : NSUInteger {
     CBUUID *characteristicUuid;
     MaxExternalObject* maxObjectRef;
     NSData *charDataCopy;
+    BOOL shouldReport;
 }
 //------------------------------------------------------------------------------
 @property (retain) NSMutableArray *discoveredPeripherals;
@@ -54,6 +55,7 @@ typedef enum : NSUInteger {
 - (void)clearDicoveredPeripherals;
 - (void)setRssiSensitivity:(int)rssiSensitivity;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
+- (void)setReporting: (int) reportingMode;
 - (void)getFoundDeviceList;
 //------------------------------------------------------------------------------
 @end

@@ -27,3 +27,5 @@ void bleCentralCGetDeviceList   (MacosBleCentralC *t);
 void bleCentralCClearDiscovered (MacosBleCentralC *t);
 void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit);
 void bleCentralCRequestCubeData (MacosBleCentralC *t);
+void bleCentralCSetReporting    (MacosBleCentralC *t, bool shouldReport);
+

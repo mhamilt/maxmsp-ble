@@ -77,6 +77,19 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }
         }
         break;
+        cases("report")
+        if(argc == 1)
+               {
+                   switch (atom_gettype(argv))
+                   {
+                       case A_LONG:
+                           bleCentralCSetReporting(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
+                           break;
+                       default:
+                           break;
+                   }
+               }
+        break;
         defaults
         object_post( (t_object*)maxObjectPtr,
                     "This method was invoked by sending the ’%s’ message to this object.",

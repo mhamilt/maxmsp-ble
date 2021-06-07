@@ -71,3 +71,8 @@ void bleCentralCRequestCubeData (MacosBleCentralC *t)
 {
     
 }
+
+void bleCentralCSetReporting (MacosBleCentralC *t, bool shouldReport)
+{
+    
+}
