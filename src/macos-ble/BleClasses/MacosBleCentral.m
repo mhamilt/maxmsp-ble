@@ -394,8 +394,7 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
 - (void) peripheral:(CBPeripheral *)peripheral
         didReadRSSI:(NSNumber *)RSSI
               error:(NSError *)error
-{
-    post("didReadRSSI\n");
+{    
     if (@available(macOS 10.13, *))
     {
         onRSSIRead(maxObjectRef,
