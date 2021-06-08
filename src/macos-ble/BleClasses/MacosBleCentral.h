@@ -14,7 +14,8 @@ typedef enum : NSUInteger {
     BLE_CONNECT_WITH_MANU_DATA,
     BLE_CONNECT_WITH_DEVICE_NAME,
     BLE_CONNECT_GET_RSSI,
-    BLE_CONNECT_EVERYTHING
+    BLE_CONNECT_EVERYTHING,
+    BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC
 } BleConnectMode;
 
 
@@ -27,6 +28,7 @@ typedef enum : NSUInteger {
     MaxExternalObject* maxObjectRef;
     NSData *charDataCopy;
     BOOL shouldReport;
+    NSMutableArray *discoveredPeripheralsRSSIs;
 }
 //------------------------------------------------------------------------------
 @property (retain) NSMutableArray *discoveredPeripherals;
@@ -50,8 +52,6 @@ typedef enum : NSUInteger {
          characteristicToRead: (CBUUID *) characteristicId;
 - (void)scan;
 - (void)stop;
-- (void)scanForDeviceWithName:     (NSString *) name;
-- (void)scanForDeviceWithManuData: (NSData *)   data;
 - (void)connectToFoundDevice: (int) deviceIndex;
 - (void)clearDicoveredPeripherals;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
@@ -59,5 +59,8 @@ typedef enum : NSUInteger {
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
+- (void)subscribeToCharacteristic: (const char*) cuuid
+                        OfService: (const char*) suuid
+                    OfFoundDevice: (int) deviceIndex;
 //------------------------------------------------------------------------------
 @end

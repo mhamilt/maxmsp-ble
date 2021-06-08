@@ -19,11 +19,6 @@ void bleCentralCStopScan(MacosBleCentralC *t)
     [(__bridge MacosBleCentral *)t stop];
 }
 //------------------------------------------------------------------------------
-void bleCentralCScanForDeviceWithName(MacosBleCentralC *t, const char* name)
-{
-    [(__bridge MacosBleCentral *)t scanForDeviceWithName: [NSString stringWithCString:name encoding:NSASCIIStringEncoding] ];
-}
-
 void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex)
 {
     [(__bridge MacosBleCentral *)t connectToFoundDevice: deviceIndex];
@@ -65,12 +60,14 @@ void bleCentralCGetRssi (MacosBleCentralC *t, int deviceIndex)
     [(__bridge MacosBleCentral *)t getRssiOfFoundDevice:deviceIndex];
 }
 
-void bleCentralCRequestCubeData (MacosBleCentralC *t)
-{
-    
-}
-
 void bleCentralCSetReporting (MacosBleCentralC *t, bool shouldReport)
 {
     [(__bridge MacosBleCentral *)t setReporting:shouldReport];
+}
+
+void bleCentralCSubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex, const char* suuid, const char* cuuid)
+{
+        [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
+                                                       OfService:suuid
+                                                   OfFoundDevice:deviceIndex];
 }

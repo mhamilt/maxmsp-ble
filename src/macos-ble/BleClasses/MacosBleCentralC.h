@@ -17,7 +17,6 @@ typedef const void MacosBleCentralC; // 'const void *' is more CF-like, but eith
 MacosBleCentralC* newBleCentralC(void);
 void bleCentralCScan            (MacosBleCentralC *t);
 void bleCentralCStopScan        (MacosBleCentralC *t);
-void bleCentralCScanForDeviceWithName (MacosBleCentralC *t, const char* name);
 void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCRelease         (MacosBleCentralC *t);
 int  bleCentralCGetLatestValue  (MacosBleCentralC *t);
@@ -26,6 +25,6 @@ void bleCentralCGetDeviceList   (MacosBleCentralC *t);
 void bleCentralCClearDiscovered (MacosBleCentralC *t);
 void bleCentralCGetRssi         (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit);
-void bleCentralCRequestCubeData (MacosBleCentralC *t);
 void bleCentralCSetReporting    (MacosBleCentralC *t, bool shouldReport);
-
+void bleCentralCSubscribeToCharacteristic   (MacosBleCentralC *t, int deviceIndex, const char* suuid ,const char* cuuid);
+void bleCentralCUnsubscribeToCharacteristic (MacosBleCentralC *t, const char* charUuid);

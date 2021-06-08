@@ -32,6 +32,7 @@
         _ignoreUnconnectable = NO;
         _rssiSensitivity = 90;
         self.discoveredPeripherals = [[NSMutableArray alloc] init];
+        discoveredPeripheralsRSSIs = [[NSMutableArray alloc] init];
         _latestValue = 0;
         shouldReport = YES;
         _bleQueue = centralDelegateQueue;
@@ -62,50 +63,19 @@
         {
             if(shouldReport)
             {
+                if (@available(macOS 10.13, *))
+                post("Index: %d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
+                             discoveredPeripherals.count,
+                             aPeripheral.identifier.UUIDString.UTF8String,
+                             aPeripheral.name.UTF8String,
+                             RSSI.intValue);
                 post("------------------------");
-                post("Name: %s ", [[aPeripheral name] UTF8String]);
-                post("RSSI: %s", [RSSI.description UTF8String]);
-                post("Index: %d", discoveredPeripherals.count);
-                if (@available(macOS 10.13, *)) {
-                    post("Identifier: %s", [aPeripheral.identifier.UUIDString UTF8String]);
-                }
             }
             
             [discoveredPeripherals addObject:aPeripheral];
+            [discoveredPeripheralsRSSIs addObject:RSSI];
         }
     }
-    
-    if (_shouldConnect)
-    {
-        switch (_connectMode)
-        {
-            case BLE_CONNECT_WITH_MANU_DATA:
-                if (manuData == discoveredPeripherals[_connectDeviceIndex])
-                {
-                    if(shouldReport)
-                        post("Connecting\n");
-                    
-                    _peripheral = aPeripheral;
-                    [_manager connectPeripheral: aPeripheral options:nil];
-                    [_manager stopScan];
-                }
-                break;
-            case BLE_CONNECT_WITH_DEVICE_NAME:
-                if ([[aPeripheral name] isEqualToString: _deviceName])
-                {
-                    if(shouldReport)
-                        post("Connecting\n");
-                    
-                    _peripheral = aPeripheral;
-                    [_manager connectPeripheral: aPeripheral options:nil];
-                    [_manager stopScan];
-                }
-            default:
-                break;
-        }
-        
-    }
-    
 }
 
 //------------------------------------------------------------------------------
@@ -116,21 +86,19 @@
         post("Connected!\n");
     
     [aPeripheral setDelegate:self];
+    
     switch (_connectMode)
     {
         case BLE_CONNECT_GET_RSSI:
             [aPeripheral readRSSI]; // go to peripheralDidUpdateRSSI
             break;
-
+        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+            [aPeripheral discoverServices:@[serviceUuid]];
+            break;
         default:
-            
             [aPeripheral discoverServices:nil];
             break;
     }
-    
-    
-    
-
 }
 //------------------------------------------------------------------------------
 - (void)centralManagerDidUpdateState:(CBCentralManager *)manager
@@ -180,36 +148,20 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 - (void) startScan
 {
     post("Start scanning\n");
+    post("------------------------");
     [_manager scanForPeripheralsWithServices: nil
                                      options: nil];
-}
-//------------------------------------------------------------------------------
-- (void) scanForDeviceWithName:(NSString *) name
-{
-    post("Search for %s", [name UTF8String]);
-    _deviceName = name;
-    _shouldConnect = YES;
-    _connectMode = BLE_CONNECT_WITH_DEVICE_NAME;
-}
-
-- (void) scanForDeviceWithManuData:(NSData *) data
-{
-    post("Search for %s", [data.description UTF8String]);
-    _connectDeviceIndex = [self.discoveredPeripherals indexOfObject:data];
-    if(_connectDeviceIndex != NSNotFound)
-    {
-        [self startScan];
-        _shouldConnect = YES;
-        _connectMode = BLE_CONNECT_WITH_MANU_DATA;
-    }
 }
 
 //------------------------------------------------------------------------------
 
 - (void) connectToFoundDevice: (int) deviceIndex
 {
-    _connectMode = BLE_CONNECT_EVERYTHING;
-    [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    if (deviceIndex < discoveredPeripherals.count)
+    {
+        _connectMode = BLE_CONNECT_EVERYTHING;
+        [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    }
     
 }
 
@@ -231,8 +183,26 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) getRssiOfFoundDevice: (int) deviceIndex
 {
-    _connectMode = BLE_CONNECT_GET_RSSI;
+    if (deviceIndex < discoveredPeripherals.count)
+    {
+        _connectMode = BLE_CONNECT_GET_RSSI;
+        [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    }
+}
+
+
+- (void) subscribeToCharacteristic: (const char *) cuuid
+                         OfService: (const char*)  suuid
+                     OfFoundDevice: (int) deviceIndex
+{
+    _connectMode = BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC;
+    characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
+    serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
     [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    
+    post("Subscribe to %s: %s\n",
+         serviceUuid.UUIDString.UTF8String,
+         characteristicUuid.UUIDString.UTF8String);
 }
 
 //------------------------------------------------------------------------------
@@ -250,35 +220,61 @@ didDiscoverIncludedServicesForService:(CBService *)service
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
-    for (CBService *aService in aPeripheral.services)
-    {
-        [aPeripheral discoverCharacteristics: nil
-                                  forService: aService];
+    switch (_connectMode) {
+        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+            [aPeripheral discoverCharacteristics:@[characteristicUuid]
+                                      forService:aPeripheral.services[0]];
+            break;
+            
+        default:
+            for (CBService *aService in aPeripheral.services)
+            {
+                [aPeripheral discoverCharacteristics: nil
+                                          forService: aService];
+            }
+            break;
     }
 }
 //------------------------------------------------------------------------------
 // Invoked upon completion of a -[discoverCharacteristics:forService:] request.
 // Perform appropriate operations on interested characteristics
-- (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
+- (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service
+              error: (NSError *)error
 {
-    const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
-    NSString* sericeDescription = nil;
-    if (@available(macOS 10.13, *))
-    {
-        sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
-    }
     
-    if(shouldReport)
-        post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
-    
-    for (CBCharacteristic *aChar in service.characteristics)
+    switch (_connectMode)
     {
-        if (aChar.properties & CBCharacteristicPropertyRead)
+        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+            [aPeripheral setNotifyValue:YES
+                      forCharacteristic:service.characteristics[0]];
+            
+            break;
+            
+        default:
         {
-            [aPeripheral readValueForCharacteristic:aChar];
+            const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
+            NSString* sericeDescription = nil;
+            if (@available(macOS 10.13, *))
+            {
+                sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
+            }
+            
+            if(shouldReport)
+                post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
+            
+            for (CBCharacteristic *aChar in service.characteristics)
+            {
+                if (aChar.properties & CBCharacteristicPropertyRead)
+                {
+                    [aPeripheral readValueForCharacteristic:aChar];
+                }
+                
+            }
+            break;
         }
-        
     }
+    
+    
 }
 //------------------------------------------------------------------------------
 - (void) peripheral:(CBPeripheral *)peripheral
@@ -293,63 +289,80 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     if(!error)
     {
-        NSString* charDescription = nil;
-        
-        if (@available(macOS 10.13, *))
+        switch (_connectMode)
         {
-            charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+                
+            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+                if(characteristic.isNotifying)
+                    onNotificationRead(maxObjectRef,
+                                       characteristic.UUID.UUIDString.UTF8String,
+                                       (uint8_t*)charDataCopy.bytes,
+                                       characteristic.value.length);
+                break;
+                
+            default:
+            {
+                NSString* charDescription = nil;
+                
+                if (@available(macOS 10.13, *))
+                {
+                    charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+                }
+                
+                if(!charDescription)
+                {
+                    charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
+                }
+                
+                NSString* valueString = nil;
+                
+                if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
+                    valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+                else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
+                    valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
+                else
+                    valueString = characteristic.value.description;
+                
+                if(shouldReport)
+                {
+                    NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@"Properties: "];
+                    
+                    if (characteristic.properties & CBCharacteristicPropertyBroadcast)
+                        [propertiesDescription appendString:@"Broadcast, "];
+                    if (characteristic.properties & CBCharacteristicPropertyRead)
+                        [propertiesDescription appendString:@"Read, "];
+                    if (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
+                        [propertiesDescription appendString:@"Write Without Response, "];
+                    if (characteristic.properties & CBCharacteristicPropertyWrite)
+                        [propertiesDescription appendString:@"Write, "];
+                    if (characteristic.properties & CBCharacteristicPropertyNotify)
+                        [propertiesDescription appendString:@"Notify, "];
+                    if (characteristic.properties & CBCharacteristicPropertyIndicate)
+                        [propertiesDescription appendString:@"Indicate, "];
+                    if (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites)
+                        [propertiesDescription appendString:@"SignedWrites, "];
+                    if (characteristic.properties & CBCharacteristicPropertyExtendedProperties)
+                        [propertiesDescription appendString:@"ExtendedProperties, "];
+                    if (characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired)
+                        [propertiesDescription appendString:@"NotifyEncryptionRequired, "];
+                    if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
+                        [propertiesDescription appendString:@"IndicateEncryptionRequired"];
+                    
+                    
+                    post("%s: %s : %s", charDescription.UTF8String, valueString.UTF8String, propertiesDescription.UTF8String);
+                    
+                }
+                charDataCopy = characteristic.value.copy;
+                
+                onCharacteristicRead(maxObjectRef,
+                                     characteristic.service.UUID.UUIDString.UTF8String,
+                                     characteristic.UUID.UUIDString.UTF8String,
+                                     (uint8_t*)charDataCopy.bytes,
+                                     characteristic.value.length);
+                break;
+            }
+                
         }
-        
-        if(!charDescription)
-        {
-            charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
-        }
-        
-        NSString* valueString = nil;
-        
-        if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
-            valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-        else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
-            valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
-        else
-            valueString = characteristic.value.description;
-        
-        if(shouldReport)
-        {
-            NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@"Properties: "];
-            
-            if (characteristic.properties & CBCharacteristicPropertyBroadcast)
-                [propertiesDescription appendString:@"Broadcast, "];
-            if (characteristic.properties & CBCharacteristicPropertyRead)
-                [propertiesDescription appendString:@"Read, "];
-            if (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
-                [propertiesDescription appendString:@"Write Without Response, "];
-            if (characteristic.properties & CBCharacteristicPropertyWrite)
-                [propertiesDescription appendString:@"Write, "];
-            if (characteristic.properties & CBCharacteristicPropertyNotify)
-                [propertiesDescription appendString:@"Notify, "];
-            if (characteristic.properties & CBCharacteristicPropertyIndicate)
-                [propertiesDescription appendString:@"Indicate, "];
-            if (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites)
-                [propertiesDescription appendString:@"SignedWrites, "];
-            if (characteristic.properties & CBCharacteristicPropertyExtendedProperties)
-                [propertiesDescription appendString:@"ExtendedProperties, "];
-            if (characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired)
-                [propertiesDescription appendString:@"NotifyEncryptionRequired, "];
-            if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
-                [propertiesDescription appendString:@"IndicateEncryptionRequired"];
-            
-            if(shouldReport)
-                post("%s: %s : %s", charDescription.UTF8String, valueString.UTF8String, propertiesDescription.UTF8String);
-            
-        }
-        charDataCopy = characteristic.value.copy;
-        
-        onCharacteristicRead(maxObjectRef,
-                             characteristic.service.UUID.UUIDString.UTF8String,
-                             characteristic.UUID.UUIDString.UTF8String,
-                             (uint8_t*)charDataCopy.bytes,
-                             characteristic.value.length);
     }
     else
     {
@@ -360,14 +373,16 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     }
 }
 //------------------------------------------------------------------------------
-- (void) peripheral: (CBPeripheral *)peripheral didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor error:(NSError *)error
+- (void) peripheral: (CBPeripheral *)peripheral
+didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
+              error:(NSError *)error
 {
     post("didDiscoverDescriptorsForCharacteristic");
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
 {
-    post("didUpdateNotificationStateForCharacteristic");
+    
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral
@@ -389,17 +404,6 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     }
 }
 
-//- (void) peripheralDidUpdateRSSI:(CBPeripheral *)peripheral
-//                           error:(NSError *)error
-//{
-//    post("peripheralDidUpdateRSSI\n");
-//    if (@available(macOS 10.13, *))
-//    {
-//        onRSSIRead(maxObjectRef,
-//                   peripheral.identifier.UUIDString.UTF8String,
-//                   peripheral.RSSI.intValue);
-//    }
-//}
 //------------------------------------------------------------------------------
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
 {
@@ -415,7 +419,22 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     for(CBPeripheral* device in discoveredPeripherals)
     {
-        post("%s\n", [[device description] UTF8String]);
+        if (@available(macOS 10.13, *))
+        {
+            NSUInteger index = [discoveredPeripherals indexOfObject:device];
+            NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
+            if (shouldReport)
+                post("%d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
+                     index,
+                     device.identifier.UUIDString.UTF8String,
+                     device.name.UTF8String,
+                     rssi.intValue);
+            
+            outputFoundDeviceList(maxObjectRef,
+                                  index,
+                                  device.identifier.UUIDString.UTF8String,
+                                  rssi.intValue);
+        }
     }
 }
 

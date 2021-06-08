@@ -16,8 +16,9 @@ void* myExternalConstructor()
     MaxExternalObject* maxObjectPtr = (MaxExternalObject*)object_alloc(myExternClass);
     maxObjectPtr->bleCentral = newBleCentralC();
     bleCentralCSetMaxObjRef(maxObjectPtr->bleCentral, maxObjectPtr);
-    maxObjectPtr->maxListSize = 30;
+    maxObjectPtr->maxListSize = 100;
     
+    maxObjectPtr->list_outlet2 = listout(maxObjectPtr);
     maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
     atom_alloc_array(maxObjectPtr->maxListSize,
                      &maxObjectPtr->listSize,
@@ -50,7 +51,10 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
     switchs(s->s_name)
     {
         cases("scan")
-        bleCentralCScan(maxObjectPtr->bleCentral);
+        if(argc && !atom_getlong(argv))
+            bleCentralCStopScan(maxObjectPtr->bleCentral);
+        else
+            bleCentralCScan(maxObjectPtr->bleCentral);
         break;
         cases("stop")
         bleCentralCStopScan(maxObjectPtr->bleCentral);
@@ -79,7 +83,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         {
             if(atom_gettype(argv) == A_LONG)
                 bleCentralCSetReporting(maxObjectPtr->bleCentral,
-                                        (bool)atom_getlong(argv));            
+                                        (bool)atom_getlong(argv));
         }
         break;
         cases("device")
@@ -90,6 +94,14 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             {
                 cases("rssi")
                 bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
+                break;
+                cases("subscribe")
+                if(argc == 4 && atom_gettype(argv + 2) == A_SYM && atom_gettype(argv + 3) == A_SYM)
+                bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                     deviceIndex,
+                                                     atom_getsym(argv + 2)->s_name,
+                                                     atom_getsym(argv + 3)->s_name);
+                break;
                 defaults
                 break;
             } switchs_end
