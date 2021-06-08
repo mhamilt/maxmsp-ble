@@ -13,7 +13,8 @@
 typedef enum : NSUInteger {
     BLE_CONNECT_WITH_MANU_DATA,
     BLE_CONNECT_WITH_DEVICE_NAME,
-    BLE_CONNECT_GET_RSSI
+    BLE_CONNECT_GET_RSSI,
+    BLE_CONNECT_EVERYTHING
 } BleConnectMode;
 
 
@@ -51,13 +52,12 @@ typedef enum : NSUInteger {
 - (void)stop;
 - (void)scanForDeviceWithName:     (NSString *) name;
 - (void)scanForDeviceWithManuData: (NSData *)   data;
-- (void)scanForFoundDevice:   (int) deviceIndex;
 - (void)connectToFoundDevice: (int) deviceIndex;
 - (void)clearDicoveredPeripherals;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
 - (void)setRssiSensitivity:(int)rssiSensitivity;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
-- (void)setReporting: (int) reportingMode;
+- (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
 //------------------------------------------------------------------------------
 @end

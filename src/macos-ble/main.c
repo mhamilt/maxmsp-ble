@@ -77,14 +77,9 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         cases("report")
         if(argc == 1)
         {
-            switch (atom_gettype(argv))
-            {
-                case A_LONG:
-                    bleCentralCSetReporting(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
-                    break;
-                default:
-                    break;
-            }
+            if(atom_gettype(argv) == A_LONG)
+                bleCentralCSetReporting(maxObjectPtr->bleCentral,
+                                        (bool)atom_getlong(argv));            
         }
         break;
         cases("device")

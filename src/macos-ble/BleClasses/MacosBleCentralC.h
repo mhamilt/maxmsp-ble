@@ -18,7 +18,6 @@ MacosBleCentralC* newBleCentralC(void);
 void bleCentralCScan            (MacosBleCentralC *t);
 void bleCentralCStopScan        (MacosBleCentralC *t);
 void bleCentralCScanForDeviceWithName (MacosBleCentralC *t, const char* name);
-void bleCentralCScanForFoundDevice   (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCRelease         (MacosBleCentralC *t);
 int  bleCentralCGetLatestValue  (MacosBleCentralC *t);

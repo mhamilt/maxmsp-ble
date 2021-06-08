@@ -112,9 +112,12 @@
 - (void) centralManager: (CBCentralManager *)central
    didConnectPeripheral: (CBPeripheral *)aPeripheral
 {
-    post("Connected!\n");
+    if (shouldReport)
+        post("Connected!\n");
+    
     [aPeripheral setDelegate:self];
-    switch (_connectMode) {
+    switch (_connectMode)
+    {
         case BLE_CONNECT_GET_RSSI:
             [aPeripheral readRSSI]; // go to peripheralDidUpdateRSSI
             break;
@@ -203,23 +206,11 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 //------------------------------------------------------------------------------
 
-- (void) scanForFoundDevice: (int) deviceIndex
-{
-    _connectDeviceIndex = deviceIndex;
-    if (_connectDeviceIndex < discoveredPeripherals.count)
-    {
-        [self startScan];
-        _shouldConnect = YES;
-        _connectMode = BLE_CONNECT_WITH_MANU_DATA;
-    }
-}
-
-//------------------------------------------------------------------------------
-
 - (void) connectToFoundDevice: (int) deviceIndex
 {
-    post("Connecting...\n");
+    _connectMode = BLE_CONNECT_EVERYTHING;
     [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    
 }
 
 //------------------------------------------------------------------------------
@@ -241,7 +232,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 - (void) getRssiOfFoundDevice: (int) deviceIndex
 {
     _connectMode = BLE_CONNECT_GET_RSSI;
-    [self connectToFoundDevice: deviceIndex];
+    [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
 }
 
 //------------------------------------------------------------------------------
@@ -270,7 +261,6 @@ didDiscoverServices: (NSError *)error
 // Perform appropriate operations on interested characteristics
 - (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error
 {
-    
     const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
     NSString* sericeDescription = nil;
     if (@available(macOS 10.13, *))
@@ -386,26 +376,39 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     post("Service Modified\n");
     [_manager cancelPeripheralConnection:peripheral];
 }
-
-- (void) peripheralDidUpdateRSSI:(CBPeripheral *)peripheral
-                           error:(NSError *)error
+- (void) peripheral:(CBPeripheral *)peripheral
+        didReadRSSI:(NSNumber *)RSSI
+              error:(NSError *)error
 {
+    post("didReadRSSI\n");
     if (@available(macOS 10.13, *))
     {
         onRSSIRead(maxObjectRef,
                    peripheral.identifier.UUIDString.UTF8String,
-                   peripheral.RSSI.intValue);
+                   RSSI.intValue);
     }
 }
+
+//- (void) peripheralDidUpdateRSSI:(CBPeripheral *)peripheral
+//                           error:(NSError *)error
+//{
+//    post("peripheralDidUpdateRSSI\n");
+//    if (@available(macOS 10.13, *))
+//    {
+//        onRSSIRead(maxObjectRef,
+//                   peripheral.identifier.UUIDString.UTF8String,
+//                   peripheral.RSSI.intValue);
+//    }
+//}
 //------------------------------------------------------------------------------
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
 {
     maxObjectRef = extMaxObjectRef;
 }
 
-- (void)setReporting: (int) reportingMode
+- (void)setReporting: (BOOL) reportingMode
 {
-    shouldReport = (BOOL)reportingMode;
+    shouldReport = reportingMode;
 }
 
 - (void)getFoundDeviceList
