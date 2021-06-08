@@ -4,6 +4,7 @@
 //------------------------------------------------------------------------------
 #define MAXMSP
 #include "ext.h"
+#include "ext_proto.h"
 #include "MaxObject.h"
 #include "MacosBleCentralC.h"
 #include "SwitchString.h"
@@ -20,7 +21,7 @@ void* myExternalConstructor()
     maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
     atom_alloc_array(maxObjectPtr->maxListSize,
                      &maxObjectPtr->listSize,
-                     &maxObjectPtr->myList,
+                     &maxObjectPtr->outputList,
                      &maxObjectPtr->listAllocSuccess);
     
     
@@ -75,16 +76,29 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         cases("report")
         if(argc == 1)
-               {
-                   switch (atom_gettype(argv))
-                   {
-                       case A_LONG:
-                           bleCentralCSetReporting(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
-                           break;
-                       default:
-                           break;
-                   }
-               }
+        {
+            switch (atom_gettype(argv))
+            {
+                case A_LONG:
+                    bleCentralCSetReporting(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
+                    break;
+                default:
+                    break;
+            }
+        }
+        break;
+        cases("device")
+        if(argc >= 2)
+        {
+            int deviceIndex = (int)atom_getlong(argv);
+            switchs(atom_getsym(argv + 1)->s_name)
+            {
+                cases("rssi")
+                bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
+                defaults
+                break;
+            } switchs_end
+        }
         break;
         defaults
         object_post( (t_object*)maxObjectPtr,

@@ -114,7 +114,20 @@
 {
     post("Connected!\n");
     [aPeripheral setDelegate:self];
-    [aPeripheral discoverServices:nil];
+    switch (_connectMode) {
+        case BLE_CONNECT_GET_RSSI:
+            [aPeripheral readRSSI]; // go to peripheralDidUpdateRSSI
+            break;
+
+        default:
+            
+            [aPeripheral discoverServices:nil];
+            break;
+    }
+    
+    
+    
+
 }
 //------------------------------------------------------------------------------
 - (void)centralManagerDidUpdateState:(CBCentralManager *)manager
@@ -144,6 +157,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         post("Failed to connect to peripheral: %s", aPeripheral, [[error localizedDescription] UTF8String]);
     }
 }
+//------------------------------------------------------------------------------
+#pragma mark Interface Methods
 
 - (void) scan;
 {
@@ -185,6 +200,9 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         _connectMode = BLE_CONNECT_WITH_MANU_DATA;
     }
 }
+
+//------------------------------------------------------------------------------
+
 - (void) scanForFoundDevice: (int) deviceIndex
 {
     _connectDeviceIndex = deviceIndex;
@@ -196,20 +214,34 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     }
 }
 
+//------------------------------------------------------------------------------
+
 - (void) connectToFoundDevice: (int) deviceIndex
 {
     post("Connecting...\n");
     [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
 }
 
+//------------------------------------------------------------------------------
+
 - (void) clearDicoveredPeripherals
 {
     [self.discoveredPeripherals removeAllObjects];
 }
 
+//------------------------------------------------------------------------------
+
 - (void)setRssiSensitivity:(int)rssiSensitivity
 {
     _rssiSensitivity = rssiSensitivity;
+}
+
+//------------------------------------------------------------------------------
+
+- (void) getRssiOfFoundDevice: (int) deviceIndex
+{
+    _connectMode = BLE_CONNECT_GET_RSSI;
+    [self connectToFoundDevice: deviceIndex];
 }
 
 //------------------------------------------------------------------------------
@@ -271,7 +303,6 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     if(!error)
     {
-        
         NSString* charDescription = nil;
         
         if (@available(macOS 10.13, *))
@@ -354,6 +385,17 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     post("Service Modified\n");
     [_manager cancelPeripheralConnection:peripheral];
+}
+
+- (void) peripheralDidUpdateRSSI:(CBPeripheral *)peripheral
+                           error:(NSError *)error
+{
+    if (@available(macOS 10.13, *))
+    {
+        onRSSIRead(maxObjectRef,
+                   peripheral.identifier.UUIDString.UTF8String,
+                   peripheral.RSSI.intValue);
+    }
 }
 //------------------------------------------------------------------------------
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef

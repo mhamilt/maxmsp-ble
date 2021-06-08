@@ -25,6 +25,7 @@ int  bleCentralCGetLatestValue  (MacosBleCentralC *t);
 void bleCentralCSetMaxObjRef    (MacosBleCentralC *t, MaxExternalObject* maxObjRef);
 void bleCentralCGetDeviceList   (MacosBleCentralC *t);
 void bleCentralCClearDiscovered (MacosBleCentralC *t);
+void bleCentralCGetRssi         (MacosBleCentralC *t, int deviceIndex);
 void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit);
 void bleCentralCRequestCubeData (MacosBleCentralC *t);
 void bleCentralCSetReporting    (MacosBleCentralC *t, bool shouldReport);

@@ -66,6 +66,10 @@ void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit)
     [(__bridge MacosBleCentral *)t setRssiSensitivity:rssiLimit]  ;
 }
 
+void bleCentralCGetRssi (MacosBleCentralC *t, int deviceIndex)
+{
+    [(__bridge MacosBleCentral *)t getRssiOfFoundDevice:deviceIndex];
+}
 
 void bleCentralCRequestCubeData (MacosBleCentralC *t)
 {
