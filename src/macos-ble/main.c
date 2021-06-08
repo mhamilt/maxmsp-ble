@@ -1,13 +1,9 @@
 /*
- Integrate Objective C Corebluetooth class
+ * Max Ble: A macOS BLE
  */
-
+//------------------------------------------------------------------------------
 #define MAXMSP
-//#include <objc/runtime.h>
 #include "ext.h"
-#include "ext_obex.h"
-#include "z_dsp.h"
-#include "buffer.h"
 #include "MaxObject.h"
 #include "MacosBleCentralC.h"
 #include "SwitchString.h"
