@@ -1,3 +1,4 @@
+//------------------------------------------------------------------------------
 #pragma once
 #import <Foundation/Foundation.h>
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -9,6 +10,7 @@
 #else
 #define post printf
 #endif
+//------------------------------------------------------------------------------
 
 typedef enum : NSUInteger {
     BLE_CONNECT_WITH_MANU_DATA,
@@ -18,6 +20,7 @@ typedef enum : NSUInteger {
     BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC
 } BleConnectMode;
 
+//------------------------------------------------------------------------------
 
 /// <#Description#>
 @interface MacosBleCentral: NSObject
@@ -29,27 +32,20 @@ typedef enum : NSUInteger {
     NSData *charDataCopy;
     BOOL shouldReport;
     NSMutableArray *discoveredPeripheralsRSSIs;
+    NSMutableArray *discoveredPeripherals;
+    CBCentralManager * manager;
+    dispatch_queue_t bleQueue;
+    NSUInteger connectDeviceIndex;
+    BleConnectMode connectMode;
+    BOOL shouldConnect;
+    BOOL ignoreUnconnectable;
+    int rssiSensitivity;
 }
 //------------------------------------------------------------------------------
-@property (retain) NSMutableArray *discoveredPeripherals;
-@property (strong, nonatomic) NSString *deviceName;
-@property (strong, nonatomic) CBCentralManager * manager;
-@property (strong, nonatomic) CBPeripheral *peripheral;
-@property (strong, atomic) CBService *currentService;
-@property (strong, nonatomic) dispatch_queue_t bleQueue;
-@property (nonatomic) NSUInteger connectDeviceIndex;
-@property (nonatomic) BleConnectMode connectMode;
-@property (nonatomic) BOOL shouldConnect;
-@property (nonatomic) BOOL ignoreUnconnectable;
-@property (nonatomic) int rssiSensitivity;
-@property (copy) NSString *manufacturer;
 @property (atomic) int latestValue;
 //------------------------------------------------------------------------------
 - (instancetype)init;
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue;
-- (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue
-                serviceToScan: (CBUUID *) scanServiceId
-         characteristicToRead: (CBUUID *) characteristicId;
 - (void)scan;
 - (void)stop;
 - (void)connectToFoundDevice: (int) deviceIndex;

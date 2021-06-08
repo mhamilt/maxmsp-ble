@@ -2,8 +2,7 @@
 #import "MacosBleCentral.h"
 //------------------------------------------------------------------------------
 @implementation MacosBleCentral
-//------------------------------------------------------------------------------
-@synthesize discoveredPeripherals;
+
 //------------------------------------------------------------------------------
 - (instancetype)init
 {
@@ -14,35 +13,24 @@
 ////------------------------------------------------------------------------------
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue
 {
-    return [self initWithQueue: centralDelegateQueue
-                 serviceToScan: nil
-          characteristicToRead: [CBUUID UUIDWithString:@"B81672D5-396B-4803-82C2-029D34319015"]];
-}
-//------------------------------------------------------------------------------
-- (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue
-                serviceToScan: (CBUUID *) scanServiceId
-         characteristicToRead: (CBUUID *) characteristicId
-{
     self = [super init];
     if (self)
     {
-        post("Start BLE\n");
-        _shouldConnect = NO;
-        _connectMode = NO;
-        _ignoreUnconnectable = NO;
-        _rssiSensitivity = 90;
-        self.discoveredPeripherals = [[NSMutableArray alloc] init];
+        shouldConnect = NO;
+        connectMode = NO;
+        ignoreUnconnectable = NO;
+        rssiSensitivity = 90;
+        discoveredPeripherals = [[NSMutableArray alloc] init];
         discoveredPeripheralsRSSIs = [[NSMutableArray alloc] init];
         _latestValue = 0;
         shouldReport = YES;
-        _bleQueue = centralDelegateQueue;
-        serviceUuid = scanServiceId;
-        characteristicUuid = characteristicId;
-        _manager = [[CBCentralManager alloc] initWithDelegate: self
-                                                        queue: _bleQueue];
+        bleQueue = centralDelegateQueue;
+        manager = [[CBCentralManager alloc] initWithDelegate: self
+                                                       queue: bleQueue];
     }
     return self;
 }
+//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 #pragma mark Manager Methods
@@ -58,8 +46,8 @@
     if(manuData)
     {
         if (![discoveredPeripherals containsObject: aPeripheral]
-            && !(!connectable && _ignoreUnconnectable)
-            && (abs([RSSI intValue]) < abs(_rssiSensitivity)))
+            && !(!connectable && ignoreUnconnectable)
+            && (abs([RSSI intValue]) < abs(rssiSensitivity)))
         {
             if(shouldReport)
             {
@@ -87,7 +75,7 @@
     
     [aPeripheral setDelegate:self];
     
-    switch (_connectMode)
+    switch (connectMode)
     {
         case BLE_CONNECT_GET_RSSI:
             [aPeripheral readRSSI]; // go to peripheralDidUpdateRSSI
@@ -140,8 +128,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 - (void) stop;
 {
     post("Stop scanning\n");
-    _shouldConnect = NO;
-    [_manager stopScan];
+    shouldConnect = NO;
+    [manager stopScan];
 }
 
 
@@ -149,7 +137,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 {
     post("Start scanning\n");
     post("------------------------");
-    [_manager scanForPeripheralsWithServices: nil
+    [manager scanForPeripheralsWithServices: nil
                                      options: nil];
 }
 
@@ -159,8 +147,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 {
     if (deviceIndex < discoveredPeripherals.count)
     {
-        _connectMode = BLE_CONNECT_EVERYTHING;
-        [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+        connectMode = BLE_CONNECT_EVERYTHING;
+        [manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
     }
     
 }
@@ -169,14 +157,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) clearDicoveredPeripherals
 {
-    [self.discoveredPeripherals removeAllObjects];
+    [discoveredPeripherals removeAllObjects];
 }
 
 //------------------------------------------------------------------------------
 
 - (void)setRssiSensitivity:(int)rssiSensitivity
 {
-    _rssiSensitivity = rssiSensitivity;
+    self.rssiSensitivity = rssiSensitivity;
 }
 
 //------------------------------------------------------------------------------
@@ -185,8 +173,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 {
     if (deviceIndex < discoveredPeripherals.count)
     {
-        _connectMode = BLE_CONNECT_GET_RSSI;
-        [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+        connectMode = BLE_CONNECT_GET_RSSI;
+        [manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
     }
 }
 
@@ -195,10 +183,10 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                          OfService: (const char*)  suuid
                      OfFoundDevice: (int) deviceIndex
 {
-    _connectMode = BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC;
+    connectMode = BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC;
     characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
     serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
-    [_manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
+    [manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
     
     post("Subscribe to %s: %s\n",
          serviceUuid.UUIDString.UTF8String,
@@ -220,7 +208,7 @@ didDiscoverIncludedServicesForService:(CBService *)service
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
-    switch (_connectMode) {
+    switch (connectMode) {
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverCharacteristics:@[characteristicUuid]
                                       forService:aPeripheral.services[0]];
@@ -242,7 +230,7 @@ didDiscoverServices: (NSError *)error
               error: (NSError *)error
 {
     
-    switch (_connectMode)
+    switch (connectMode)
     {
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral setNotifyValue:YES
@@ -289,7 +277,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     if(!error)
     {
-        switch (_connectMode)
+        switch (connectMode)
         {
                 
             case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
@@ -389,7 +377,7 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
   didModifyServices: (NSArray<CBService *> *)invalidatedServices
 {
     post("Service Modified\n");
-    [_manager cancelPeripheralConnection:peripheral];
+    [manager cancelPeripheralConnection:peripheral];
 }
 - (void) peripheral:(CBPeripheral *)peripheral
         didReadRSSI:(NSNumber *)RSSI

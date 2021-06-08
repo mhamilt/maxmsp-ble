@@ -31,9 +31,7 @@ void* myExternalConstructor()
 //------------------------------------------------------------------------------
 void myExternDestructor(MaxExternalObject* maxObjectPtr)
 {
-    post("Max-BLE END");
     bleCentralCRelease(maxObjectPtr->bleCentral);
-    
 }
 //------------------------------------------------------------------------------
 void onBang(MaxExternalObject* maxObjectPtr)
