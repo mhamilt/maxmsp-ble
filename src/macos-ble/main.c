@@ -153,6 +153,47 @@ void onList(MaxExternalObject* maxObjectPtr,
     }
 }
 
+/// @brief This is the function called by MaxMSP when the cursor is over an inlet or
+/// outlet.
+/// @param maxObjectPtr object pointer
+/// @param box still don't know what this is
+/// @param message either inlet  1 or outlet 2
+/// @param arg inlet / outlet index
+/// @param dstString pointer to destination: limited to 60 chars.
+void inletAssistant(MaxExternalObject* maxObjectPtr,
+                    void *box,
+                    long message,
+                    long arg,
+                    char *dstString)
+{
+    switch (message)
+    {
+        case 1: // inletMessage
+            switch (arg)
+            {
+                case 0:
+                    sprintf(dstString, "A Message scan $1, stop, found, clear, connect $1");
+                    break;
+                default:
+                    sprintf(dstString, "some other inlet");
+            }
+            break;
+        case 2:  // outletMessage
+            switch (arg)
+            {
+                case 0:
+                    sprintf(dstString, "List of found devices on found message or services characteristics");
+                    break;
+                case 1:
+                    sprintf(dstString, "list out on notification recieved from subscribed device");
+                    break;
+                default:
+                    sprintf(dstString, "some other outlet");
+            }
+            break;
+    }
+}
+
 
 //------------------------------------------------------------------------------
 void coupleMethodsToExternal( t_class* c)
@@ -161,6 +202,7 @@ void coupleMethodsToExternal( t_class* c)
     class_addmethod(c, (method)onPrintMessage, "print", 0);
     class_addmethod(c, (method)onList, "list", A_GIMME, 0);
     class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
+    class_addmethod(c, (method)inletAssistant, "assist", A_CANT, 0);
 }
 
 int C74_EXPORT main(void)
