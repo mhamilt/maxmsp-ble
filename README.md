@@ -4,8 +4,12 @@ A BLE Object for Max
 
 ## Install
 
-Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
+- Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
 
+**OR**
+
+- Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.3-alpha/max-ble.zip) to `~/Documents/Max 8/Packages`
+- 
 ### Usage
 
 - Send a `scan` message to the object to find available devices.
