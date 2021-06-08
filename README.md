@@ -4,22 +4,22 @@ A BLE Object for Max
 
 ## Install
 
-- Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
+-   Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
 
 **OR**
 
-- Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.3-alpha/max-ble.zip) to `~/Documents/Max 8/Packages`
-- 
+-   Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.3-alpha/max-ble.zip) to `~/Documents/Max 8/Packages`
+
 ### Usage
 
-- Send a `scan` message to the object to find available devices.
-- Found Devices will be printed to the Max Console Window
-- Details logged about a device will include an index.
-- send a `connect $1` message to the object, where `$1` is the index of a found device.
-- Details of what services and charateristics the device has will be printed to the Max Window
-- Available data will be sent out the inlet in `list` form `SERVICE_UUID CHARACTERISTIC_UUID RAW_BYTE_LIST`
-- Use a pair of `route` objects to filter which Service / Characteristic pair you need.
-- `RAW_BYTE_LIST` can then be assmebled into the original data format.
+-   Send a `scan` message to the object to find available devices.
+-   Found Devices will be printed to the Max Console Window
+-   Details logged about a device will include an index.
+-   send a `connect $1` message to the object, where `$1` is the index of a found device.
+-   Details of what services and charateristics the device has will be printed to the Max Window
+-   Available data will be sent out the inlet in `list` form `SERVICE_UUID CHARACTERISTIC_UUID RAW_BYTE_LIST`
+-   Use a pair of `route` objects to filter which Service / Characteristic pair you need.
+-   `RAW_BYTE_LIST` can then be assmebled into the original data format.
 
 ### Example
 
@@ -86,7 +86,6 @@ AaX5h8fD7.oifgbgaHzWxb+lG4qzGtec.UYZSoM8npUv5JX4X28bBJjFeonl
 -----------end_max5_patcher-----------
 </code></pre>
 
-
 #### Combining with umenus
 
 <pre><code>
@@ -131,8 +130,6 @@ Tl9TVsJsdaogFNOysS5zYcgtE77sYscgqUF5OoYjE4IqUUaZmzkYxF29e29+
 .0eXAXC
 -----------end_max5_patcher-----------
 </code></pre>
-
-
 
 ## Building
 
