@@ -2,7 +2,6 @@
 #import "MacosBleCentral.h"
 //------------------------------------------------------------------------------
 @implementation MacosBleCentral
-
 //------------------------------------------------------------------------------
 - (instancetype)init
 {
@@ -16,17 +15,19 @@
     self = [super init];
     if (self)
     {
-        shouldConnect = NO;
-        connectMode = NO;
-        ignoreUnconnectable = NO;
-        rssiSensitivity = 90;
         discoveredPeripherals = [[NSMutableArray alloc] init];
         discoveredPeripheralsRSSIs = [[NSMutableArray alloc] init];
-        _latestValue = 0;
-        shouldReport = YES;
+        
         bleQueue = centralDelegateQueue;
         manager = [[CBCentralManager alloc] initWithDelegate: self
                                                        queue: bleQueue];
+        shouldReport = YES;
+        shouldConnect = NO;
+        ignoreUnconnectable = NO;
+        rssiSensitivity = 127;
+        ignoreiPhone = NO;
+        servicesToScan = [[NSMutableArray alloc] init];
+        
     }
     return self;
 }
@@ -40,29 +41,24 @@
      advertisementData:(NSDictionary *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
-    NSData* manuData = advertisementData[CBAdvertisementDataManufacturerDataKey];
-    BOOL connectable = ([discoveredPeripherals containsObject: advertisementData[CBAdvertisementDataIsConnectable]] );
-    
-    if(manuData)
+    if (![discoveredPeripherals containsObject: aPeripheral]
+        //&& !(!connectable && ignoreUnconnectable)
+        && (abs([RSSI intValue]) < abs(rssiSensitivity))
+        && !(advertisementData[@"kCBAdvDataAppleMfgData"] && ignoreiPhone)
+        )
     {
-        if (![discoveredPeripherals containsObject: aPeripheral]
-            && !(!connectable && ignoreUnconnectable)
-            && (abs([RSSI intValue]) < abs(rssiSensitivity)))
+        if(shouldReport)
         {
-            if(shouldReport)
-            {
-                if (@available(macOS 10.13, *))
-                post("Index: %d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
-                             discoveredPeripherals.count,
-                             aPeripheral.identifier.UUIDString.UTF8String,
-                             aPeripheral.name.UTF8String,
-                             RSSI.intValue);
-                post("------------------------");
-            }
-            
-            [discoveredPeripherals addObject:aPeripheral];
-            [discoveredPeripheralsRSSIs addObject:RSSI];
+            NSUInteger index = discoveredPeripherals.count;
+            if (@available(macOS 10.13, *))
+                post("Index: %d, UUID: %s, RSSI: %d\n",
+                     index,
+                     aPeripheral.identifier.UUIDString.UTF8String,
+                     RSSI.intValue);
+            post("------------------------");
         }
+        [discoveredPeripherals addObject:aPeripheral];
+        [discoveredPeripheralsRSSIs addObject:RSSI];
     }
 }
 
@@ -121,6 +117,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) scan;
 {
+    [servicesToScan removeAllObjects];
     [self startScan];
 }
 
@@ -132,13 +129,39 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     [manager stopScan];
 }
 
+- (void)scanForService: (t_atom*) serviceUUIDs
+                 count: (long) argc
+{
+    if (!argc)
+    {
+        [servicesToScan removeAllObjects];
+    }
+    else
+    {
+        for (int i = 0; i < argc; i++)
+        {
+            [servicesToScan addObject:[CBUUID UUIDWithString:
+                                       [[NSString alloc]
+                                        initWithUTF8String:atom_getsym(serviceUUIDs + i)->s_name]]];
+        }
+    }
+    
+    [self startScan];    
+}
 
 - (void) startScan
 {
-    post("Start scanning\n");
-    post("------------------------");
-    [manager scanForPeripheralsWithServices: nil
-                                     options: nil];
+    if (@available(macOS 10.13, *))
+    {
+        if (![manager isScanning])
+        {
+            post("Start scanning\n");
+            post("------------------------");
+        }
+    }
+    
+    [manager scanForPeripheralsWithServices: ((servicesToScan.count) ? servicesToScan : nil)
+                                    options: @{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
 }
 
 //------------------------------------------------------------------------------
@@ -162,9 +185,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 //------------------------------------------------------------------------------
 
-- (void)setRssiSensitivity:(int)rssiSensitivity
+- (void)setRssiSensitivity:(int)newRSSISensitivity
+{    
+    rssiSensitivity = newRSSISensitivity;
+}
+
+- (void)setIgnoreiPhone:(BOOL)shouldIgnore
 {
-    self.rssiSensitivity = rssiSensitivity;
+    ignoreiPhone = shouldIgnore;
 }
 
 //------------------------------------------------------------------------------
@@ -277,89 +305,79 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 {
     if(!error)
     {
-        switch (connectMode)
+        if(characteristic.isNotifying)
         {
-                
-            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-                if(characteristic.isNotifying)
-                    onNotificationRead(maxObjectRef,
-                                       characteristic.UUID.UUIDString.UTF8String,
-                                       (uint8_t*)charDataCopy.bytes,
-                                       characteristic.value.length);
-                break;
-                
-            default:
-            {
-                NSString* charDescription = nil;
-                
-                if (@available(macOS 10.13, *))
-                {
-                    charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
-                }
-                
-                if(!charDescription)
-                {
-                    charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
-                }
-                
-                NSString* valueString = nil;
-                
-                if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
-                    valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
-                else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
-                    valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
-                else
-                    valueString = characteristic.value.description;
-                
-                if(shouldReport)
-                {
-                    NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@"Properties: "];
-                    
-                    if (characteristic.properties & CBCharacteristicPropertyBroadcast)
-                        [propertiesDescription appendString:@"Broadcast, "];
-                    if (characteristic.properties & CBCharacteristicPropertyRead)
-                        [propertiesDescription appendString:@"Read, "];
-                    if (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
-                        [propertiesDescription appendString:@"Write Without Response, "];
-                    if (characteristic.properties & CBCharacteristicPropertyWrite)
-                        [propertiesDescription appendString:@"Write, "];
-                    if (characteristic.properties & CBCharacteristicPropertyNotify)
-                        [propertiesDescription appendString:@"Notify, "];
-                    if (characteristic.properties & CBCharacteristicPropertyIndicate)
-                        [propertiesDescription appendString:@"Indicate, "];
-                    if (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites)
-                        [propertiesDescription appendString:@"SignedWrites, "];
-                    if (characteristic.properties & CBCharacteristicPropertyExtendedProperties)
-                        [propertiesDescription appendString:@"ExtendedProperties, "];
-                    if (characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired)
-                        [propertiesDescription appendString:@"NotifyEncryptionRequired, "];
-                    if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
-                        [propertiesDescription appendString:@"IndicateEncryptionRequired"];
-                    
-                    
-                    post("%s: %s : %s", charDescription.UTF8String, valueString.UTF8String, propertiesDescription.UTF8String);
-                    
-                }
-                charDataCopy = characteristic.value.copy;
-                
-                onCharacteristicRead(maxObjectRef,
-                                     characteristic.service.UUID.UUIDString.UTF8String,
-                                     characteristic.UUID.UUIDString.UTF8String,
-                                     (uint8_t*)charDataCopy.bytes,
-                                     characteristic.value.length);
-                break;
-            }
-                
+            onNotificationRead(maxObjectRef,
+                               characteristic.UUID.UUIDString.UTF8String,
+                               (uint8_t*)characteristic.value.bytes,
+                               characteristic.value.length);
         }
+        else
+        {
+            if(shouldReport)
+                [self postCharacteristicDescription:characteristic];
+            
+            onCharacteristicRead(maxObjectRef,
+                                 characteristic.service.UUID.UUIDString.UTF8String,
+                                 characteristic.UUID.UUIDString.UTF8String,
+                                 (uint8_t*)characteristic.value.bytes,
+                                 characteristic.value.length);
+        }
+        
     }
     else
     {
-        if(shouldReport)
-        {
-            post("Error %s\n",[[error localizedDescription] UTF8String]);
-        }
+        //        if(shouldReport)
+        post("Error %s\n",[[error localizedDescription] UTF8String]);
+        
     }
 }
+
+- (void) postCharacteristicDescription: (CBCharacteristic *)characteristic
+{
+    NSString* charDescription = nil;
+    
+    if (@available(macOS 10.13, *))
+        charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+    
+    if(!charDescription)
+        charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
+    
+    NSString* valueString = nil;
+    
+    if([charDescription containsString:@"String"] || [charDescription containsString:@"Name"])
+        valueString = [[NSString alloc] initWithData:characteristic.value encoding:NSUTF8StringEncoding];
+    else if ([characteristic.UUID.UUIDString isEqual:@"2A19"])
+        valueString = [NSString stringWithFormat:@"%d", *(int*)characteristic.value.bytes];
+    else
+        valueString = characteristic.value.description;
+    
+    NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@"Properties: "];
+    
+    if (characteristic.properties & CBCharacteristicPropertyBroadcast)
+        [propertiesDescription appendString:@"Broadcast, "];
+    if (characteristic.properties & CBCharacteristicPropertyRead)
+        [propertiesDescription appendString:@"Read, "];
+    if (characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
+        [propertiesDescription appendString:@"Write Without Response, "];
+    if (characteristic.properties & CBCharacteristicPropertyWrite)
+        [propertiesDescription appendString:@"Write, "];
+    if (characteristic.properties & CBCharacteristicPropertyNotify)
+        [propertiesDescription appendString:@"Notify, "];
+    if (characteristic.properties & CBCharacteristicPropertyIndicate)
+        [propertiesDescription appendString:@"Indicate, "];
+    if (characteristic.properties & CBCharacteristicPropertyAuthenticatedSignedWrites)
+        [propertiesDescription appendString:@"SignedWrites, "];
+    if (characteristic.properties & CBCharacteristicPropertyExtendedProperties)
+        [propertiesDescription appendString:@"ExtendedProperties, "];
+    if (characteristic.properties & CBCharacteristicPropertyNotifyEncryptionRequired)
+        [propertiesDescription appendString:@"NotifyEncryptionRequired, "];
+    if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
+        [propertiesDescription appendString:@"IndicateEncryptionRequired"];
+    
+    post("%s: %s : %s", charDescription.UTF8String, valueString.UTF8String, propertiesDescription.UTF8String);
+}
+
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral
 didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor

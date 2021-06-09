@@ -1,6 +1,6 @@
 /*
-    C Bridge for CoreBluetooth Central on macOS
-*/
+ C Bridge for CoreBluetooth Central on macOS
+ */
 
 #import "MacosBleCentralC.h"
 //------------------------------------------------------------------------------
@@ -35,19 +35,14 @@ void bleCentralCRelease(MacosBleCentralC *t)
 }
 //------------------------------------------------------------------------------
 
-int bleCentralCGetLatestValue(MacosBleCentralRef t)
-{
-    return [(__bridge MacosBleCentral *)t latestValue];
-}
-
 void bleCentralCSetMaxObjRef(MacosBleCentralRef t, MaxExternalObject* maxObjRef)
 {
-   [(__bridge MacosBleCentral *)t setMaxObjectRef:maxObjRef];
+    [(__bridge MacosBleCentral *)t setMaxObjectRef:maxObjRef];
 }
 
 void bleCentralCGetDeviceList (MacosBleCentralC *t)
 {
-   [(__bridge MacosBleCentral *)t getFoundDeviceList];
+    [(__bridge MacosBleCentral *)t getFoundDeviceList];
 }
 
 void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit)
@@ -67,7 +62,23 @@ void bleCentralCSetReporting (MacosBleCentralC *t, bool shouldReport)
 
 void bleCentralCSubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex, const char* suuid, const char* cuuid)
 {
-        [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
-                                                       OfService:suuid
-                                                   OfFoundDevice:deviceIndex];
+    [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
+                                                   OfService:suuid
+                                               OfFoundDevice:deviceIndex];
+}
+
+void bleCentralCSetRSSIScanThreshold (MacosBleCentralC *t, int rssi)
+{
+    
+    [(__bridge MacosBleCentral *)t setRssiSensitivity: abs(rssi)];
+}
+
+void bleCentralCSetIgnoreiPhone (MacosBleCentralC *t, bool shouldIgnore)
+{
+    [(__bridge MacosBleCentral *)t setIgnoreiPhone: shouldIgnore];
+}
+
+void bleCentralCScanForServices (MacosBleCentralC *t, t_atom* argv, long argc)
+{
+    [(__bridge MacosBleCentral *)t scanForService:argv count:argc];
 }

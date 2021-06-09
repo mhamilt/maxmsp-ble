@@ -105,6 +105,29 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             } switchs_end
         }
         break;
+        cases("filter")
+                
+        if(argc >= 1)
+        {
+            switchs(atom_getsym(argv)->s_name)
+            {
+                cases("rssi")
+                bleCentralCSetRSSIScanThreshold (maxObjectPtr->bleCentral,
+                                                 (int)atom_getlong(argv + 1));
+                break;
+                cases("iphone")
+                bleCentralCSetIgnoreiPhone(maxObjectPtr->bleCentral,
+                                           (bool)atom_getlong(argv + 1));
+                break;
+                cases("services")
+                
+                bleCentralCScanForServices(maxObjectPtr->bleCentral,
+                                           argv + 1,
+                                           argc - 1);
+                break;
+            }switchs_end;
+        }
+        break;
         defaults
         object_post( (t_object*)maxObjectPtr,
                     "This method was invoked by sending the ’%s’ message to this object.",

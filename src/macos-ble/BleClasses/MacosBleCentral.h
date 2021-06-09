@@ -28,30 +28,31 @@ typedef enum : NSUInteger {
 {
     CBUUID *serviceUuid;
     CBUUID *characteristicUuid;
+    NSMutableArray *servicesToScan;
     MaxExternalObject* maxObjectRef;
-    NSData *charDataCopy;
-    BOOL shouldReport;
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray *discoveredPeripherals;
-    CBCentralManager * manager;
     dispatch_queue_t bleQueue;
+    CBCentralManager * manager;
     NSUInteger connectDeviceIndex;
     BleConnectMode connectMode;
+    BOOL shouldReport;
     BOOL shouldConnect;
     BOOL ignoreUnconnectable;
+    BOOL ignoreiPhone;
     int rssiSensitivity;
 }
-//------------------------------------------------------------------------------
-@property (atomic) int latestValue;
 //------------------------------------------------------------------------------
 - (instancetype)init;
 - (instancetype)initWithQueue: (dispatch_queue_t) centralDelegateQueue;
 - (void)scan;
+- (void)scanForService: (t_atom*) serviceUUID count: (long) argc;
 - (void)stop;
 - (void)connectToFoundDevice: (int) deviceIndex;
 - (void)clearDicoveredPeripherals;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
 - (void)setRssiSensitivity:(int)rssiSensitivity;
+- (void)setIgnoreiPhone:(BOOL)shouldIgnore;
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
