@@ -50,11 +50,11 @@
         if(shouldReport)
         {
             NSUInteger index = discoveredPeripherals.count;
-            if (@available(macOS 10.13, *))
-                post("Index: %d, UUID: %s, RSSI: %d\n",
-                     index,
-                     aPeripheral.identifier.UUIDString.UTF8String,
-                     RSSI.intValue);
+            
+            post("Index: %d, UUID: %s, RSSI: %d\n",
+                 index,
+                 aPeripheral.identifier.UUIDString.UTF8String,
+                 RSSI.intValue);
             post("------------------------");
         }
         [discoveredPeripherals addObject:aPeripheral];
@@ -157,14 +157,13 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) startScan
 {
-    if (@available(macOS 10.13, *))
+    
+    if (![manager isScanning])
     {
-        if (![manager isScanning])
-        {
-            post("Start scanning\n");
-            post("------------------------");
-        }
+        post("Start scanning\n");
+        post("------------------------");
     }
+    
     
     [manager scanForPeripheralsWithServices: ((servicesToScan.count) ? servicesToScan : nil)
                                     options: @{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
@@ -322,10 +321,9 @@ didDiscoverServices: (NSError *)error
         {
             const char *serviceUUID = [[[service UUID] UUIDString] UTF8String];
             NSString* sericeDescription = nil;
-            if (@available(macOS 10.13, *))
-            {
-                sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
-            }
+            
+            sericeDescription = [MacosBleCentral getCBUUIDDescription:service];
+            
             
             if(shouldReport)
                 post("Service %s: %s\n", serviceUUID, ((sericeDescription)?sericeDescription.UTF8String:""));
@@ -387,10 +385,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 
 - (void) postCharacteristicDescription: (CBCharacteristic *)characteristic
 {
-    NSString* charDescription = nil;
-    
-    if (@available(macOS 10.13, *))
-        charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
+    NSString* charDescription = [MacosBleCentral getCBUUIDDescription:characteristic];
     
     if(!charDescription)
         charDescription = [NSString stringWithFormat:@"Characteristic %@", characteristic.UUID.UUIDString];
@@ -453,12 +448,11 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
         didReadRSSI:(NSNumber *)RSSI
               error:(NSError *)error
 {    
-    if (@available(macOS 10.13, *))
-    {
-        onRSSIRead(maxObjectRef,
-                   peripheral.identifier.UUIDString.UTF8String,
-                   RSSI.intValue);
-    }
+    
+    onRSSIRead(maxObjectRef,
+               peripheral.identifier.UUIDString.UTF8String,
+               RSSI.intValue);
+    
 }
 
 //------------------------------------------------------------------------------
@@ -476,22 +470,20 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
 {
     for(CBPeripheral* device in discoveredPeripherals)
     {
-        if (@available(macOS 10.13, *))
-        {
-            NSUInteger index = [discoveredPeripherals indexOfObject:device];
-            NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
-            if (shouldReport)
-                post("%d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
-                     index,
-                     device.identifier.UUIDString.UTF8String,
-                     device.name.UTF8String,
-                     rssi.intValue);
-            
-            outputFoundDeviceList(maxObjectRef,
-                                  index,
-                                  device.identifier.UUIDString.UTF8String,
-                                  rssi.intValue);
-        }
+        NSUInteger index = [discoveredPeripherals indexOfObject:device];
+        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
+        if (shouldReport)
+            post("%d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
+                 index,
+                 device.identifier.UUIDString.UTF8String,
+                 device.name.UTF8String,
+                 rssi.intValue);
+        
+        outputFoundDeviceList(maxObjectRef,
+                              index,
+                              device.identifier.UUIDString.UTF8String,
+                              rssi.intValue);
+        
     }
 }
 
@@ -502,7 +494,6 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
 
 
 + (NSString*)getCBUUIDDescription: (CBAttribute*) attribute
-API_AVAILABLE(macos(10.13))
 {
     NSString* attributeType = nil;
     if ([attribute isKindOfClass:[CBService class]])
