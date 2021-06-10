@@ -24,6 +24,16 @@ void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex)
     [(__bridge MacosBleCentral *)t connectToFoundDevice: deviceIndex];
 }
 
+void bleCentralCConnectToDeviceWithUUID (MacosBleCentralC *t, const char *uuid)
+{
+    [(__bridge MacosBleCentral *)t connectToDeviceWithUUID: uuid];
+}
+
+void bleCentralCConnectToDeviceWithName (MacosBleCentralC *t, const char *name)
+{    
+    [(__bridge MacosBleCentral *)t connectToDeviceWithName:name];
+}
+
 void bleCentralCClearDiscovered (MacosBleCentralC *t)
 {
     [(__bridge MacosBleCentral *)t clearDicoveredPeripherals];

@@ -1,9 +1,5 @@
 #include "MaxObject.h"
-//------------------------------------------------------------------------------
-void onBleNotify(MaxExternalObject* maxObjectPtr, int output)
-{
-    
-}
+
 //------------------------------------------------------------------------------
 
 void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)

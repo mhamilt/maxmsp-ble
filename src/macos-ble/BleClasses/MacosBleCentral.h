@@ -13,8 +13,8 @@
 //------------------------------------------------------------------------------
 
 typedef enum : NSUInteger {
-    BLE_CONNECT_WITH_MANU_DATA,
-    BLE_CONNECT_WITH_DEVICE_NAME,
+//    BLE_CONNECT_WITH_MANU_DATA,
+    BLE_CONNECT_WITH_DEVICE_UUID,
     BLE_CONNECT_GET_RSSI,
     BLE_CONNECT_EVERYTHING,
     BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC
@@ -26,6 +26,7 @@ typedef enum : NSUInteger {
 @interface MacosBleCentral: NSObject
 <CBCentralManagerDelegate, CBPeripheralDelegate>
 {
+    NSUUID *targetDeviceUUID;
     CBUUID *serviceUuid;
     CBUUID *characteristicUuid;
     NSMutableArray *servicesToScan;
@@ -49,6 +50,8 @@ typedef enum : NSUInteger {
 - (void)scanForService: (t_atom*) serviceUUID count: (long) argc;
 - (void)stop;
 - (void)connectToFoundDevice: (int) deviceIndex;
+- (void)connectToDeviceWithUUID: (const char*) uuid;
+- (void)connectToDeviceWithName: (const char*) name;
 - (void)clearDicoveredPeripherals;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
 - (void)setRssiSensitivity:(int)rssiSensitivity;

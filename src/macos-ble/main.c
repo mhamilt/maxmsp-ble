@@ -71,9 +71,22 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 case A_LONG:
                     bleCentralCConnectToFoundDevice(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
                     break;
-                default:
+                case A_SYM:
+                    bleCentralCConnectToDeviceWithUUID(maxObjectPtr->bleCentral,
+                                                       atom_getsym(argv)->s_name);
                     break;
             }
+        }
+        else if (argc >= 2)
+        {
+            switchs(atom_getsym(argv)->s_name)
+            {
+                cases("service")
+                break;
+                cases("name")
+                bleCentralCConnectToDeviceWithName(maxObjectPtr->bleCentral, atom_getsym(argv + 1)->s_name);
+                break;
+            }switchs_end
         }
         break;
         cases("report")
@@ -95,18 +108,16 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 break;
                 cases("subscribe")
                 if(argc == 4 && atom_gettype(argv + 2) == A_SYM && atom_gettype(argv + 3) == A_SYM)
-                bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
-                                                     deviceIndex,
-                                                     atom_getsym(argv + 2)->s_name,
-                                                     atom_getsym(argv + 3)->s_name);
-                break;
-                defaults
+                    bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                         deviceIndex,
+                                                         atom_getsym(argv + 2)->s_name,
+                                                         atom_getsym(argv + 3)->s_name);
                 break;
             } switchs_end
         }
         break;
         cases("filter")
-                
+        
         if(argc >= 1)
         {
             switchs(atom_getsym(argv)->s_name)
@@ -120,7 +131,6 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                                            (bool)atom_getlong(argv + 1));
                 break;
                 cases("services")
-                
                 bleCentralCScanForServices(maxObjectPtr->bleCentral,
                                            argv + 1,
                                            argc - 1);
@@ -193,7 +203,7 @@ void inletAssistant(MaxExternalObject* maxObjectPtr,
             switch (arg)
             {
                 case 0:
-                    sprintf(dstString, "A Message scan $1, stop, found, clear, connect $1");
+                    sprintf(dstString, "A message list scan $1, stop, found, clear, connect $1");
                     break;
                 default:
                     sprintf(dstString, "some other inlet");
@@ -221,7 +231,7 @@ void coupleMethodsToExternal( t_class* c)
 {
     class_addmethod(c, (method)onBang, "bang", 0);
     class_addmethod(c, (method)onPrintMessage, "print", 0);
-    class_addmethod(c, (method)onList, "list", A_GIMME, 0);
+    //    class_addmethod(c, (method)onList, "list", A_GIMME, 0);
     class_addmethod(c, (method)onAnyMessage, "anything", A_GIMME, 0);
     class_addmethod(c, (method)inletAssistant, "assist", A_CANT, 0);
 }

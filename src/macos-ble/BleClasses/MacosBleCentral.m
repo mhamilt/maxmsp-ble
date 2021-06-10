@@ -59,6 +59,12 @@
         }
         [discoveredPeripherals addObject:aPeripheral];
         [discoveredPeripheralsRSSIs addObject:RSSI];
+        if (  connectMode == BLE_CONNECT_WITH_DEVICE_UUID
+            && ([aPeripheral.identifier isEqual:targetDeviceUUID]))
+        {
+            [manager connectPeripheral:aPeripheral
+                               options:nil];
+        }
     }
 }
 
@@ -87,7 +93,7 @@
 //------------------------------------------------------------------------------
 - (void)centralManagerDidUpdateState:(CBCentralManager *)manager
 {
-    if ([manager state] == CBCentralManagerStatePoweredOn)
+    if ([manager state] == CBManagerStatePoweredOn)
     {
     }
 }
@@ -146,7 +152,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         }
     }
     
-    [self startScan];    
+    [self startScan];
 }
 
 - (void) startScan
@@ -174,6 +180,52 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         [manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
     }
     
+}
+
+- (void)connectToDeviceWithUUID: (const char*) uuid
+{
+    targetDeviceUUID = [[NSUUID alloc] initWithUUIDString:[[NSString alloc]
+                                                           initWithUTF8String:uuid]];
+    
+    BOOL isTargetDeviceFound = NO;
+    for (CBPeripheral* device in discoveredPeripherals)
+    {
+        if ([device.identifier isEqual:targetDeviceUUID])
+        {
+            isTargetDeviceFound = YES;
+            [manager connectPeripheral:device
+                               options:nil];
+            break;
+        }
+    }
+    
+    if (!isTargetDeviceFound)
+    {
+        connectMode = BLE_CONNECT_WITH_DEVICE_UUID;
+        [manager scanForPeripheralsWithServices:nil
+                                        options:nil];
+    }
+    
+}
+
+- (void)connectToDeviceWithName: (const char*) name
+{
+    BOOL deviceFound = NO;
+    NSString* deviceName = [[NSString alloc] initWithUTF8String:name];
+    
+    for (CBPeripheral* device in discoveredPeripherals)
+    {
+        if ([device.name isEqual:deviceName])
+        {
+            deviceFound = YES;
+            [manager connectPeripheral:device
+                               options:nil];
+            break;
+        }
+    }
+    
+    if (!deviceFound)
+        object_post((t_object *)maxObjectRef, "device with name %s not found", name);
 }
 
 //------------------------------------------------------------------------------
