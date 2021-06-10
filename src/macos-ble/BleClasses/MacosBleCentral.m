@@ -47,18 +47,23 @@
         && !(advertisementData[@"kCBAdvDataAppleMfgData"] && ignoreiPhone)
         )
     {
+        NSUInteger deviceIndex = discoveredPeripherals.count;
         if(shouldReport)
         {
-            NSUInteger index = discoveredPeripherals.count;
             
             post("Index: %d, UUID: %s, RSSI: %d\n",
-                 index,
+                 deviceIndex,
                  aPeripheral.identifier.UUIDString.UTF8String,
                  RSSI.intValue);
             post("------------------------");
         }
         [discoveredPeripherals addObject:aPeripheral];
         [discoveredPeripheralsRSSIs addObject:RSSI];
+        outputFoundDeviceList(maxObjectRef,
+                              deviceIndex,
+                              aPeripheral.identifier.UUIDString.UTF8String,
+                              RSSI.intValue);
+
         if (  connectMode == BLE_CONNECT_WITH_DEVICE_UUID
             && ([aPeripheral.identifier isEqual:targetDeviceUUID]))
         {

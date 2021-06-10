@@ -18,13 +18,14 @@ void* myExternalConstructor()
     bleCentralCSetMaxObjRef(maxObjectPtr->bleCentral, maxObjectPtr);
     maxObjectPtr->maxListSize = 100;
     
+    maxObjectPtr->list_outlet3 = listout(maxObjectPtr);
     maxObjectPtr->list_outlet2 = listout(maxObjectPtr);
     maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
+    
     atom_alloc_array(maxObjectPtr->maxListSize,
                      &maxObjectPtr->listSize,
                      &maxObjectPtr->outputList,
                      &maxObjectPtr->listAllocSuccess);
-    
     
     return maxObjectPtr;
 }
@@ -212,10 +213,13 @@ void inletAssistant(MaxExternalObject* maxObjectPtr,
             switch (arg)
             {
                 case 0:
-                    sprintf(dstString, "List of found devices on found message or services characteristics");
+                    sprintf(dstString, "list: output of service characteristic and raw bytes");
                     break;
                 case 1:
-                    sprintf(dstString, "list out on notification recieved from subscribed device");
+                    sprintf(dstString, "list: out on notification recieved from subscribed device");
+                    break;
+                case 2:
+                    sprintf(dstString, "list: output when new device found or on 'found' message");
                     break;
                 default:
                     sprintf(dstString, "some other outlet");

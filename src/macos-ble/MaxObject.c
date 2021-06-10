@@ -37,12 +37,9 @@ void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* cuuid, uint
 
 void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi)
 {
-    //atom_setlong(maxObjectPtr->outputList + 0, (t_atom_long) index);
     atom_setsym (maxObjectPtr->outputList + 0, gensym(uuid));
-//    atom_setsym (maxObjectPtr->outputList + 2, gensym(name));
     atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long) rssi);
-    
-    outlet_list(maxObjectPtr->list_outlet1, 0L, 2, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->list_outlet3, 0L, 2, maxObjectPtr->outputList);
 }
 
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi)

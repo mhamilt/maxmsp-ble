@@ -12,13 +12,18 @@ typedef struct _MaxExternalObject
     MacosBleCentralRef bleCentral;
     void*   list_outlet1;
     void*   list_outlet2;
+    void*   list_outlet3;
     size_t  maxListSize;
     t_atom* outputList;
     long listSize;
     char listAllocSuccess;
 } MaxExternalObject;
 
+///
 void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
+///
 void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* cuuid, uint8_t* byteArray, size_t numBytes);
+///
 void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
+///
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi);
