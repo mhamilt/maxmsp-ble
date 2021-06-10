@@ -49,8 +49,12 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
     switchs(s->s_name)
     {
         cases("scan")
-        if(argc && !atom_getlong(argv))
+        if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
             bleCentralCStopScan(maxObjectPtr->bleCentral);
+        else if (argc && atom_gettype(argv) == A_SYM)
+            bleCentralCScanForServices(maxObjectPtr->bleCentral,
+                                       argv,
+                                       argc);
         else
             bleCentralCScan(maxObjectPtr->bleCentral);
         break;
@@ -129,11 +133,6 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 cases("iphone")
                 bleCentralCSetIgnoreiPhone(maxObjectPtr->bleCentral,
                                            (bool)atom_getlong(argv + 1));
-                break;
-                cases("services")
-                bleCentralCScanForServices(maxObjectPtr->bleCentral,
-                                           argv + 1,
-                                           argc - 1);
                 break;
             }switchs_end;
         }
