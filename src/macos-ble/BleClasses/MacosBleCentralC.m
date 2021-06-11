@@ -74,8 +74,34 @@ void bleCentralCSubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex,
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
-                                               OfFoundDevice:deviceIndex];
+                                               OfFoundDevice:deviceIndex
+                                             shouldSubscribe:YES];
 }
+
+void bleCentralCSubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, const char* duuid, const char* suuid, const char* cuuid)
+{
+    [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
+                                                   OfService:suuid
+                                            ofDeviceWithUUID:duuid
+                                             shouldSubscribe:YES];
+}
+
+void bleCentralCUnsubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex, const char *suuid, const char *cuuid)
+{
+    [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
+                                                   OfService:suuid
+                                               OfFoundDevice:deviceIndex
+                                             shouldSubscribe:NO];
+}
+
+void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, const char* duuid, const char* suuid, const char* cuuid)
+{
+    [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
+                                                   OfService:suuid
+                                            ofDeviceWithUUID:duuid
+                                             shouldSubscribe:NO];
+}
+
 
 void bleCentralCSetRSSIScanThreshold (MacosBleCentralC *t, int rssi)
 {

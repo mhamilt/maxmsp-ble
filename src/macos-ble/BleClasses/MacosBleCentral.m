@@ -69,6 +69,7 @@
         {
             [manager connectPeripheral:aPeripheral
                                options:nil];
+            [manager stopScan];
         }
     }
 }
@@ -87,6 +88,7 @@
         case BLE_CONNECT_GET_RSSI:
             [aPeripheral readRSSI]; // go to peripheralDidUpdateRSSI
             break;
+        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverServices:@[serviceUuid]];
             break;
@@ -266,8 +268,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 - (void) subscribeToCharacteristic: (const char *) cuuid
                          OfService: (const char*)  suuid
                      OfFoundDevice: (int) deviceIndex
+                   shouldSubscribe: (BOOL) shouldSubscribe
 {
-    connectMode = BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC;
+    
+    connectMode = ((shouldSubscribe) ?
+                   BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
+                   BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+
+    
     characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
     serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
     [manager connectPeripheral:discoveredPeripherals[deviceIndex] options:nil];
@@ -275,6 +283,33 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     post("Subscribe to %s: %s\n",
          serviceUuid.UUIDString.UTF8String,
          characteristicUuid.UUIDString.UTF8String);
+}
+
+- (void)subscribeToCharacteristic: (const char*) cuuid
+                        OfService: (const char*) suuid
+                 ofDeviceWithUUID: (const char*) duuid
+                  shouldSubscribe: (BOOL) shouldSubscribe;
+{
+    connectMode = ((shouldSubscribe) ?
+                   BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
+                   BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+    
+    characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
+    serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
+    
+    BOOL isTargetDeviceFound = NO;
+    for (CBPeripheral* device in discoveredPeripherals)
+    {
+        if ([device.identifier isEqual:targetDeviceUUID])
+        {
+            isTargetDeviceFound = YES;
+            [manager connectPeripheral:device
+                               options:nil];
+            break;
+        }
+    }
+    if (!isTargetDeviceFound)
+        post("Device with UUID %s not found", duuid);
 }
 
 //------------------------------------------------------------------------------
@@ -292,7 +327,9 @@ didDiscoverIncludedServicesForService:(CBService *)service
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
-    switch (connectMode) {
+    switch (connectMode)
+    {
+        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverCharacteristics:@[characteristicUuid]
                                       forService:aPeripheral.services[0]];
@@ -320,26 +357,26 @@ didDiscoverServices: (NSError *)error
             [aPeripheral setNotifyValue:YES
                       forCharacteristic:service.characteristics[0]];
             break;
+        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
+            [aPeripheral setNotifyValue:NO
+                      forCharacteristic:service.characteristics[0]];
+            break;
         default:
         {
             if(shouldReport)
+            {
                 post("Service (%s) %s\n",
                      service.UUID.UUIDString.UTF8String,
                      ((service.UUID.UUIDString.length == 4) ? service.UUID.description.UTF8String : ""));
-            
+            }
             for (CBCharacteristic *aChar in service.characteristics)
             {
                 if (aChar.properties & CBCharacteristicPropertyRead)
-                {
                     [aPeripheral readValueForCharacteristic:aChar];
-                    //[aPeripheral discoverDescriptorsForCharacteristic:aChar];
-                }                
             }
             break;
         }
     }
-    
-    
 }
 //------------------------------------------------------------------------------
 - (void) peripheral:(CBPeripheral *)peripheral
@@ -486,11 +523,6 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
                               rssi.intValue);
         
     }
-}
-
-+ (void) printCharacteristicProperties:(CBCharacteristicProperties*) properties
-{
-    
 }
 
 @end

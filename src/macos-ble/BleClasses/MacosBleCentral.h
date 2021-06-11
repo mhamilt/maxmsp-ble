@@ -17,7 +17,8 @@ typedef enum : NSUInteger {
     BLE_CONNECT_WITH_DEVICE_UUID,
     BLE_CONNECT_GET_RSSI,
     BLE_CONNECT_EVERYTHING,
-    BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC
+    BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC,
+    BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC
 } BleConnectMode;
 
 //------------------------------------------------------------------------------
@@ -34,7 +35,7 @@ typedef enum : NSUInteger {
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray *discoveredPeripherals;
     dispatch_queue_t bleQueue;
-    CBCentralManager * manager;
+    CBCentralManager *manager;
     NSUInteger connectDeviceIndex;
     BleConnectMode connectMode;
     BOOL shouldReport;
@@ -61,6 +62,12 @@ typedef enum : NSUInteger {
 - (void)getFoundDeviceList;
 - (void)subscribeToCharacteristic: (const char*) cuuid
                         OfService: (const char*) suuid
-                    OfFoundDevice: (int) deviceIndex;
+                    OfFoundDevice: (int)  deviceIndex
+                  shouldSubscribe: (BOOL) shouldSubscribe;
+
+- (void)subscribeToCharacteristic: (const char*) cuuid
+                        OfService: (const char*) suuid
+                 ofDeviceWithUUID: (const char*) duuid
+                  shouldSubscribe: (BOOL) shouldSubscribe;
 //------------------------------------------------------------------------------
 @end

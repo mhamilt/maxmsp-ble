@@ -117,6 +117,28 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                                                          deviceIndex,
                                                          atom_getsym(argv + 2)->s_name,
                                                          atom_getsym(argv + 3)->s_name);
+                if(argc == 5
+                   && atom_gettype(argv + 2) == A_SYM
+                   && atom_gettype(argv + 3) == A_SYM
+                   && atom_gettype(argv + 4) == A_LONG)
+                {
+                    
+                    if (atom_getlong(argv + 4))
+                    {
+                        bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                             deviceIndex,
+                                                             atom_getsym(argv + 2)->s_name,
+                                                             atom_getsym(argv + 3)->s_name);
+                    }
+                    else
+                    {
+                        bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                               deviceIndex,
+                                                               atom_getsym(argv + 2)->s_name,
+                                                               atom_getsym(argv + 3)->s_name);
+                    }
+                
+                }
                 break;
             } switchs_end
         }
@@ -195,7 +217,7 @@ void inletAssistant(MaxExternalObject* maxObjectPtr,
                     void *box,
                     long message,
                     long arg,
-                    char *dstString)
+                    char *destination)
 {
     switch (message)
     {
@@ -203,26 +225,26 @@ void inletAssistant(MaxExternalObject* maxObjectPtr,
             switch (arg)
             {
                 case 0:
-                    sprintf(dstString, "A message list scan $1, stop, found, clear, connect $1");
+                    sprintf(destination, "A message list scan $1, stop, found, clear, connect $1");
                     break;
                 default:
-                    sprintf(dstString, "some other inlet");
+                    sprintf(destination, "some other inlet");
             }
             break;
         case 2:  // outletMessage
             switch (arg)
             {
                 case 0:
-                    sprintf(dstString, "list: output of service characteristic and raw bytes");
+                    sprintf(destination, "list: output of service characteristic and raw bytes");
                     break;
                 case 1:
-                    sprintf(dstString, "list: out on notification recieved from subscribed device");
+                    sprintf(destination, "list: out on notification recieved from subscribed device");
                     break;
                 case 2:
-                    sprintf(dstString, "list: output when new device found or on 'found' message");
+                    sprintf(destination, "list: output when new device found or on 'found' message");
                     break;
                 default:
-                    sprintf(dstString, "some other outlet");
+                    sprintf(destination, "some other outlet");
             }
             break;
     }
