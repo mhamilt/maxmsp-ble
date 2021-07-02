@@ -51,13 +51,13 @@ void WinBleCentral::connectToDeviceWithUUID(const char* uuid)
             break;
         }
     }
-    // for items in dicovered peripherals
-    // if item.uuid equals uuid
-    // connectToPeripheral(item.BluetoothAddress());
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::connectToDeviceWithName(const char* name) {}
+void WinBleCentral::connectToDeviceWithName(const char* name)
+{
+    post("Not yet implemented in Windows");
+}
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::clearDicoveredPeripherals()
@@ -67,15 +67,23 @@ void WinBleCentral::clearDicoveredPeripherals()
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::getRssiOfFoundDevice(int deviceIndex) {}
+void WinBleCentral::getRssiOfFoundDevice(int deviceIndex) 
+{
+    post("Not yet implemented in Windows");
+}
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::getFoundDeviceList()
 {
-    for (auto device : discoveredPeripherals)
+    for (size_t i = 0; i < discoveredPeripherals.size(); i++)
     {
-
+        outputFoundDevice(
+            maxObjectRef,
+            i,
+            bluetoothAddressToString(discoveredPeripherals[i].BluetoothAddress()).c_str(),
+            discoveredPeripherals[i].RawSignalStrengthInDBm());
     }
+
 }
 
 //--------------------------------------------------------------------------------------------
@@ -85,14 +93,22 @@ void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::setIgnoreiPhone(bool shouldIgnore) {}
+void WinBleCentral::setIgnoreiPhone(bool shouldIgnore) 
+{
+    post("Not yet implemented in Windows");
+}
 //--------------------------------------------------------------------------------------------
 
-void WinBleCentral::setReporting(bool reportingMode) {}
+void WinBleCentral::setReporting(bool reportingMode) 
+{
+    post("Not yet implemented in Windows");
+}
 //--------------------------------------------------------------------------------------------
 
 void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suuid, int deviceIndex)
-{}
+{
+    post("Not yet implemented in Windows");
+}
 
 //--------------------------------------------------------------------------------------------    
 
@@ -233,19 +249,18 @@ void WinBleCentral::didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watche
         if (shouldReport)
             printDeviceDescription(eventArgs);
         outputFoundDevice(maxObjectRef, discoveredPeripherals.size() - 1, bluetoothAddressToString(eventArgs.BluetoothAddress()).c_str(), eventArgs.RawSignalStrengthInDBm());
-        //connectToFoundDevice(discoveredPeripherals.size() - 1);
     }
 }
 
 void WinBleCentral::didCancelScanning()
 {
-    std::cout << "stopped scanning" << std::endl;
+    post("Stopped Scanning");
 }
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
 {
-    std::wcout << "didConnectPeripheral:" << device.Name().c_str() << std::endl;
+    post("didConnectPeripheral: %s", device.Name().c_str());
     discoverServices(device);
 }
 
@@ -258,30 +273,28 @@ void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services,
 {
     if (status == GattCommunicationStatus::Success)
     {
-        std::cout << "didDiscoverServices: " << services.GetAt(0).Device().Name().c_str() << std::endl;
+//        std::cout << "didDiscoverServices: " << services.GetAt(0).Device().Name().c_str() << std::endl;
 
         for (auto service : services)
         {
-            std::cout << "Service: " << winrtGuidToString(service.Uuid()) << std::endl;
+            //std::cout << "Service: " << winrtGuidToString(service.Uuid()) << std::endl;
             discoverCharacteristicsForService(service);
         }
     }
     else
     {
-        std::cout << "Error Getting Services: ";
         switch (status)
         {
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            std::cout << "Unreachable";
+            post("Error Getting Services: Unreachable");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            std::cout << "ProtocolError";
+            post("Error Getting Services: ProtocolError");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            std::cout << "AccessDenied";
+            post("Error Getting Services: AccessDenied");
             break;
         }
-        std::cout << std::endl;
     }
 }
 
@@ -300,20 +313,18 @@ void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharact
     }
     else
     {
-        std::cout << "Error Getting Characteristics: ";
         switch (status)
         {
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            std::cout << "Unreachable";
+            post("Error Getting Services: Unreachable");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            std::cout << "ProtocolError";
+            post("Error Getting Services: ProtocolError");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            std::cout << "AccessDenied";
+            post("Error Getting Services: AccessDenied");
             break;
         }
-        std::cout << std::endl;
     }
 }
 
@@ -330,20 +341,18 @@ void WinBleCentral::didReadValueForCharacteristic(winrt::Windows::Storage::Strea
     }
     else
     {
-        std::cout << "Error Value For Characteristic: ";
         switch (status)
         {
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            std::cout << "Unreachable";
+            post("Error Getting Services: Unreachable");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            std::cout << "ProtocolError";
+            post("Error Getting Services: ProtocolError");
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            std::cout << "AccessDenied";
+            post("Error Getting Services: AccessDenied");
             break;
         }
-        std::cout << std::endl;
     }
 }
 
@@ -405,28 +414,3 @@ void WinBleCentral::outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned 
     outlet_list(maxObjectPtr->list_outlet3, 0L, 2, maxObjectPtr->outputList);
 }
 
-
-void oldGetDeviceInfo()
-{
-    //auto gattServices = device.GetGattServicesAsync(BluetoothCacheMode::Uncached).get(); // https://docs.microsoft.com/en-us/cpp/parallel/concrt/reference/task-class?view=msvc-160#get
-
-    //std::cout << gattServices.Services().Size() << std::endl;
-
-    //std::array<uint8_t, 8> ar = { 17,17,17,17,17,17,17,17 };
-    //std::array<uint8_t, 8> ar2 = { 34,34,34,34,34,34,34,34 };
-
-    //winrt::guid Guid((uint32_t)0x111111111, (uint16_t)0x1111, (uint16_t)0x1111, ar);
-    //winrt::guid charGuid((uint32_t)0x22222222, (uint16_t)0x2222, (uint16_t)0x2222, ar2);
-
-    //auto bruh = device.GetGattServicesForUuidAsync(Guid);
-    //auto d = bruh.get();
-    //auto services = d.Services();
-    //std::cout << "Service Size: " << services.Size() << std::endl;
-    //std::cout << "Char Size: " << services.GetAt(0).GetCharacteristicsForUuidAsync(charGuid).get().Characteristics().Size() << std::endl;
-    // DataWriter f;
-    // f.WriteInt16(102);
-    // auto b = services.GetAt(0).GetCharacteristicsForUuidAsync(charGuid).get().Characteristics().GetAt(0).WriteValueAsync(f.DetachBuffer());
-
-    // auto re = services.GetAt(0).GetCharacteristicsForUuidAsync(charGuid).get().Characteristics().GetAt(0).CharacteristicProperties();
-    // std::cout << (int)re << std::endl;
-}
