@@ -8,6 +8,7 @@ MaxBleCentral* newBleCentralC(void)
 
 void bleCentralCRelease(MaxBleCentral* t)
 {
+    ((WinBleCentral*)t)->stop();
     delete ((WinBleCentral*)t);
 }
 
@@ -56,7 +57,7 @@ void bleCentralCGetRssi(MaxBleCentral* t, int deviceIndex)
 }
 void bleCentralCSetRSSISensitity(MaxBleCentral* t, int rssiLimit)
 {
-    ((WinBleCentral*)t)->setRssiSensitivity(rssiLimit);
+    ((WinBleCentral*)t)->setRssiSensitivity(abs(rssiLimit));
 }
 void bleCentralCSetReporting(MaxBleCentral* t, bool shouldReport)
 {
@@ -72,7 +73,7 @@ void bleCentralCUnsubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, c
 }
 void bleCentralCSetRSSIScanThreshold(MaxBleCentral* t, int rssiLimit)
 {
-    ((WinBleCentral*)t)->setRssiSensitivity(rssiLimit);
+    ((WinBleCentral*)t)->setRssiSensitivity(abs(rssiLimit));
 }
 void bleCentralCSetIgnoreiPhone(MaxBleCentral* t, bool shouldIgnore)
 {

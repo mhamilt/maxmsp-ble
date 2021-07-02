@@ -6,7 +6,7 @@ WinBleCentral::WinBleCentral()
 {
     post("Windows BLE Started\n");
     bleWatcher.Received([this](BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementReceivedEventArgs eventArgs) {this->didDiscoverPeripheral(watcher, eventArgs); });
-    bleWatcher.Stopped([this](BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementWatcherStoppedEventArgs b) {this->didCancelScanning();});
+    bleWatcher.Stopped([this](BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementWatcherStoppedEventArgs b) {this->didCancelScanning(); });
 }
 //--------------------------------------------------------------------------------------------
 WinBleCentral::~WinBleCentral()
@@ -47,7 +47,7 @@ void WinBleCentral::connectToDeviceWithUUID(const char* uuid)
 void WinBleCentral::connectToDeviceWithName(const char* name) {}
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::clearDicoveredPeripherals() 
+void WinBleCentral::clearDicoveredPeripherals()
 {
     discoveredPeripherals.clear();
 }
@@ -56,7 +56,7 @@ void WinBleCentral::clearDicoveredPeripherals()
 void WinBleCentral::getRssiOfFoundDevice(int deviceIndex) {}
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::getFoundDeviceList() 
+void WinBleCentral::getFoundDeviceList()
 {
     for (auto device : discoveredPeripherals)
     {
@@ -65,7 +65,7 @@ void WinBleCentral::getFoundDeviceList()
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::setRssiSensitivity(int rssiSensitivity) 
+void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 {
     this->rssiSensitivity = rssiSensitivity;
 }
@@ -204,17 +204,12 @@ void WinBleCentral::readValueForCharacteristic(GattCharacteristic characteristic
 void WinBleCentral::didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watcher,
     BluetoothLEAdvertisementReceivedEventArgs eventArgs)
 {
-
-    /*if (isPeripheralNew(eventArgs) && eventArgs.RawSignalStrengthInDBm() > -60 && 127957777215202 == eventArgs.BluetoothAddress())*/
-    if (isPeripheralNew(eventArgs))
+    if (isPeripheralNew(eventArgs) && abs(eventArgs.RawSignalStrengthInDBm()) < rssiSensitivity)
     {
         discoveredPeripheralUUIDs.push_back(eventArgs.BluetoothAddress());
-        discoveredPeripherals.push_back(eventArgs);        
+        discoveredPeripherals.push_back(eventArgs);
         if (shouldReport)
-        {
-            post("Device Address: %d\n", eventArgs.BluetoothAddress());            
             printDeviceDescription(eventArgs);
-        }
 
         //connectToFoundDevice(discoveredPeripherals.size() - 1);
     }
@@ -345,27 +340,11 @@ void WinBleCentral::postCharacteristicDescription() {}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::printDeviceDescription(BluetoothLEAdvertisementReceivedEventArgs device)
 {
-    BluetoothLEAdvertisement deviceAdvert = device.Advertisement();
-    post("Name: %s", deviceAdvert.LocalName().c_str());
-
-    for (auto& service : deviceAdvert.ServiceUuids())
-        post("Service UUID: %s \n", winrtGuidToString(service).c_str());
-
-    char manuDataString[100];
-    for (auto& manuData : deviceAdvert.ManufacturerData())
-    {               
-        int j = 0;
-        for (size_t i = 0; i < manuData.Data().Length(); i++)
-        {
-            sprintf(manuDataString + j, "%02x", manuData.Data().data()[i]);
-            j += 2;
-            
-        }
-        manuDataString[j] = '\0';
-        post("Manu: %04x : %s", manuDataString);
-    }
-    post("RSSI: %d \n", device.RawSignalStrengthInDBm());
-    post("*----------------------------------------*");
+    post("Index: %d, Address: %012llX, RSSI: %d\n",
+        discoveredPeripherals.size() - 1,
+        device.BluetoothAddress(),
+        device.RawSignalStrengthInDBm());
+    post("------------------------");
 }
 //--------------------------------------------------------------------------------------------
 bool WinBleCentral::isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs eventArgs)

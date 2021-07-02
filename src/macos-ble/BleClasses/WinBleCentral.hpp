@@ -38,7 +38,9 @@ public:
     ~WinBleCentral();
     /// @brief 
     void scan();
-    //
+    /// @brief 
+    /// @param serviceUUID 
+    /// @param argc 
     void scanForService(t_atom* serviceUUID, long argc);
     /// @brief 
     void stop();
