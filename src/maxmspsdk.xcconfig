@@ -23,7 +23,7 @@ ARCHS = i386 x86_64
 C74SUPPORT = max-sdk/source/c74support
 HEADER_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
 FRAMEWORK_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
-DSTROOT = $HOME/Documents/Max 8/Packages/max-ble/externals
+DSTROOT = max-package/max-ble/externals/
 // (This next path is relative to DSTROOT)
 INSTALL_PATH = /
 
