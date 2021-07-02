@@ -6,7 +6,7 @@
 #include "ext.h"
 #include "ext_proto.h"
 #include "MaxObject.h"
-#include "MacosBleCentralC.h"
+#include "BleClasses/MaxBleCentral.h"
 #include "SwitchString.h"
 //------------------------------------------------------------------------------
 void* myExternClass;
@@ -47,7 +47,7 @@ void onBang(MaxExternalObject* maxObjectPtr)
 /// @param argv array of atoms holding the arguments.
 void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_atom *argv)
 {
-    switchs(s->s_name)
+   switchs(s->s_name)
     {
         cases("scan")
         if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
