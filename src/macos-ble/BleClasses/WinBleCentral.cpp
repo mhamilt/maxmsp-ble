@@ -23,7 +23,7 @@ void WinBleCentral::scan()
 }
 void WinBleCentral::scanForService(t_atom* serviceUUID, long argc)
 {
-
+    post("Not yet implemented in Windows");
 }
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::stop()
@@ -34,13 +34,23 @@ void WinBleCentral::stop()
 void WinBleCentral::connectToFoundDevice(int deviceIndex)
 {
     uint64_t deviceAddress = discoveredPeripherals[deviceIndex].BluetoothAddress();
-    std::cout << std::hex << "Connect to: " << deviceAddress << std::endl;
+    post("Connect to: %s", bluetoothAddressToString(deviceAddress).c_str());
     connectPeripheral(deviceAddress);
 }
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::connectToDeviceWithUUID(const char* uuid)
 {
+    std::string uuidString = std::string(uuid);
+
+    for (auto& device : discoveredPeripherals)
+    {
+        if (uuidString.compare(bluetoothAddressToString(device.BluetoothAddress())))
+        {
+            connectPeripheral(device.BluetoothAddress());
+            break;
+        }
+    }
     // for items in dicovered peripherals
     // if item.uuid equals uuid
     // connectToPeripheral(item.BluetoothAddress());
