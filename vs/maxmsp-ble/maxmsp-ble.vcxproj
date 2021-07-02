@@ -271,7 +271,15 @@
     <ClCompile Include="$(ProjectName).c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="max_extern_x64.props" />
+    <None Include="max_extern_x86.props" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="maxmsp-ble.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
