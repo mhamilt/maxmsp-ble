@@ -376,3 +376,6 @@ package/
 
 sysbuild/
 externals/
+max-package/max-ble/externals/
+
+*.zip

@@ -1,0 +1,32 @@
+{
+  "name": "max-ble",
+  "version": "0.1-alpha.5",
+  "author": "Matthew Hamilton",
+  "description": "Bluetooth Low Energy interface for Max",
+  "tags": ["bluetooth", "ble"],
+  "website": "https://github.com/mhamilt/maxmsp-ble",
+  "max_version_min": "8.0",
+  "max_version_max": "none",
+  "os": {
+    "macintosh": {
+      "min_version": "10.13",
+      "platform": ["x64"]
+    },
+    "windows" : {
+     "platform" : [ "ia32", "x64" ],
+     "min_version" : "none"
+ }
+  },
+  "homepatcher": "simple-max-ble.maxpat",
+  "package_extra": {
+    "reverse_domain": "com.mhamilt",
+    "copyright": "GNU General Public License v3.0"
+  },
+  "filelist": {
+    "examples": ["arduino-notify.maxpat", "filter-scan.maxpat", "rssi.maxpat", "simple-max-ble.maxpat", "subscribing.maxpat", "using-umenus.maxpat"],
+    "externals": ["max-ble.mxo", "max-ble.mxe", "max-ble.mxe64"],
+    "help": ["max-ble.maxhelp"],
+    "extras": ["ble-notify/ble-notify.ino"],
+    "docs": ["max-ble.maxref.xml"]
+  }
+}
