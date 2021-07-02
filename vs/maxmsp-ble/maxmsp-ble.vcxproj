@@ -268,7 +268,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.c" />
+    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.cpp" />
     <ClCompile Include="..\..\src\macos-ble\BleClasses\WinBleCentral.cpp" />
     <ClCompile Include="..\..\src\macos-ble\main.c" />
     <ClCompile Include="..\..\src\macos-ble\MaxObject.c" />
