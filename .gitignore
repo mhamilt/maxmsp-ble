@@ -375,3 +375,4 @@ package/
 *.tlog
 
 sysbuild/
+*.rc
