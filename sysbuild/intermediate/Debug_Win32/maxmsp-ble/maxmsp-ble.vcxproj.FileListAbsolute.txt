@@ -1,3 +1,0 @@
-C:\Users\admin\Documents\GitHub\maxmsp-ble\sysbuild\intermediate\Debug_Win32\maxmsp-ble\maxmsp-ble.vcxproj.MdMergeInputs.cache
-C:\Users\admin\Documents\GitHub\maxmsp-ble\sysbuild\intermediate\Debug_Win32\maxmsp-ble\maxmsp-ble.vcxproj.cppwinrt_plat.cache
-C:\Users\admin\Documents\GitHub\maxmsp-ble\sysbuild\intermediate\Debug_Win32\maxmsp-ble\maxmsp-ble.vcxproj.cppwinrt_comp.cache
