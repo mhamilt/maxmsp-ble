@@ -57,7 +57,7 @@ void bleCentralCSubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, con
 {
 
 }
-void bleCentralCUnsubscribeToCharacteristic(MaxBleCentral* t, const char* charUuid)
+void bleCentralCUnsubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid)
 {
 
 }
