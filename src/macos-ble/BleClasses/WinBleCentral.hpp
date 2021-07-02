@@ -5,6 +5,8 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include "ext.h"
+#include "../MaxObject.h"
 
 using winrt::Windows::Devices::Bluetooth::BluetoothConnectionStatus;
 using winrt::Windows::Devices::Bluetooth::BluetoothLEDevice;
@@ -36,8 +38,8 @@ public:
     ~WinBleCentral();
     /// @brief 
     void scan();
-    //void scanForService(t_atom* serviceUUID, long argc);
-
+    //
+    void scanForService(t_atom* serviceUUID, long argc);
     /// @brief 
     void stop();
     /// @brief 
@@ -67,8 +69,15 @@ public:
     void subscribeToCharacteristic(const char* cuuid,
         const char* suuid,
         int deviceIndex);
-    std::string winrtGuidToString(winrt::guid);
+    /// @brief 
+    /// @param extObjRef 
+    void setMaxObjectRef(MaxExternalObject* extObjRef);
 private:
+    /// @brief 
+    /// @param  
+    /// @return 
+    std::string winrtGuidToString(winrt::guid);
+    
     /// @brief 
     /// @param windowsDeviceAddress 
     void connectPeripheral(uint64_t windowsDeviceAddress);
@@ -146,5 +155,7 @@ private:
     BluetoothLEAdvertisementWatcher bleWatcher;
     /// @brief 
     bool connecting = false;
+    /// @brief pointer to max object that own the WinBleCentral object
+    MaxExternalObject* maxObjectRef;
 };
 

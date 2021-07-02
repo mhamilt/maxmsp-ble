@@ -21,7 +21,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9E4B5817-A909-4045-8275-7F9418CFABAC}</ProjectGuid>
-    <ProjectName>maxmsp-ble</ProjectName>
+    <ProjectName>max-ble</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -156,7 +156,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(ProjectName).mxe64</OutputFile>
@@ -274,6 +274,7 @@
     <ClCompile Include="..\..\src\macos-ble\MaxObject.c" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="max_extern_common.props" />
     <None Include="max_extern_x64.props" />
     <None Include="max_extern_x86.props" />
     <None Include="packages.config" />

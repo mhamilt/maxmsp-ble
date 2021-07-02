@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------------
 WinBleCentral::WinBleCentral()
 {
+    post("Windows BLE Started\n");
     bleWatcher.Received([this](BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementReceivedEventArgs eventArgs) {this->didDiscoverPeripheral(watcher, eventArgs); });
     bleWatcher.Stopped([this](BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementWatcherStoppedEventArgs b) {this->didCancelScanning();});
 }
@@ -14,7 +15,12 @@ WinBleCentral::~WinBleCentral()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::scan()
 {
+    post("Start Scanning\n");
     bleWatcher.Start();
+}
+void WinBleCentral::scanForService(t_atom* serviceUUID, long argc)
+{
+
 }
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::stop()
@@ -24,7 +30,6 @@ void WinBleCentral::stop()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::connectToFoundDevice(int deviceIndex)
 {
-
     uint64_t deviceAddress = discoveredPeripherals[deviceIndex].BluetoothAddress();
     std::cout << std::hex << "Connect to: " << deviceAddress << std::endl;
     connectPeripheral(deviceAddress);
@@ -67,6 +72,21 @@ void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::setIgnoreiPhone(bool shouldIgnore) {}
+//--------------------------------------------------------------------------------------------
+
+void WinBleCentral::setReporting(bool reportingMode) {}
+//--------------------------------------------------------------------------------------------
+
+void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suuid, int deviceIndex)
+{}
+
+//--------------------------------------------------------------------------------------------    
+
+void WinBleCentral::setMaxObjectRef(MaxExternalObject* extObjRef)
+{
+    maxObjectRef = extObjRef;
+}
+
 //--------------------------------------------------------------------------------------------
 std::string WinBleCentral::winrtGuidToString(winrt::guid uuid)
 {
@@ -189,15 +209,14 @@ void WinBleCentral::didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watche
     if (isPeripheralNew(eventArgs))
     {
         discoveredPeripheralUUIDs.push_back(eventArgs.BluetoothAddress());
-        discoveredPeripherals.push_back(eventArgs);
-        /*bleWatcher.Stop();*/
+        discoveredPeripherals.push_back(eventArgs);        
         if (shouldReport)
         {
-            std::cout << "Device UUID: " << eventArgs.BluetoothAddress() << std::endl;
+            post("Device Address: %d\n", eventArgs.BluetoothAddress());            
             printDeviceDescription(eventArgs);
         }
 
-        connectToFoundDevice(discoveredPeripherals.size() - 1);
+        //connectToFoundDevice(discoveredPeripherals.size() - 1);
     }
 }
 
@@ -327,24 +346,26 @@ void WinBleCentral::postCharacteristicDescription() {}
 void WinBleCentral::printDeviceDescription(BluetoothLEAdvertisementReceivedEventArgs device)
 {
     BluetoothLEAdvertisement deviceAdvert = device.Advertisement();
-    std::cout << "Name: " << deviceAdvert.LocalName().c_str() << std::endl;
+    post("Name: %s", deviceAdvert.LocalName().c_str());
 
-    for (auto service : deviceAdvert.ServiceUuids())
-        std::cout << "UUID: " << winrtGuidToString(service) << std::endl;
+    for (auto& service : deviceAdvert.ServiceUuids())
+        post("Service UUID: %s \n", winrtGuidToString(service).c_str());
 
-    for (auto manuData : deviceAdvert.ManufacturerData())
-    {
-        std::cout << std::hex << "Manu: ";
-        printf("%04x : ", manuData.CompanyId());
-
+    char manuDataString[100];
+    for (auto& manuData : deviceAdvert.ManufacturerData())
+    {               
+        int j = 0;
         for (size_t i = 0; i < manuData.Data().Length(); i++)
         {
-            printf("%02x", manuData.Data().data()[i]);
+            sprintf(manuDataString + j, "%02x", manuData.Data().data()[i]);
+            j += 2;
+            
         }
-        std::cout << std::endl;
+        manuDataString[j] = '\0';
+        post("Manu: %04x : %s", manuDataString);
     }
-    std::cout << std::dec << "RSSI: " << device.RawSignalStrengthInDBm() << std::endl;
-    std::cout << "*----------------------------------------*" << std::endl;
+    post("RSSI: %d \n", device.RawSignalStrengthInDBm());
+    post("*----------------------------------------*");
 }
 //--------------------------------------------------------------------------------------------
 bool WinBleCentral::isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs eventArgs)
