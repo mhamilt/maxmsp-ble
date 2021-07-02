@@ -117,7 +117,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <CompileAs>CompileAsC</CompileAs>
+      <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(ProjectName).mxe</OutputFile>
@@ -268,7 +268,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.cpp" />
+    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.c" />
+    <ClCompile Include="..\..\src\macos-ble\BleClasses\WinBleCentral.cpp" />
     <ClCompile Include="..\..\src\macos-ble\main.c" />
     <ClCompile Include="..\..\src\macos-ble\MaxObject.c" />
   </ItemGroup>
@@ -279,6 +280,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\macos-ble\BleClasses\MaxBleCentral.h" />
+    <ClInclude Include="..\..\src\macos-ble\BleClasses\pch.h" />
+    <ClInclude Include="..\..\src\macos-ble\BleClasses\WinBleCentral.hpp" />
     <ClInclude Include="..\..\src\macos-ble\MaxObject.h" />
     <ClInclude Include="..\..\src\macos-ble\SwitchString.h" />
     <ClInclude Include="resource.h" />

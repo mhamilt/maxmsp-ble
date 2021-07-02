@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "WinBleCentral.h"
+#include "WinBleCentral.hpp"
 
 //--------------------------------------------------------------------------------------------
 WinBleCentral::WinBleCentral()
