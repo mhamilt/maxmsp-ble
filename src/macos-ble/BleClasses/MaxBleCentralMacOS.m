@@ -4,73 +4,73 @@
 
 #import "MaxBleCentral.h"
 //------------------------------------------------------------------------------
-MacosBleCentralC* newBleCentralC(void)
+MaxBleCentral* newBleCentralC(void)
 {
     return CFBridgingRetain([MacosBleCentral new]);
 }
 
-void bleCentralCScan(MacosBleCentralC *t)
+void bleCentralCScan(MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t scan];
 }
 
-void bleCentralCStopScan(MacosBleCentralC *t)
+void bleCentralCStopScan(MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t stop];
 }
 //------------------------------------------------------------------------------
-void bleCentralCConnectToFoundDevice (MacosBleCentralC *t, int deviceIndex)
+void bleCentralCConnectToFoundDevice (MaxBleCentral *t, int deviceIndex)
 {
     [(__bridge MacosBleCentral *)t connectToFoundDevice: deviceIndex];
 }
 
-void bleCentralCConnectToDeviceWithUUID (MacosBleCentralC *t, const char *uuid)
+void bleCentralCConnectToDeviceWithUUID (MaxBleCentral *t, const char *uuid)
 {
     [(__bridge MacosBleCentral *)t connectToDeviceWithUUID: uuid];
 }
 
-void bleCentralCConnectToDeviceWithName (MacosBleCentralC *t, const char *name)
+void bleCentralCConnectToDeviceWithName (MaxBleCentral *t, const char *name)
 {
     [(__bridge MacosBleCentral *)t connectToDeviceWithName:name];
 }
 
-void bleCentralCClearDiscovered (MacosBleCentralC *t)
+void bleCentralCClearDiscovered (MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t clearDicoveredPeripherals];
 }
 //------------------------------------------------------------------------------
-void bleCentralCRelease(MacosBleCentralC *t)
+void bleCentralCRelease(MaxBleCentral *t)
 {
     CFRelease(t);
 }
 //------------------------------------------------------------------------------
 
-void bleCentralCSetMaxObjRef(MacosBleCentralRef t, MaxExternalObject* maxObjRef)
+void bleCentralCSetMaxObjRef(MaxBleCentral* t, MaxExternalObject* maxObjRef)
 {
     [(__bridge MacosBleCentral *)t setMaxObjectRef:maxObjRef];
 }
 
-void bleCentralCGetDeviceList (MacosBleCentralC *t)
+void bleCentralCGetDeviceList (MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t getFoundDeviceList];
 }
 
-void bleCentralCSetRSSISensitity(MacosBleCentralC *t, int rssiLimit)
+void bleCentralCSetRSSISensitity(MaxBleCentral *t, int rssiLimit)
 {
     [(__bridge MacosBleCentral *)t setRssiSensitivity:rssiLimit]  ;
 }
 
-void bleCentralCGetRssi (MacosBleCentralC *t, int deviceIndex)
+void bleCentralCGetRssi (MaxBleCentral *t, int deviceIndex)
 {
     [(__bridge MacosBleCentral *)t getRssiOfFoundDevice:deviceIndex];
 }
 
-void bleCentralCSetReporting (MacosBleCentralC *t, bool shouldReport)
+void bleCentralCSetReporting (MaxBleCentral *t, bool shouldReport)
 {
     [(__bridge MacosBleCentral *)t setReporting:shouldReport];
 }
 
-void bleCentralCSubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex, const char* suuid, const char* cuuid)
+void bleCentralCSubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, const char* suuid, const char* cuuid)
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
@@ -78,7 +78,7 @@ void bleCentralCSubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex,
                                              shouldSubscribe:YES];
 }
 
-void bleCentralCSubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, const char* duuid, const char* suuid, const char* cuuid)
+void bleCentralCSubscribeToCharacteristicWithDeviceUUID (MaxBleCentral *t, const char* duuid, const char* suuid, const char* cuuid)
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
@@ -86,7 +86,7 @@ void bleCentralCSubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, co
                                              shouldSubscribe:YES];
 }
 
-void bleCentralCUnsubscribeToCharacteristic (MacosBleCentralC *t, int deviceIndex, const char *suuid, const char *cuuid)
+void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, const char *suuid, const char *cuuid)
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
@@ -94,7 +94,7 @@ void bleCentralCUnsubscribeToCharacteristic (MacosBleCentralC *t, int deviceInde
                                              shouldSubscribe:NO];
 }
 
-void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, const char* duuid, const char* suuid, const char* cuuid)
+void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MaxBleCentral *t, const char* duuid, const char* suuid, const char* cuuid)
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
@@ -103,18 +103,18 @@ void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, 
 }
 
 
-void bleCentralCSetRSSIScanThreshold (MacosBleCentralC *t, int rssi)
+void bleCentralCSetRSSIScanThreshold (MaxBleCentral *t, int rssi)
 {
 
     [(__bridge MacosBleCentral *)t setRssiSensitivity: abs(rssi)];
 }
 
-void bleCentralCSetIgnoreiPhone (MacosBleCentralC *t, bool shouldIgnore)
+void bleCentralCSetIgnoreiPhone (MaxBleCentral *t, bool shouldIgnore)
 {
     [(__bridge MacosBleCentral *)t setIgnoreiPhone: shouldIgnore];
 }
 
-void bleCentralCScanForServices (MacosBleCentralC *t, t_atom* argv, long argc)
+void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
 {
     [(__bridge MacosBleCentral *)t scanForService:argv count:argc];
 }

@@ -36,7 +36,7 @@ void bleCentralCGetRssi         (MaxBleCentral *t, int deviceIndex);
 void bleCentralCSetRSSISensitity(MaxBleCentral *t, int rssiLimit);
 void bleCentralCSetReporting    (MaxBleCentral *t, bool shouldReport);
 void bleCentralCSubscribeToCharacteristic   (MaxBleCentral *t, int deviceIndex, const char *suuid ,const char *cuuid);
-void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, const char *charUuid);
+void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, const char *suuid, const char *cuuid);
 void bleCentralCSetRSSIScanThreshold (MaxBleCentral *t, int rssi);
 void bleCentralCSetIgnoreiPhone (MaxBleCentral *t, bool shouldIgnore);
 void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc);

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		583308812433178F00331097 /* MacosBleCentral.m in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC09242E3205004FE028 /* MacosBleCentral.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
-		583308822433178F00331097 /* MacosBleCentralC.m in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC12242E3680004FE028 /* MacosBleCentralC.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
+		583308822433178F00331097 /* MaxBleCentralMacOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
 		5849241E2444B0C000FB0C24 /* MaxObject.c in Sources */ = {isa = PBXBuildFile; fileRef = 5849241D2444B0C000FB0C24 /* MaxObject.c */; };
 		589D3E7A2448204C00FFA01E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589D3E792448204C00FFA01E /* CoreBluetooth.framework */; };
 		58F0AC07242E3161004FE028 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC06242E3161004FE028 /* main.c */; };
@@ -26,6 +26,7 @@
 		587196D324324E410059E189 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = DEVELOPER_DIR; };
 		588E2DD9266A059B0016428B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		589D3E792448204C00FFA01E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
+		58B8B884268F1BFD004B4F2E /* MaxBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxBleCentral.h; sourceTree = "<group>"; };
 		58E0BF0226652DA700DCB7A0 /* SwitchString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchString.h; sourceTree = "<group>"; };
 		58F0AC04242E3110004FE028 /* max-ble.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "max-ble.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
 		58F0AC06242E3161004FE028 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
@@ -33,8 +34,7 @@
 		58F0AC0A242E3205004FE028 /* MacosBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacosBleCentral.h; sourceTree = "<group>"; };
 		58F0AC0E242E3241004FE028 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		58F0AC10242E3248004FE028 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
-		58F0AC12242E3680004FE028 /* MacosBleCentralC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MacosBleCentralC.m; sourceTree = "<group>"; };
-		58F0AC14242E3696004FE028 /* MacosBleCentralC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MacosBleCentralC.h; sourceTree = "<group>"; };
+		58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MaxBleCentralMacOS.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,8 +94,8 @@
 			children = (
 				58F0AC0A242E3205004FE028 /* MacosBleCentral.h */,
 				58F0AC09242E3205004FE028 /* MacosBleCentral.m */,
-				58F0AC14242E3696004FE028 /* MacosBleCentralC.h */,
-				58F0AC12242E3680004FE028 /* MacosBleCentralC.m */,
+				58B8B884268F1BFD004B4F2E /* MaxBleCentral.h */,
+				58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */,
 			);
 			path = BleClasses;
 			sourceTree = "<group>";
@@ -225,7 +225,7 @@
 			files = (
 				583308812433178F00331097 /* MacosBleCentral.m in Sources */,
 				5849241E2444B0C000FB0C24 /* MaxObject.c in Sources */,
-				583308822433178F00331097 /* MacosBleCentralC.m in Sources */,
+				583308822433178F00331097 /* MaxBleCentralMacOS.m in Sources */,
 				58F0AC07242E3161004FE028 /* main.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
