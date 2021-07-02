@@ -80,6 +80,7 @@ private:
     /// @return 
     std::string winrtGuidToString(winrt::guid);
     
+    std::string bluetoothAddressToString(uint64_t);
     /// @brief 
     /// @param windowsDeviceAddress 
     void connectPeripheral(uint64_t windowsDeviceAddress);
@@ -141,6 +142,13 @@ private:
     /// @param  
     /// @return 
     bool isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs);
+
+    /// @brief 
+    /// @param maxObjectPtr 
+    /// @param index 
+    /// @param uuid 
+    /// @param rssi 
+    void outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
 
 private:
     /// @brief 

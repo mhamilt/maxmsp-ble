@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "WinBleCentral.hpp"
+#include "..\MaxObject.h"
+
+
 
 //--------------------------------------------------------------------------------------------
 WinBleCentral::WinBleCentral()
@@ -49,6 +52,7 @@ void WinBleCentral::connectToDeviceWithName(const char* name) {}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::clearDicoveredPeripherals()
 {
+    object_post((t_object*)maxObjectRef, "Device List Cleared");
     discoveredPeripherals.clear();
 }
 
@@ -99,6 +103,14 @@ std::string WinBleCentral::winrtGuidToString(winrt::guid uuid)
     std::string guid = std::string(uuidCStr);
     return guid;
 }
+
+std::string WinBleCentral::bluetoothAddressToString(uint64_t address)
+{
+    char addressStr[13];
+    sprintf(addressStr, "%012llX", address);
+    return std::string(addressStr);
+}
+
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::connectPeripheral(uint64_t windowsDeviceAddress)
 {
@@ -210,7 +222,7 @@ void WinBleCentral::didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watche
         discoveredPeripherals.push_back(eventArgs);
         if (shouldReport)
             printDeviceDescription(eventArgs);
-
+        outputFoundDevice(maxObjectRef, discoveredPeripherals.size() - 1, bluetoothAddressToString(eventArgs.BluetoothAddress()).c_str(), eventArgs.RawSignalStrengthInDBm());
         //connectToFoundDevice(discoveredPeripherals.size() - 1);
     }
 }
@@ -340,9 +352,9 @@ void WinBleCentral::postCharacteristicDescription() {}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::printDeviceDescription(BluetoothLEAdvertisementReceivedEventArgs device)
 {
-    post("Index: %d, Address: %012llX, RSSI: %d\n",
+    post("Index: %d, Address: %s, RSSI: %d\n",
         discoveredPeripherals.size() - 1,
-        device.BluetoothAddress(),
+        bluetoothAddressToString(device.BluetoothAddress()).c_str(),
         device.RawSignalStrengthInDBm());
     post("------------------------");
 }
@@ -374,6 +386,13 @@ void WinBleCentral::didFailToReadValueForCharacteristic()
 {
     std::cout << "didFailToReadValueForCharacteristic" << std::endl;
 
+}
+
+void WinBleCentral::outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi)
+{
+    atom_setsym(maxObjectPtr->outputList + 0, gensym(uuid));
+    atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)rssi);
+    outlet_list(maxObjectPtr->list_outlet3, 0L, 2, maxObjectPtr->outputList);
 }
 
 
