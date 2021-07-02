@@ -372,3 +372,7 @@ maxmsp-external-templates.xcodeproj/project.xcworkspace/xcuserdata/mhamilt7.xcus
 *xcuserdata/
 
 package/
+*.tlog
+
+sysbuild/
+externals/

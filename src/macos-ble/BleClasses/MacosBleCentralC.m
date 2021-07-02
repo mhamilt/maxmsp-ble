@@ -2,7 +2,7 @@
  C Bridge for CoreBluetooth Central on macOS
  */
 
-#import "MacosBleCentralC.h"
+#import "MaxBleCentral.h"
 //------------------------------------------------------------------------------
 MacosBleCentralC* newBleCentralC(void)
 {
@@ -30,7 +30,7 @@ void bleCentralCConnectToDeviceWithUUID (MacosBleCentralC *t, const char *uuid)
 }
 
 void bleCentralCConnectToDeviceWithName (MacosBleCentralC *t, const char *name)
-{    
+{
     [(__bridge MacosBleCentral *)t connectToDeviceWithName:name];
 }
 
@@ -105,7 +105,7 @@ void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MacosBleCentralC *t, 
 
 void bleCentralCSetRSSIScanThreshold (MacosBleCentralC *t, int rssi)
 {
-    
+
     [(__bridge MacosBleCentral *)t setRssiSensitivity: abs(rssi)];
 }
 
