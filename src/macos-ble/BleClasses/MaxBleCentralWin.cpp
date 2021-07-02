@@ -1,4 +1,5 @@
 #include "MaxBleCentral.h"
+#include "WinBleCentral.hpp"
 
 MaxBleCentral* newBleCentralC(void)
 {
