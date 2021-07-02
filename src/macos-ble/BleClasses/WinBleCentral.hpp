@@ -126,7 +126,7 @@ private:
     /// @brief 
     /// @param value 
     /// @param error 
-    void didReadValueForCharacteristic(winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus error);
+    void didReadValueForCharacteristic(GattCharacteristic characteristic, winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus error);
     /// @brief 
     void didUpdateValueForDescriptor();
     /// @brief 
@@ -149,6 +149,8 @@ private:
     /// @param uuid 
     /// @param rssi 
     void outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
+
+    void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
 
 private:
     /// @brief 

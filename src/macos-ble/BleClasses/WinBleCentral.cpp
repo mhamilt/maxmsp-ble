@@ -67,7 +67,7 @@ void WinBleCentral::clearDicoveredPeripherals()
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::getRssiOfFoundDevice(int deviceIndex) 
+void WinBleCentral::getRssiOfFoundDevice(int deviceIndex)
 {
     post("Not yet implemented in Windows");
 }
@@ -93,13 +93,13 @@ void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 }
 
 //--------------------------------------------------------------------------------------------
-void WinBleCentral::setIgnoreiPhone(bool shouldIgnore) 
+void WinBleCentral::setIgnoreiPhone(bool shouldIgnore)
 {
     post("Not yet implemented in Windows");
 }
 //--------------------------------------------------------------------------------------------
 
-void WinBleCentral::setReporting(bool reportingMode) 
+void WinBleCentral::setReporting(bool reportingMode)
 {
     post("Not yet implemented in Windows");
 }
@@ -216,14 +216,14 @@ void WinBleCentral::discoverCharacteristicsForService(GattDeviceService service)
 void WinBleCentral::readValueForCharacteristic(GattCharacteristic characteristic)
 {
     characteristic.ReadValueAsync().Completed(
-        [this](IAsyncOperation<GattReadResult> sender, AsyncStatus status)
+        [this, characteristic](IAsyncOperation<GattReadResult> sender, AsyncStatus status)
         {
             if (GattReadResult  result = sender.get(); result)
             {
                 switch (status)
                 {
                 case winrt::Windows::Foundation::AsyncStatus::Completed:
-                    this->didReadValueForCharacteristic(result.Value(), result.Status());
+                    this->didReadValueForCharacteristic(characteristic, result.Value(), result.Status());
                     break;
                 case winrt::Windows::Foundation::AsyncStatus::Canceled:
                 case winrt::Windows::Foundation::AsyncStatus::Error:
@@ -260,7 +260,7 @@ void WinBleCentral::didCancelScanning()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
 {
-    post("didConnectPeripheral: %s", device.Name().c_str());
+    post("didConnectPeripheral: %s", device.Name().data());
     discoverServices(device);
 }
 
@@ -273,7 +273,7 @@ void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services,
 {
     if (status == GattCommunicationStatus::Success)
     {
-//        std::cout << "didDiscoverServices: " << services.GetAt(0).Device().Name().c_str() << std::endl;
+        //        std::cout << "didDiscoverServices: " << services.GetAt(0).Device().Name().c_str() << std::endl;
 
         for (auto service : services)
         {
@@ -303,11 +303,11 @@ void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharact
 {
     if (status == GattCommunicationStatus::Success)
     {
-        std::cout << "didDiscoverCharacteristicsForService: " << winrtGuidToString(characteristics.GetAt(0).Service().Uuid()) << std::endl;
+        //std::cout << "didDiscoverCharacteristicsForService: " << winrtGuidToString(characteristics.GetAt(0).Service().Uuid()) << std::endl;
 
         for (auto characteristic : characteristics)
         {
-            std::cout << "Characteristic: " << winrtGuidToString(characteristic.Uuid()) << " : " << characteristic.UserDescription().c_str() << std::endl;
+            //std::cout << "Characteristic: " << winrtGuidToString(characteristic.Uuid()) << " : " << characteristic.UserDescription().c_str() << std::endl;
             readValueForCharacteristic(characteristic);
         }
     }
@@ -328,16 +328,15 @@ void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharact
     }
 }
 
-void WinBleCentral::didReadValueForCharacteristic(winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus status)
+void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteristic, winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
     {
-        std::cout << "Value: ";
-        for (size_t i = 0; i < value.Length(); i++)
-        {
-            printf("%02x", value.data()[i]);
-        }
-        std::cout << std::endl;
+        onCharacteristicRead(maxObjectRef,
+            winrtGuidToString(characteristic.Service().Uuid()).c_str(),
+            winrtGuidToString(characteristic.Uuid()).c_str(),
+            value.data(),
+            value.Length());
     }
     else
     {
@@ -414,3 +413,19 @@ void WinBleCentral::outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned 
     outlet_list(maxObjectPtr->list_outlet3, 0L, 2, maxObjectPtr->outputList);
 }
 
+void WinBleCentral::onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
+{
+    atom_setsym(maxObjectPtr->outputList, gensym(suuid));
+    atom_setsym(maxObjectPtr->outputList + 1, gensym(cuuid));
+
+    if (numBytes > (maxObjectPtr->maxListSize - 2))
+    {
+        numBytes = maxObjectPtr->maxListSize - 2;
+        post("Bytes Truncated\n");
+    }
+
+    for (short i = 0; i < numBytes; i++)
+        atom_setlong(maxObjectPtr->outputList + 2 + i, (t_atom_long)byteArray[i]);
+
+    outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 2, maxObjectPtr->outputList);
+}
