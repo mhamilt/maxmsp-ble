@@ -6,7 +6,7 @@
 WinBleCentral::WinBleCentral()
 {
     bleWatcher.Received([this](BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementReceivedEventArgs eventArgs) {this->didDiscoverPeripheral(watcher, eventArgs); });
-    bleWatcher.Stopped([this] (BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementWatcherStoppedEventArgs eventArgs) {this->didCancelScanning(); });
+    bleWatcher.Stopped([this](BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementWatcherStoppedEventArgs eventArgs) {this->didCancelScanning(); });
 }
 //--------------------------------------------------------------------------------------------
 WinBleCentral::~WinBleCentral()
@@ -325,10 +325,31 @@ void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharact
     }
 }
 
+std::string uint8_to_hex_string(const uint8_t* v, const size_t s) {
+    std::stringstream ss;
+
+    ss << std::hex << std::setfill('0');
+
+    for (int i = 0; i < s; i++) {
+        ss << std::hex << std::setw(2) << static_cast<int>(v[i]);
+    }
+
+    return ss.str();
+}
+
 void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteristic, winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
     {
+        std::string dataHex = uint8_to_hex_string(value.data(), value.Length());
+
+        post("D: %s, S: %s, C: %s, Value: %s",
+            bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress()).c_str(),
+            winrtGuidToString(characteristic.Service().Uuid()).c_str(),
+            winrtGuidToString(characteristic.Uuid()).c_str(),
+            dataHex.c_str()
+        );
+
         onCharacteristicRead(maxObjectRef,
             winrtGuidToString(characteristic.Service().Uuid()).c_str(),
             winrtGuidToString(characteristic.Uuid()).c_str(),
