@@ -2,14 +2,11 @@
 #include "WinBleCentral.hpp"
 #include "..\MaxObject.h"
 
-
-
 //--------------------------------------------------------------------------------------------
 WinBleCentral::WinBleCentral()
 {
-    post("Windows BLE Started\n");
     bleWatcher.Received([this](BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementReceivedEventArgs eventArgs) {this->didDiscoverPeripheral(watcher, eventArgs); });
-    bleWatcher.Stopped([this](BluetoothLEAdvertisementWatcher w, BluetoothLEAdvertisementWatcherStoppedEventArgs b) {this->didCancelScanning(); });
+    bleWatcher.Stopped([this] (BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementWatcherStoppedEventArgs eventArgs) {this->didCancelScanning(); });
 }
 //--------------------------------------------------------------------------------------------
 WinBleCentral::~WinBleCentral()
@@ -23,7 +20,7 @@ void WinBleCentral::scan()
 }
 void WinBleCentral::scanForService(t_atom* serviceUUID, long argc)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::stop()
@@ -56,7 +53,7 @@ void WinBleCentral::connectToDeviceWithUUID(const char* uuid)
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::connectToDeviceWithName(const char* name)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------
@@ -69,7 +66,7 @@ void WinBleCentral::clearDicoveredPeripherals()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::getRssiOfFoundDevice(int deviceIndex)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------
@@ -95,19 +92,19 @@ void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::setIgnoreiPhone(bool shouldIgnore)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 //--------------------------------------------------------------------------------------------
 
 void WinBleCentral::setReporting(bool reportingMode)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 //--------------------------------------------------------------------------------------------
 
 void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suuid, int deviceIndex)
 {
-    post("Not yet implemented in Windows");
+    post("Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------    
