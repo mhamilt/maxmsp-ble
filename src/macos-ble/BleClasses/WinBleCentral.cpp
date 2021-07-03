@@ -135,9 +135,9 @@ std::string WinBleCentral::winrtGuidToString(winrt::guid uuid)
     char uuidCStr[34];
     uint64_t d6 = *((uint64_t*)&uuid.Data4[2]);
     if (uuid.Data2 == 0)
-        sprintf(uuidCStr, "%04x", uuid.Data1);
+        sprintf(uuidCStr, "%04X", uuid.Data1);
     else
-        sprintf(uuidCStr, "%08x-%04x-%04x-%02x%02x-%06x", uuid.Data1, uuid.Data2, uuid.Data3, uuid.Data4[0], uuid.Data4[1], d6);
+        sprintf(uuidCStr, "%08X-%04X-%04X-%02X%02X-%06X", uuid.Data1, uuid.Data2, uuid.Data3, uuid.Data4[0], uuid.Data4[1], d6);
     std::string guid = std::string(uuidCStr);
     return guid;
 }
@@ -272,7 +272,7 @@ void WinBleCentral::didCancelScanning()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
 {
-    post("didConnectPeripheral: %s", device.Name().data());
+    post("Connected to: %s", winrt::to_string(device.Name()).c_str());
     discoverServices(device);
 }
 
@@ -284,29 +284,30 @@ void WinBleCentral::didDiscoverIncludedServicesForService() {}
 void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
-    {
-        //        std::cout << "didDiscoverServices: " << services.GetAt(0).Device().Name().c_str() << std::endl;
-
+    {       
         for (auto service : services)
         {
-            //std::cout << "Service: " << winrtGuidToString(service.Uuid()) << std::endl;
             discoverCharacteristicsForService(service);
         }
     }
     else
     {
+        std::stringstream ss;
+        ss << bluetoothAddressToString(services.GetAt(0).Device().BluetoothAddress()) << " Services: ";
         switch (status)
         {
+ 
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            post("Error Getting Services: Unreachable");
+            ss << "Unreachable";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            post("Error Getting Services: ProtocolError");
+            ss << "ProtocolError";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            post("Error Getting Services: AccessDenied");
+            ss << "AccessDenied";
             break;
         }
+        post("%s", ss.str().c_str());
     }
 }
 
@@ -314,29 +315,33 @@ void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services,
 void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharacteristic> characteristics, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
-    {
-        //std::cout << "didDiscoverCharacteristicsForService: " << winrtGuidToString(characteristics.GetAt(0).Service().Uuid()) << std::endl;
-
+    {        
         for (auto characteristic : characteristics)
         {
-            //std::cout << "Characteristic: " << winrtGuidToString(characteristic.Uuid()) << " : " << characteristic.UserDescription().c_str() << std::endl;
             readValueForCharacteristic(characteristic);
         }
     }
     else
     {
+        std::stringstream ss;
+        ss << bluetoothAddressToString(characteristics.GetAt(0).Service().Device().BluetoothAddress()) 
+            << " Service: " 
+            << winrtGuidToString(characteristics.GetAt(0).Service().Uuid())
+            << " Characteristics: ";
         switch (status)
         {
+
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            post("Error Getting Services: Unreachable");
+            ss << "Unreachable";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            post("Error Getting Services: ProtocolError");
+            ss << "ProtocolError";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            post("Error Getting Services: AccessDenied");
+            ss << "AccessDenied";
             break;
         }
+        post("%s", ss.str().c_str());
     }
 }
 
@@ -347,7 +352,7 @@ void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteris
     {
         std::string dataHex = bytesToHexString(value.data(), value.Length());
 
-        post("D: %s, S: %s, C: %s, Value: %s",
+        post("Device: %s, Service: %s, Char: %s, Value: %s",
             bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress()).c_str(),
             winrtGuidToString(characteristic.Service().Uuid()).c_str(),
             winrtGuidToString(characteristic.Uuid()).c_str(),
@@ -362,18 +367,27 @@ void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteris
     }
     else
     {
+        std::stringstream ss;
+        ss << bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress())
+            << " Service: "
+            << winrtGuidToString(characteristic.Service().Uuid())
+            << " Characteristic: "
+            << winrtGuidToString(characteristic.Uuid())
+            << " Value: ";
         switch (status)
         {
+
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            post("Error Getting Services: Unreachable");
+            ss << "Unreachable";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            post("Error Getting Services: ProtocolError");
+            ss << "ProtocolError";
             break;
         case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            post("Error Getting Services: AccessDenied");
+            ss << "AccessDenied";
             break;
         }
+        post("%s", ss.str().c_str());
     }
 }
 
