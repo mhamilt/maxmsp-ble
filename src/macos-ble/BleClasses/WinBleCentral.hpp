@@ -151,7 +151,10 @@ private:
     void outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
 
     void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
-
+    /// @brief keeps the GattCommunication status feedback a little tidier. Simply appends the status to the give string.
+    /// @param  reference to stream to be printed
+    /// @param  GattCommunicationStatus from Async operation
+    void appendGattCommunicationStatus(std::stringstream&, GattCommunicationStatus);
 private:
     /// @brief 
     std::vector<uint64_t> discoveredPeripheralUUIDs;

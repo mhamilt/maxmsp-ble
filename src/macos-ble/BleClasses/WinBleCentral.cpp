@@ -10,7 +10,7 @@ std::string bytesToHexString(const uint8_t* v, const size_t s)
 
     ss << std::uppercase << std::hex << std::setfill('0');
 
-    for (int i = 0; i < s; i++) 
+    for (int i = 0; i < s; i++)
         ss << std::uppercase << std::hex << std::setw(2) << static_cast<int>(v[i]);
 
     return ss.str();
@@ -30,12 +30,12 @@ WinBleCentral::~WinBleCentral()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::scan()
 {
-    post("Start Scanning\n");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Start Scanning\n");
     bleWatcher.Start();
 }
 void WinBleCentral::scanForService(t_atom* serviceUUID, long argc)
 {
-    post("Not yet implemented on Windows");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::stop()
@@ -46,7 +46,7 @@ void WinBleCentral::stop()
 void WinBleCentral::connectToFoundDevice(int deviceIndex)
 {
     uint64_t deviceAddress = discoveredPeripherals[deviceIndex].BluetoothAddress();
-    post("Connect to: %s", bluetoothAddressToString(deviceAddress).c_str());
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Connect to: %s", bluetoothAddressToString(deviceAddress).c_str());
     connectPeripheral(deviceAddress);
 }
 
@@ -68,20 +68,20 @@ void WinBleCentral::connectToDeviceWithUUID(const char* uuid)
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::connectToDeviceWithName(const char* name)
 {
-    post("Not yet implemented on Windows");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::clearDicoveredPeripherals()
 {
-    object_post((t_object*)maxObjectRef, "Device List Cleared");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Device List Cleared");
     discoveredPeripherals.clear();
 }
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::getRssiOfFoundDevice(int deviceIndex)
 {
-    post("Not yet implemented on Windows");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------
@@ -107,19 +107,19 @@ void WinBleCentral::setRssiSensitivity(int rssiSensitivity)
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::setIgnoreiPhone(bool shouldIgnore)
 {
-    post("Not yet implemented on Windows");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 //--------------------------------------------------------------------------------------------
 
 void WinBleCentral::setReporting(bool reportingMode)
 {
-    post("Not yet implemented on Windows");
+    shouldReport = reportingMode;
 }
 //--------------------------------------------------------------------------------------------
 
 void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suuid, int deviceIndex)
 {
-    post("Not yet implemented on Windows");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 
 //--------------------------------------------------------------------------------------------    
@@ -170,7 +170,7 @@ void WinBleCentral::connectPeripheral(uint64_t windowsDeviceAddress)
             }
             else
             {
-                std::cout << "Device is Null: " << sender.ErrorCode() << std::endl;
+                this->didFailToConnectPeripheral();
             }
         });
 }
@@ -195,7 +195,7 @@ void WinBleCentral::discoverServices(BluetoothLEDevice device)
             }
             else
             {
-                std::cout << "Services are Null" << std::endl;
+                this->didFailToDiscoverServices();
             }
         });
 }
@@ -220,7 +220,7 @@ void WinBleCentral::discoverCharacteristicsForService(GattDeviceService service)
             }
             else
             {
-                std::cout << "Characteristics are Null" << std::endl;
+                this->didFailToDiscoverCharacteristicsForService();
             }
         });
 }
@@ -245,7 +245,7 @@ void WinBleCentral::readValueForCharacteristic(GattCharacteristic characteristic
             }
             else
             {
-                std::cout << "Value is Null" << std::endl;
+                this->didFailToReadValueForCharacteristic();
             }
         });
 }
@@ -266,13 +266,13 @@ void WinBleCentral::didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watche
 
 void WinBleCentral::didCancelScanning()
 {
-    post("Stopped Scanning");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Stopped Scanning");
 }
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
 {
-    post("Connected to: %s", winrt::to_string(device.Name()).c_str());
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Connected to: %s <%s>", bluetoothAddressToString(device.BluetoothAddress()).c_str(), winrt::to_string(device.Name()).c_str());
     discoverServices(device);
 }
 
@@ -284,7 +284,7 @@ void WinBleCentral::didDiscoverIncludedServicesForService() {}
 void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
-    {       
+    {
         for (auto service : services)
         {
             discoverCharacteristicsForService(service);
@@ -293,21 +293,12 @@ void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services,
     else
     {
         std::stringstream ss;
-        ss << bluetoothAddressToString(services.GetAt(0).Device().BluetoothAddress()) << " Services: ";
-        switch (status)
-        {
- 
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            ss << "Unreachable";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            ss << "ProtocolError";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            ss << "AccessDenied";
-            break;
-        }
-        post("%s", ss.str().c_str());
+        ss << "Device: "
+            << bluetoothAddressToString(services.GetAt(0).Device().BluetoothAddress())
+            << " Services: ";
+        appendGattCommunicationStatus(ss, status);
+
+        if (shouldReport) object_post((t_object*)maxObjectRef, "%s", ss.str().c_str());
     }
 }
 
@@ -315,7 +306,7 @@ void WinBleCentral::didDiscoverServices(IVectorView<GattDeviceService> services,
 void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharacteristic> characteristics, GattCommunicationStatus status)
 {
     if (status == GattCommunicationStatus::Success)
-    {        
+    {
         for (auto characteristic : characteristics)
         {
             readValueForCharacteristic(characteristic);
@@ -324,24 +315,14 @@ void WinBleCentral::didDiscoverCharacteristicsForService(IVectorView<GattCharact
     else
     {
         std::stringstream ss;
-        ss << bluetoothAddressToString(characteristics.GetAt(0).Service().Device().BluetoothAddress()) 
-            << " Service: " 
+        ss << "Device: "
+            << bluetoothAddressToString(characteristics.GetAt(0).Service().Device().BluetoothAddress())
+            << " Service: "
             << winrtGuidToString(characteristics.GetAt(0).Service().Uuid())
             << " Characteristics: ";
-        switch (status)
-        {
+        appendGattCommunicationStatus(ss, status);
 
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            ss << "Unreachable";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            ss << "ProtocolError";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            ss << "AccessDenied";
-            break;
-        }
-        post("%s", ss.str().c_str());
+        if (shouldReport) object_post((t_object*)maxObjectRef, "%s", ss.str().c_str());
     }
 }
 
@@ -352,7 +333,7 @@ void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteris
     {
         std::string dataHex = bytesToHexString(value.data(), value.Length());
 
-        post("Device: %s, Service: %s, Char: %s, Value: %s",
+        if (shouldReport) object_post((t_object*)maxObjectRef, "Device: %s Service: %s Char: %s Value: %s",
             bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress()).c_str(),
             winrtGuidToString(characteristic.Service().Uuid()).c_str(),
             winrtGuidToString(characteristic.Uuid()).c_str(),
@@ -368,26 +349,17 @@ void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteris
     else
     {
         std::stringstream ss;
-        ss << bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress())
+        ss << "Device: "
+            << bluetoothAddressToString(characteristic.Service().Device().BluetoothAddress())
             << " Service: "
             << winrtGuidToString(characteristic.Service().Uuid())
             << " Characteristic: "
             << winrtGuidToString(characteristic.Uuid())
             << " Value: ";
-        switch (status)
-        {
 
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
-            ss << "Unreachable";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
-            ss << "ProtocolError";
-            break;
-        case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
-            ss << "AccessDenied";
-            break;
-        }
-        post("%s", ss.str().c_str());
+        appendGattCommunicationStatus(ss, status);
+        
+        if (shouldReport) object_post((t_object*)maxObjectRef, "%s", ss.str().c_str());
     }
 }
 
@@ -406,11 +378,11 @@ void WinBleCentral::postCharacteristicDescription() {}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::printDeviceDescription(BluetoothLEAdvertisementReceivedEventArgs device)
 {
-    post("Index: %d, Address: %s, RSSI: %d\n",
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Index: %d, Address: %s, RSSI: %d\n",
         discoveredPeripherals.size() - 1,
         bluetoothAddressToString(device.BluetoothAddress()).c_str(),
         device.RawSignalStrengthInDBm());
-    post("------------------------");
+    if (shouldReport) object_post((t_object*)maxObjectRef, "------------------------");
 }
 //--------------------------------------------------------------------------------------------
 bool WinBleCentral::isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs eventArgs)
@@ -424,22 +396,21 @@ void WinBleCentral::didDisconnectPeripheral() {}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didFailToConnectPeripheral()
 {
-    std::cout << "didFailToConnectPeripheral" << std::endl;
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Failed to Connect");
 }
 void WinBleCentral::didFailToDiscoverServices()
 {
-    std::cout << "didFailToDiscoverServices" << std::endl;
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Failed to Discover Services");
 }
 
 void WinBleCentral::didFailToDiscoverCharacteristicsForService()
 {
-    std::cout << "didFailToDiscoverCharacteristicsForService" << std::endl;
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Failed to Discover Characteristics");
 }
 
 void WinBleCentral::didFailToReadValueForCharacteristic()
 {
-    std::cout << "didFailToReadValueForCharacteristic" << std::endl;
-
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Failed to Read Value");
 }
 
 void WinBleCentral::outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi)
@@ -457,11 +428,28 @@ void WinBleCentral::onCharacteristicRead(MaxExternalObject* maxObjectPtr, const 
     if (numBytes > (maxObjectPtr->maxListSize - 2))
     {
         numBytes = maxObjectPtr->maxListSize - 2;
-        post("Bytes Truncated\n");
+        if (shouldReport) object_post((t_object*)maxObjectRef, "Bytes Truncated\n");
     }
 
     for (short i = 0; i < numBytes; i++)
         atom_setlong(maxObjectPtr->outputList + 2 + i, (t_atom_long)byteArray[i]);
 
     outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 2, maxObjectPtr->outputList);
+}
+
+
+void WinBleCentral::appendGattCommunicationStatus(std::stringstream& ss, GattCommunicationStatus status)
+{
+    switch (status)
+    {
+    case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::Unreachable:
+        ss << "Unreachable";
+        break;
+    case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::ProtocolError:
+        ss << "ProtocolError";
+        break;
+    case winrt::Windows::Devices::Bluetooth::GenericAttributeProfile::GattCommunicationStatus::AccessDenied:
+        ss << "AccessDenied";
+        break;
+    }
 }
