@@ -2,22 +2,7 @@
 
 A BLE Object for Max
 
-## Install
-
-Add [the `.mxo`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
-
-### Usage
-
-- Send a `scan` message to the object to find available devices.
-- Found Devices will be printed to the Max Console Window
-- Details logged about a device will include an index.
-- send a `connect $1` message to the object, where `$1` is the index of a found device.
-- Details of what services and charateristics the device has will be printed to the Max Window
-- Available data will be sent out the inlet in `list` form `SERVICE_UUID CHARACTERISTIC_UUID RAW_BYTE_LIST`
-- Use a pair of `route` objects to filter which Service / Characteristic pair you need.
-- `RAW_BYTE_LIST` can then be assmebled into the original data format.
-
-### Example
+### Examples
 
 Copy and paste the below example into Max:
 
@@ -82,7 +67,6 @@ AaX5h8fD7.oifgbgaHzWxb+lG4qzGtec.UYZSoM8npUv5JX4X28bBJjFeonl
 -----------end_max5_patcher-----------
 </code></pre>
 
-
 #### Combining with umenus
 
 <pre><code>
@@ -127,41 +111,3 @@ Tl9TVsJsdaogFNOysS5zYcgtE77sYscgqUF5OoYjE4IqUUaZmzkYxF29e29+
 .0eXAXC
 -----------end_max5_patcher-----------
 </code></pre>
-
-
-
-## Building
-
-### Cloning this Repository
-
-First step, open Terminal then make sure you have `git` by typing:
-
-```sh
-which git
-```
-
-If you get nothing then type:
-
-```sh
-xcode-select --install
-```
-
-To make this repository a little more portable, the `max-sdk` has been included as a submodule. What this means is that you will need to state `--recurse-submodules` when cloning.
-
-Clone this repo into your Max folder's `developing` directory
-
-```sh
-cd "~/Documents/Max 8/"
-mkdir developing
-cd "developing"
-git clone --recurse-submodules https://github.com/mhamilt/maxmsp-ble
-```
-
-You should be able to build straight away from the Xcode project contained in the `xcode` directory.
-
-### Change sdk Version
-
-```sh
-cd max-sdk
-git checkout v7.0.3 # or v7.1.0 v7.3.3 v8.0.3
-```
