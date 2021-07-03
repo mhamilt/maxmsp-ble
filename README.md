@@ -4,11 +4,7 @@ A BLE Object for Max
 
 ## Install
 
--   Add External [macOS: `.mxo`, Windows: `.mxe64`](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1.0-alpha/max-ble.mxo.zip) to `~/Documents/Max 8/Library` or define your own folder and add it to the [Search Path](https://docs.cycling74.com/max8/vignettes/search_path)
-
-**OR**
-
--   Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1-alpha.6/max-ble.zip) to `~/Documents/Max 8/Packages`
+Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1-alpha.6/max-ble.zip) to `~/Documents/Max 8/Packages`
 
 ## Building
 
@@ -53,4 +49,4 @@ For usage of the external, see the package [README](max-package/max-ble/README.m
 
 ## Contribution
 
-If you have any suggestions on interface or functionality, please feel free to [flag an issue](issues/new)
+If you have any suggestions on interface or functionality, please feel free to [flag an issue](https://github.com/mhamilt/maxmsp-ble/issues/new)
