@@ -13,7 +13,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
-    <OutDir>%UserProfile%\Documents\Max 8\Externals\</OutDir>
+    <OutDir>%UserProfile%\Documents\Max 8\Packages\max-ble\externals\</OutDir>
     <IntDir>..\..\sysbuild\intermediate\$(Configuration)_$(PlatformName)\$(ProjectName)\</IntDir>
     <EmbedManifest>false</EmbedManifest>
   </PropertyGroup>
