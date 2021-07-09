@@ -34,6 +34,7 @@ typedef enum : NSUInteger {
     MaxExternalObject* maxObjectRef;
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray *discoveredPeripherals;
+    NSMutableArray *blacklistPeripherals;
     dispatch_queue_t bleQueue;
     CBCentralManager *manager;
     NSUInteger connectDeviceIndex;
@@ -54,6 +55,7 @@ typedef enum : NSUInteger {
 - (void)connectToDeviceWithUUID: (const char*) uuid;
 - (void)connectToDeviceWithName: (const char*) name;
 - (void)clearDicoveredPeripherals;
+- (void)blacklistDevicesStillConnecting;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
 - (void)setRssiSensitivity:(int)rssiSensitivity;
 - (void)setIgnoreiPhone:(BOOL)shouldIgnore;

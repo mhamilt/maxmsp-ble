@@ -47,7 +47,7 @@ void onBang(MaxExternalObject* maxObjectPtr)
 /// @param argv array of atoms holding the arguments.
 void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_atom *argv)
 {
-   switchs(s->s_name)
+   switchs(s)
     {
         cases("scan")
         if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
@@ -84,7 +84,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         }
         else if (argc >= 2)
         {
-            switchs(atom_getsym(argv)->s_name)
+            switchs(atom_getsym(argv))
             {
                 cases("service")
                 break;
@@ -106,7 +106,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         if(argc >= 2)
         {
             int deviceIndex = (int)atom_getlong(argv);
-            switchs(atom_getsym(argv + 1)->s_name)
+            switchs(atom_getsym(argv + 1))
             {
                 cases("rssi")
                 bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
@@ -143,11 +143,14 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             } switchs_end
         }
         break;
+        cases("blacklist")
+        bleCentralCBlacklistStalledDevices(maxObjectPtr->bleCentral);
+        break;
         cases("filter")
         
         if(argc >= 1)
         {
-            switchs(atom_getsym(argv)->s_name)
+            switchs(atom_getsym(argv))
             {
                 cases("rssi")
                 bleCentralCSetRSSIScanThreshold (maxObjectPtr->bleCentral,
