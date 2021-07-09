@@ -118,3 +118,9 @@ void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
 {
     [(__bridge MacosBleCentral *)t scanForService:argv count:argc];
 }
+
+
+void bleCentralCBlacklistStalledDevices (MaxBleCentral *t)
+{
+   [(__bridge MacosBleCentral *)t blacklistDevicesStillConnecting];
+}

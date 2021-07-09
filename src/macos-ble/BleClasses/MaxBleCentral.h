@@ -42,6 +42,7 @@ void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, 
 void bleCentralCSetRSSIScanThreshold (MaxBleCentral *t, int rssi);
 void bleCentralCSetIgnoreiPhone (MaxBleCentral *t, bool shouldIgnore);
 void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc);
+void bleCentralCBlacklistStalledDevices (MaxBleCentral *t);
 
 #if defined _WIN32 || defined _WIN64
 #ifdef __cplusplus
