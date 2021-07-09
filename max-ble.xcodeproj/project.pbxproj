@@ -197,7 +197,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "\n#cd \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/max-ble/externals/\"\n#codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/max-ble/externals/max-ble.mxo\"\n#cd \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/\"\n#zip -r max-ble.zip max-ble -x \"*.DS_Store\"\n#cp -r \"${DSTROOT}/../../max-ble\" \"${HOME}/Documents/Max 8/Packages\"\n";
+			shellScript = "codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"${DSTROOT}/${WRAPPER_NAME}\"\ncd \"${DSTROOT}/../..\"\nzip -r max-ble.zip max-ble -x \"*.DS_Store\"\n#cp -r \"${DSTROOT}/../../max-ble\" \"${HOME}/Documents/Max 8/Packages\"\n";
 		};
 		58F0ABFB242E3110004FE028 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
