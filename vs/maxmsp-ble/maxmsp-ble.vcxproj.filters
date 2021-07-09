@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
+    <ClCompile Include="..\..\src\macos-ble\main.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\macos-ble\MaxObject.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.cpp">
+      <Filter>src\BLEClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\macos-ble\BleClasses\WinBleCentral.cpp">
+      <Filter>src\BLEClasses</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\macos-ble\MaxObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\macos-ble\BleClasses\pch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\macos-ble\SwitchString.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\macos-ble\BleClasses\MaxBleCentral.h">
+      <Filter>src\BLEClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\macos-ble\BleClasses\WinBleCentral.hpp">
+      <Filter>src\BLEClasses</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="maxmsp-ble.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="max_extern_common.props">
+      <Filter>prop_files</Filter>
+    </None>
+    <None Include="max_extern_x64.props">
+      <Filter>prop_files</Filter>
+    </None>
+    <None Include="max_extern_x86.props">
+      <Filter>prop_files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{de7b9d01-13e4-4582-bb83-a5512f397f2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\BLEClasses">
+      <UniqueIdentifier>{dc13ee07-0f41-4c41-87f7-9e1ebf9ba71b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prop_files">
+      <UniqueIdentifier>{689b326e-8e56-45a1-827d-062a7cdda203}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
