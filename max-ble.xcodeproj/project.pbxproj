@@ -22,9 +22,9 @@
 		5833088C24332BC500331097 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		5849241C2444A64000FB0C24 /* MaxObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MaxObject.h; sourceTree = "<group>"; };
 		5849241D2444B0C000FB0C24 /* MaxObject.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = MaxObject.c; sourceTree = "<group>"; };
+		584F58072698596C007E0BC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 		587196D324324E410059E189 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = DEVELOPER_DIR; };
-		588E2DD9266A059B0016428B /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		589D3E792448204C00FFA01E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 		58B8B884268F1BFD004B4F2E /* MaxBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxBleCentral.h; sourceTree = "<group>"; };
 		58E0BF0226652DA700DCB7A0 /* SwitchString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchString.h; sourceTree = "<group>"; };
@@ -52,7 +52,6 @@
 		089C166AFE841209C02AAC07 /* iterator */ = {
 			isa = PBXGroup;
 			children = (
-				588E2DD9266A059B0016428B /* Info.plist */,
 				58567A37242A0A0A00271066 /* src */,
 				19C28FB4FE9D528D11CA2CBB /* Products */,
 				58F0AC0D242E3241004FE028 /* Frameworks */,
@@ -71,6 +70,7 @@
 		58567A37242A0A0A00271066 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				584F58072698596C007E0BC8 /* Info.plist */,
 				5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */,
 				58F0AC05242E3140004FE028 /* macos-ble */,
 			);
@@ -197,7 +197,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"${DSTROOT}/${WRAPPER_NAME}\"\ncd \"${DSTROOT}/../../\"\nzip -r max-ble.zip max-ble -x \"*.DS_Store\"\ncp -r \"${DSTROOT}/../../max-ble\" \"${HOME}/Documents/Max 8/Packages\"\n";
+			shellScript = "\n#cd \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/max-ble/externals/\"\n#codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/max-ble/externals/max-ble.mxo\"\n#cd \"/Users/mhamilt7/Documents/Max 7/developing/maxmsp-ble/max-package/\"\n#zip -r max-ble.zip max-ble -x \"*.DS_Store\"\n#cp -r \"${DSTROOT}/../../max-ble\" \"${HOME}/Documents/Max 8/Packages\"\n";
 		};
 		58F0ABFB242E3110004FE028 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -331,7 +331,6 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_LDFLAGS = (
@@ -373,7 +372,6 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
-				INFOPLIST_FILE = "$(SRCROOT)/Info.plist";
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = NO;
