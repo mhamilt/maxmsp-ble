@@ -29,7 +29,7 @@ INSTALL_PATH = /
 
 // Special Files
 GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch"
-INFOPLIST_FILE = "./max-sdk/source/Info.plist"
+INFOPLIST_FILE = ./src/Info.plist
 
 
 // Architecture and Deployment
