@@ -89,6 +89,12 @@ void WinBleCentral::getFoundDeviceList()
 {
     for (size_t i = 0; i < discoveredPeripherals.size(); i++)
     {
+        if (shouldReport)
+            object_post((t_object*)maxObjectRef, "%d, UUID: %s, RSSI: %d\n",
+                i,
+                bluetoothAddressToString(discoveredPeripherals[i].BluetoothAddress()).c_str(),
+                (int)discoveredPeripherals[i].RawSignalStrengthInDBm());
+
         outputFoundDevice(
             maxObjectRef,
             i,
@@ -272,7 +278,7 @@ void WinBleCentral::didCancelScanning()
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
 {
-    if (shouldReport) object_post((t_object*)maxObjectRef, "Connected to: %s <%s>", bluetoothAddressToString(device.BluetoothAddress()).c_str(), winrt::to_string(device.Name()).c_str());
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Connected to: %s <%ls>", bluetoothAddressToString(device.BluetoothAddress()).c_str(), device.Name().c_str());
     discoverServices(device);
 }
 
