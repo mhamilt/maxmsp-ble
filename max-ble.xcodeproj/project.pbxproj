@@ -214,7 +214,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "echo start\nif [[ ! \"$(ls -A max-sdk)\" ]]; then \ngit submodule update --init;\necho \"error: Max SDK not present, try building again\"\nexit 1\nfi\n";
+			shellScript = "echo start\nif [[ ! \"$(ls -A max-sdk-base)\" ]]; then \ngit submodule update --init;\necho \"error: Max SDK not present, try building again\"\nexit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
