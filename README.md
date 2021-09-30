@@ -37,7 +37,7 @@ cd max-sdk
 git checkout v7.0.3 # or v7.1.0 v7.3.3 v8.0.3
 ```
 
-You can check the [max-sdk releases for more tags](https://github.com/Cycling74/max-sdk/releases).
+You can check the [max-sdk-base releases for more tags](https://github.com/Cycling74/max-sdk-base).
 
 * * *
 
