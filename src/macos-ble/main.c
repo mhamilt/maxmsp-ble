@@ -47,7 +47,7 @@ void onBang(MaxExternalObject* maxObjectPtr)
 /// @param argv array of atoms holding the arguments.
 void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_atom *argv)
 {
-   switchs(s)
+    switchs(s)
     {
         cases("scan")
         if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
@@ -112,7 +112,9 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
                 break;
                 cases("subscribe")
-                if(argc == 4 && atom_gettype(argv + 2) == A_SYM && atom_gettype(argv + 3) == A_SYM)
+                if(argc == 4
+                   && atom_gettype(argv + 2) == A_SYM
+                   && atom_gettype(argv + 3) == A_SYM)
                     bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
                                                          deviceIndex,
                                                          atom_getsym(argv + 2)->s_name,
@@ -122,7 +124,6 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                    && atom_gettype(argv + 3) == A_SYM
                    && atom_gettype(argv + 4) == A_LONG)
                 {
-                    
                     if (atom_getlong(argv + 4))
                     {
                         bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
@@ -137,7 +138,29 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                                                                atom_getsym(argv + 2)->s_name,
                                                                atom_getsym(argv + 3)->s_name);
                     }
-                
+                }
+                break;
+                cases("unsubscribe")
+                if(argc == 2)
+                {
+                    object_post( (t_object*)maxObjectPtr,
+                                "unsubscribe from all characteristics of device %d",
+                                deviceIndex);
+                }
+                else if(argc == 4
+                        && atom_gettype(argv + 2) == A_SYM
+                        && atom_gettype(argv + 3) == A_SYM)
+                {
+//                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+//                                                           deviceIndex,
+//                                                           atom_getsym(argv + 2)->s_name,
+//                                                           atom_getsym(argv + 3)->s_name);
+//
+                    object_post( (t_object*)maxObjectPtr,
+                                "unsubscribe from Char: %s of Service: %s of Device %s",
+                                atom_getsym(argv + 2)->s_name,
+                                atom_getsym(argv + 3)->s_name,
+                                bleCentralCGetDeviceUUID(maxObjectPtr->bleCentral, deviceIndex));
                 }
                 break;
             } switchs_end
