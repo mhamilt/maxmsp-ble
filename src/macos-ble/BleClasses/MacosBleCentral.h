@@ -62,6 +62,8 @@ typedef enum : NSUInteger {
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
+- (const char*)getDeviceUUIDatIndex: (int) deviceIndex;
+- (int)getNumberOfDevices;
 - (void)subscribeToCharacteristic: (const char*) cuuid
                         OfService: (const char*) suuid
                     OfFoundDevice: (int)  deviceIndex

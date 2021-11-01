@@ -139,8 +139,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         NSLog(@"Fail to connect to peripheral: %@ with error = %@", aPeripheral, [error localizedDescription]);
         post("Failed to connect to peripheral: %s Error: %s",
              ((aPeripheral.name) ?
-             aPeripheral.name.UTF8String
-             : aPeripheral.identifier.UUIDString.UTF8String),
+              aPeripheral.name.UTF8String
+              : aPeripheral.identifier.UUIDString.UTF8String),
              [[error localizedDescription] UTF8String]);
     }
 }
@@ -153,12 +153,18 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     [self startScan];
 }
 
-
-- (void) stop;
+- (void) startScan
 {
-    post("Stop scanning\n");
-    shouldConnect = NO;
-    [manager stopScan];
+    
+    if (![manager isScanning])
+    {
+        post("Start scanning\n");
+        post("------------------------");
+    }
+    
+    
+    [manager scanForPeripheralsWithServices: ((servicesToScan.count) ? servicesToScan : nil)
+                                    options: @{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
 }
 
 - (void)scanForService: (t_atom*) serviceUUIDs
@@ -181,65 +187,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     [self startScan];
 }
 
-- (void) startScan
+- (void) stop;
 {
-    
-    if (![manager isScanning])
-    {
-        post("Start scanning\n");
-        post("------------------------");
-    }
-    
-    
-    [manager scanForPeripheralsWithServices: ((servicesToScan.count) ? servicesToScan : nil)
-                                    options: @{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
-}
-
-//------------------------------------------------------------------------------
-- (void)connectToDevice: (CBPeripheral*) device
-            withOptions: (NSDictionary<NSString *,id> *) options
-{
-    if (device.state == CBPeripheralStateConnecting)
-        [manager cancelPeripheralConnection:device];
-            
-    [manager connectPeripheral:device
-                       options:options];
-    
+    post("Stop scanning\n");
+    shouldConnect = NO;
+    [manager stopScan];
 }
 
 
-/// This method will iterate through all devices that have been discovered and add any devices in a Connecting status
-/// to a blacklist.
-/// This aims to cut out devices that cannot be connected to or that were temporarily in the area.
-/// This method will update the found device list by calling outputFoundDeviceList
-- (void)blacklistDevicesStillConnecting
-{
-
-}
-
-
-/// blacklist a specific device so that it is no longer discovered and no longer possible to to attekpt connection
-/// this method will update the found device list.
-/// @param device device to blacklist
-- (void)blacklistDevice: (CBPeripheral*) device
-{
-    [manager cancelPeripheralConnection:device];
-    NSUInteger index = [discoveredPeripherals indexOfObject:device];
-    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
-    [discoveredPeripherals removeObject:device];
-    [blacklistPeripherals addObject:device];
-    
-    for(CBPeripheral* device in discoveredPeripherals)
-    {
-        NSUInteger index = [discoveredPeripherals indexOfObject:device];
-        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
-        
-        outputFoundDeviceList(maxObjectRef,
-                              index,
-                              device.identifier.UUIDString.UTF8String,
-                              rssi.intValue);
-    }
-}
 
 
 - (void) connectToFoundDevice: (int) deviceIndex
@@ -306,7 +261,19 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     [discoveredPeripheralsRSSIs removeAllObjects];
 }
 
+- (void)blacklistDevicesStillConnecting
+{
+    
+}
 //------------------------------------------------------------------------------
+- (void) getRssiOfFoundDevice: (int) deviceIndex
+{
+    if (deviceIndex < discoveredPeripherals.count)
+    {
+        connectMode = BLE_CONNECT_GET_RSSI;
+        [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
+    }
+}
 
 - (void)setRssiSensitivity:(int)newRSSISensitivity
 {    
@@ -319,14 +286,46 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 }
 
 //------------------------------------------------------------------------------
-
-- (void) getRssiOfFoundDevice: (int) deviceIndex
+- (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
 {
-    if (deviceIndex < discoveredPeripherals.count)
+    maxObjectRef = extMaxObjectRef;
+}
+
+- (void)setReporting: (BOOL) reportingMode
+{
+    shouldReport = reportingMode;
+}
+
+- (void)getFoundDeviceList
+{
+    for(CBPeripheral* device in discoveredPeripherals)
     {
-        connectMode = BLE_CONNECT_GET_RSSI;
-        [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
+        NSUInteger index = [discoveredPeripherals indexOfObject:device];
+        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
+        if (shouldReport)
+            post("%d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
+                 index,
+                 device.identifier.UUIDString.UTF8String,
+                 device.name.UTF8String,
+                 rssi.intValue);
+        
+        outputFoundDeviceList(maxObjectRef,
+                              index,
+                              device.identifier.UUIDString.UTF8String,
+                              rssi.intValue);
     }
+}
+
+- (const char*)getDeviceUUIDatIndex: (int) deviceIndex
+{
+    CBPeripheral* device = discoveredPeripherals[deviceIndex];
+    return device.identifier.UUIDString.UTF8String;
+}
+
+
+- (int)getNumberOfDevices
+{
+    return (int)discoveredPeripherals.count;
 }
 
 
@@ -335,19 +334,24 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                      OfFoundDevice: (int) deviceIndex
                    shouldSubscribe: (BOOL) shouldSubscribe
 {
-    
-    connectMode = ((shouldSubscribe) ?
-                   BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
-                   BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
-    
-    
-    characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
-    serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
-    [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
-    
-    post("Subscribe to %s: %s\n",
-         serviceUuid.UUIDString.UTF8String,
-         characteristicUuid.UUIDString.UTF8String);
+    if (deviceIndex < discoveredPeripherals.count) {
+        
+        connectMode = ((shouldSubscribe) ?
+                       BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
+                       BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+        
+        characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
+        serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
+        [self connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
+        
+        post("Subscribe to %s: %s\n",
+             serviceUuid.UUIDString.UTF8String,
+             characteristicUuid.UUIDString.UTF8String);
+    }
+    else
+    {
+        
+    }
 }
 
 - (void)subscribeToCharacteristic: (const char*) cuuid
@@ -429,9 +433,9 @@ didDiscoverServices: (NSError *)error
         {
             if(shouldReport)
             {
-//                post("Service (%s) %s\n",
-//                     service.UUID.UUIDString.UTF8String,
-//                     ((service.UUID.UUIDString.length == 4) ? service.UUID.description.UTF8String : ""));
+                //                post("Service (%s) %s\n",
+                //                     service.UUID.UUIDString.UTF8String,
+                //                     ((service.UUID.UUIDString.length == 4) ? service.UUID.description.UTF8String : ""));
             }
             for (CBCharacteristic *aChar in service.characteristics)
             {
@@ -520,10 +524,10 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     if (characteristic.properties & CBCharacteristicPropertyIndicateEncryptionRequired)
         [propertiesDescription appendString:@"IndicateEncryptionRequired"];
     
-//    characteristic.service.peripheral.
+    //    characteristic.service.peripheral.
     CBPeripheral* device = characteristic.service.peripheral;
     CBService* service = characteristic.service;
-        
+    
     post("Device: %s Service (%s) %s Char: (%s) %s: Value: %s Porperties: %s",
          device.identifier.UUIDString.UTF8String,
          service.UUID.UUIDString.UTF8String,
@@ -569,28 +573,37 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
 }
 
 //------------------------------------------------------------------------------
-- (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef
+
+
+//------------------------------------------------------------------------------
+- (void)connectToDevice: (CBPeripheral*) device
+            withOptions: (NSDictionary<NSString *,id> *) options
 {
-    maxObjectRef = extMaxObjectRef;
+    if (device.state == CBPeripheralStateConnecting)
+        [manager cancelPeripheralConnection:device];
+    
+    [manager connectPeripheral:device
+                       options:options];
+    
 }
 
-- (void)setReporting: (BOOL) reportingMode
-{
-    shouldReport = reportingMode;
-}
+    
 
-- (void)getFoundDeviceList
+/// blacklist a specific device so that it is no longer discovered and no longer possible to to attekpt connection
+/// this method will update the found device list.
+/// @param device device to blacklist
+- (void)blacklistDevice: (CBPeripheral*) device
 {
+    [manager cancelPeripheralConnection:device];
+    NSUInteger index = [discoveredPeripherals indexOfObject:device];
+    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
+    [discoveredPeripherals removeObject:device];
+    [blacklistPeripherals addObject:device];
+    
     for(CBPeripheral* device in discoveredPeripherals)
     {
         NSUInteger index = [discoveredPeripherals indexOfObject:device];
         NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
-        if (shouldReport)
-            post("%d,\tUUID: %s,\tname: %s,\tRSSI: %d\n",
-                 index,
-                 device.identifier.UUIDString.UTF8String,
-                 device.name.UTF8String,
-                 rssi.intValue);
         
         outputFoundDeviceList(maxObjectRef,
                               index,
@@ -598,5 +611,6 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
                               rssi.intValue);
     }
 }
+
 
 @end
