@@ -55,6 +55,16 @@ void bleCentralCGetDeviceList (MaxBleCentral *t)
     [(__bridge MacosBleCentral *)t getFoundDeviceList];
 }
 
+const char* bleCentralCGetDeviceUUID   (MaxBleCentral *t, int deviceIndex)
+{
+    return [(__bridge MacosBleCentral *)t getDeviceUUIDatIndex:deviceIndex];
+}
+
+int bleCentralCGetNumberOfDevices(MaxBleCentral *t)
+{
+    return [(__bridge MacosBleCentral *)t getNumberOfDevices];
+}
+
 void bleCentralCSetRSSISensitity(MaxBleCentral *t, int rssiLimit)
 {
     [(__bridge MacosBleCentral *)t setRssiSensitivity:rssiLimit]  ;

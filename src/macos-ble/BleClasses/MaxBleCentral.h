@@ -33,6 +33,8 @@ void bleCentralCConnectToDeviceWithName (MaxBleCentral *t, const char *name);
 void bleCentralCRelease         (MaxBleCentral *t);
 void bleCentralCSetMaxObjRef    (MaxBleCentral *t, MaxExternalObject *maxObjRef);
 void bleCentralCGetDeviceList   (MaxBleCentral *t);
+const char* bleCentralCGetDeviceUUID   (MaxBleCentral *t, int deviceIndex);
+int bleCentralCGetNumberOfDevices(MaxBleCentral *t);
 void bleCentralCClearDiscovered (MaxBleCentral *t);
 void bleCentralCGetRssi         (MaxBleCentral *t, int deviceIndex);
 void bleCentralCSetRSSISensitity(MaxBleCentral *t, int rssiLimit);
