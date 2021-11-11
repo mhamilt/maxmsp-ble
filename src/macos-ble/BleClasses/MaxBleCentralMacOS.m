@@ -129,6 +129,10 @@ void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
     [(__bridge MacosBleCentral *)t scanForService:argv count:argc];
 }
 
+void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc)
+{
+    
+}
 
 void bleCentralCBlacklistStalledDevices (MaxBleCentral *t)
 {

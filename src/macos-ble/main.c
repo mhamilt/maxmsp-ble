@@ -197,6 +197,10 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("write")
+        if(argc >= 3) // Message Format: write <device index> <service uuid> <char uuid> <values>
+        {
+//            bleCentralCWriteToCharactaristic();
+        }
         break;
         //----------------------------------------------------------------------
         defaults

@@ -98,6 +98,7 @@
         case BLE_CONNECT_GET_RSSI:
             [aPeripheral readRSSI]; // goto didReadRSSI
             break;
+        case BLE_CONNECT_WRITE:
         case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverServices:@[serviceUuid]];
@@ -397,6 +398,7 @@ didDiscoverServices: (NSError *)error
 {
     switch (connectMode)
     {
+        case BLE_CONNECT_WRITE:
         case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverCharacteristics:@[characteristicUuid]
@@ -428,6 +430,11 @@ didDiscoverServices: (NSError *)error
         case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
             [aPeripheral setNotifyValue:NO
                       forCharacteristic:service.characteristics[0]];
+            break;
+        case BLE_CONNECT_WRITE:
+            [aPeripheral writeValue:dataToWrite
+                  forCharacteristic:service.characteristics[0]
+                               type:CBCharacteristicWriteWithResponse];
             break;
         default:
         {
@@ -587,7 +594,7 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
     
 }
 
-    
+
 
 /// blacklist a specific device so that it is no longer discovered and no longer possible to to attekpt connection
 /// this method will update the found device list.
@@ -612,5 +619,23 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
     }
 }
 
+- (void)writeToToCharacteristic: (const char*) cuuid
+                      OfService: (const char*) suuid
+                  OfFoundDevice: (int)   deviceIndex
+                      withBytes: (void*) values
+                       ofLength: (int)   numBytes
+                    
+{
+    if (deviceIndex < discoveredPeripherals.count)
+    {
+        characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
+        serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
+        dataToWrite = [[NSData alloc] initWithBytes:values
+                                             length:numBytes];
+        connectMode = BLE_CONNECT_WRITE;
+        [self
+         connectToDevice:discoveredPeripherals[deviceIndex]   withOptions:nil];
+    }
+}
 
 @end
