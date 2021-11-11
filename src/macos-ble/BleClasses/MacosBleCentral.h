@@ -78,7 +78,8 @@ typedef enum : NSUInteger {
 
 - (void)writeToToCharacteristic: (const char*) cuuid
                       OfService: (const char*) suuid
-                  OfFoundDevice: (int)  deviceIndex
-                     withValues: (int) values;
+                  OfFoundDevice: (int)   deviceIndex
+                      withBytes: (void*) values
+                       ofLength: (int)   numBytes;
 //------------------------------------------------------------------------------
 @end
