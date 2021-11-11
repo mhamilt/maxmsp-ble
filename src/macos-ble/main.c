@@ -196,11 +196,15 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         bleCentralCStopScan(maxObjectPtr->bleCentral);
         break;
         //----------------------------------------------------------------------
+        cases("subscribe")
+        break;
+        //----------------------------------------------------------------------
+        cases("unsubscribe")
+        break;
+        //----------------------------------------------------------------------
         cases("write")
-        if(argc >= 3) // Message Format: write <device index> <service uuid> <char uuid> <values>
-        {
-//            bleCentralCWriteToCharactaristic();
-        }
+        if(argc >= 3)
+            bleCentralCWriteToCharactaristic (maxObjectPtr->bleCentral, argv, argc);        
         break;
         //----------------------------------------------------------------------
         defaults

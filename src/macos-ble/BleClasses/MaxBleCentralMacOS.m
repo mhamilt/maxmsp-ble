@@ -115,7 +115,7 @@ void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID (MaxBleCentral *t, con
 
 void bleCentralCSetRSSIScanThreshold (MaxBleCentral *t, int rssi)
 {
-
+    
     [(__bridge MacosBleCentral *)t setRssiSensitivity: abs(rssi)];
 }
 
@@ -131,10 +131,42 @@ void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
 
 void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc)
 {
+    int deviceIndex = (int)atom_getlong(argv);
+    const char* suuid = atom_getsym(argv + 1)->s_name;
+    const char* cuuid = atom_getsym(argv + 2)->s_name;
     
+    void* bytes[72];
+    size_t numBytes = 0;
+        
+    for (int i = 3; i < argc; i++)
+    {
+        if(atom_gettype(argv + i) == A_SYM)
+        {
+            const char* value = atom_getsym(argv + i)->s_name;
+            memcpy((void*)(bytes + numBytes), value, strlen(value));
+        }
+        else if(atom_gettype(argv + i) == A_FLOAT)
+        {
+            float value = (float)atom_getfloat(argv + i);
+            memcpy((void*)(bytes + numBytes), &value, 4);
+            numBytes += 4;
+        }
+        else if(atom_gettype(argv + i) == A_LONG)
+        {
+            int value = (int)atom_getlong(argv + i);
+            memcpy((void*)(bytes + numBytes), &value, 4);
+            numBytes += 4;
+        }
+    }
+        
+    [(__bridge  MacosBleCentral *)t writeToToCharacteristic: cuuid
+                                                  OfService: suuid
+                                              OfFoundDevice: deviceIndex
+                                                  withBytes: bytes
+                                                   ofLength: numBytes];
 }
 
 void bleCentralCBlacklistStalledDevices (MaxBleCentral *t)
 {
-   [(__bridge MacosBleCentral *)t blacklistDevicesStillConnecting];
+    [(__bridge MacosBleCentral *)t blacklistDevicesStillConnecting];
 }
