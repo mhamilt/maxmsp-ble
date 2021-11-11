@@ -49,25 +49,15 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
 {
     switchs(s)
     {
-        cases("scan")
-        if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
-            bleCentralCStopScan(maxObjectPtr->bleCentral);
-        else if (argc && atom_gettype(argv) == A_SYM)
-            bleCentralCScanForServices(maxObjectPtr->bleCentral,
-                                       argv,
-                                       argc);
-        else
-            bleCentralCScan(maxObjectPtr->bleCentral);
+        //----------------------------------------------------------------------
+        cases("blacklist")
+        bleCentralCBlacklistStalledDevices(maxObjectPtr->bleCentral);
         break;
-        cases("stop")
-        bleCentralCStopScan(maxObjectPtr->bleCentral);
-        break;
-        cases("found")
-        bleCentralCGetDeviceList(maxObjectPtr->bleCentral);
-        break;
+        //----------------------------------------------------------------------
         cases("clear")
         bleCentralCClearDiscovered(maxObjectPtr->bleCentral);
         break;
+        //----------------------------------------------------------------------
         cases("connect")
         if(argc == 1)
         {
@@ -94,14 +84,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }switchs_end
         }
         break;
-        cases("report")
-        if(argc == 1)
-        {
-            if(atom_gettype(argv) == A_LONG)
-                bleCentralCSetReporting(maxObjectPtr->bleCentral,
-                                        (bool)atom_getlong(argv));
-        }
-        break;
+        //----------------------------------------------------------------------
         cases("device")
         if(argc >= 2)
         {
@@ -151,11 +134,11 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                         && atom_gettype(argv + 2) == A_SYM
                         && atom_gettype(argv + 3) == A_SYM)
                 {
-//                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
-//                                                           deviceIndex,
-//                                                           atom_getsym(argv + 2)->s_name,
-//                                                           atom_getsym(argv + 3)->s_name);
-//
+                    //                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                    //                                                           deviceIndex,
+                    //                                                           atom_getsym(argv + 2)->s_name,
+                    //                                                           atom_getsym(argv + 3)->s_name);
+                    //
                     object_post( (t_object*)maxObjectPtr,
                                 "unsubscribe from Char: %s of Service: %s of Device %s",
                                 atom_getsym(argv + 2)->s_name,
@@ -166,9 +149,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             } switchs_end
         }
         break;
-        cases("blacklist")
-        bleCentralCBlacklistStalledDevices(maxObjectPtr->bleCentral);
-        break;
+        //----------------------------------------------------------------------
         cases("filter")
         
         if(argc >= 1)
@@ -186,11 +167,44 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }switchs_end;
         }
         break;
+        //----------------------------------------------------------------------
+        cases("found")
+        bleCentralCGetDeviceList(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("report")
+        if(argc == 1)
+        {
+            if(atom_gettype(argv) == A_LONG)
+                bleCentralCSetReporting(maxObjectPtr->bleCentral,
+                                        (bool)atom_getlong(argv));
+        }
+        break;
+        //----------------------------------------------------------------------
+        cases("scan")
+        if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
+            bleCentralCStopScan(maxObjectPtr->bleCentral);
+        else if (argc && atom_gettype(argv) == A_SYM)
+            bleCentralCScanForServices(maxObjectPtr->bleCentral,
+                                       argv,
+                                       argc);
+        else
+            bleCentralCScan(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("stop")
+        bleCentralCStopScan(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("write")
+        break;
+        //----------------------------------------------------------------------
         defaults
         object_post( (t_object*)maxObjectPtr,
                     "This method was invoked by sending the ’%s’ message to this object.",
                     s->s_name);
         break;
+        
     } switchs_end;
 }
 
