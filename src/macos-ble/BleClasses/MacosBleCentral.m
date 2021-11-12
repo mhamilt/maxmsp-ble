@@ -535,7 +535,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     CBPeripheral* device = characteristic.service.peripheral;
     CBService* service = characteristic.service;
     
-    post("Device: %s Service (%s) %s Char: (%s) %s: Value: %s Porperties: %s",
+    post("Device: %s Service (%s) %s Char: (%s) %s: Value: %s Properties: %s",
          device.identifier.UUIDString.UTF8String,
          service.UUID.UUIDString.UTF8String,
          ((service.UUID.UUIDString.length == 4) ?
