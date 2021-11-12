@@ -80,6 +80,6 @@ typedef enum : NSUInteger {
                       OfService: (const char*) suuid
                   OfFoundDevice: (int)   deviceIndex
                       withBytes: (void*) values
-                       ofLength: (int)   numBytes;
+                       ofLength: (size_t)   numBytes;
 //------------------------------------------------------------------------------
 @end

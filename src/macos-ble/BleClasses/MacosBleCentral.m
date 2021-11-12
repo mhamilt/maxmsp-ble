@@ -396,22 +396,28 @@ didDiscoverIncludedServicesForService:(CBService *)service
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
-    switch (connectMode)
+    post("didDiscoverServices");
+    if(error)
+        post(error.localizedDescription.UTF8String);
+    else
     {
-        case BLE_CONNECT_WRITE:
-        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-            [aPeripheral discoverCharacteristics:@[characteristicUuid]
-                                      forService:aPeripheral.services[0]];
-            break;
-            
-        default:
-            for (CBService *aService in aPeripheral.services)
-            {
-                [aPeripheral discoverCharacteristics: nil
-                                          forService: aService];
-            }
-            break;
+        switch (connectMode)
+        {
+            case BLE_CONNECT_WRITE:
+            case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
+            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+                [aPeripheral discoverCharacteristics:@[characteristicUuid]
+                                          forService:aPeripheral.services[0]];
+                break;
+                
+            default:
+                for (CBService *aService in aPeripheral.services)
+                {
+                    [aPeripheral discoverCharacteristics: nil
+                                              forService: aService];
+                }
+                break;
+        }
     }
 }
 //------------------------------------------------------------------------------
@@ -438,8 +444,8 @@ didDiscoverServices: (NSError *)error
                                    type:CBCharacteristicWriteWithoutResponse];
             else
                 [aPeripheral writeValue:dataToWrite
-                forCharacteristic:service.characteristics[0]
-                             type:CBCharacteristicWriteWithResponse];
+                      forCharacteristic:service.characteristics[0]
+                                   type:CBCharacteristicWriteWithResponse];
             break;
         default:
         {
@@ -637,23 +643,39 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     }
 }
 
+
+
 - (void)writeToToCharacteristic: (const char*) cuuid
                       OfService: (const char*) suuid
-                  OfFoundDevice: (int)   deviceIndex
-                      withBytes: (void*) values
-                       ofLength: (int)   numBytes
+                  OfFoundDevice: (int)    deviceIndex
+                      withBytes: (void*)  values
+                       ofLength: (size_t) numBytes
 
 {
     if (deviceIndex < discoveredPeripherals.count)
     {
-        characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
-        serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
-        dataToWrite = [[NSData alloc] initWithBytes:values
-                                             length:numBytes];
-        connectMode = BLE_CONNECT_WRITE;
-        [self
-         connectToDevice:discoveredPeripherals[deviceIndex]   withOptions:nil];
+        NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
+        NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
+        
+        if (![self isValidUUID: cuuidString] || ![self isValidUUID: suuidString])
+        {
+            post("UUIDs are invalid");
+        }
+        else
+        {
+            characteristicUuid = [CBUUID UUIDWithString: cuuidString];
+            serviceUuid = [CBUUID UUIDWithString: suuidString];
+            dataToWrite = [[NSData alloc] initWithBytes:values
+                                                 length:numBytes];
+            connectMode = BLE_CONNECT_WRITE;
+            [self connectToDevice:discoveredPeripherals[deviceIndex]   withOptions:nil];
+        }
     }
+}
+
+-(BOOL)isValidUUID : (NSString *)UUIDString
+{
+    return (BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString];
 }
 
 @end
