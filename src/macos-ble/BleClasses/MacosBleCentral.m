@@ -432,9 +432,14 @@ didDiscoverServices: (NSError *)error
                       forCharacteristic:service.characteristics[0]];
             break;
         case BLE_CONNECT_WRITE:
-            [aPeripheral writeValue:dataToWrite
-                  forCharacteristic:service.characteristics[0]
-                               type:CBCharacteristicWriteWithResponse];
+            if (service.characteristics[0].properties & CBCharacteristicPropertyWriteWithoutResponse)
+                [aPeripheral writeValue:dataToWrite
+                      forCharacteristic:service.characteristics[0]
+                                   type:CBCharacteristicWriteWithoutResponse];
+            else
+                [aPeripheral writeValue:dataToWrite
+                forCharacteristic:service.characteristics[0]
+                             type:CBCharacteristicWriteWithResponse];
             break;
         default:
         {
@@ -580,7 +585,20 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
 }
 
 //------------------------------------------------------------------------------
-
+- (void)            peripheral:(CBPeripheral *)peripheral
+didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
+                         error:(NSError *)error
+{
+    
+    if(error)
+        post("Couldn't write to %s: %s",
+             characteristic.UUID.UUIDString.UTF8String,
+             [[error localizedDescription] UTF8String]);
+    else
+        if (shouldReport)
+            post("Success Writing to %s", characteristic.UUID.UUIDString.UTF8String);
+    
+}
 
 //------------------------------------------------------------------------------
 - (void)connectToDevice: (CBPeripheral*) device
@@ -624,7 +642,7 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
                   OfFoundDevice: (int)   deviceIndex
                       withBytes: (void*) values
                        ofLength: (int)   numBytes
-                    
+
 {
     if (deviceIndex < discoveredPeripherals.count)
     {
