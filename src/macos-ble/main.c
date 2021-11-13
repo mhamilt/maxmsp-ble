@@ -59,7 +59,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("connect")
-        if(argc == 1)
+        if (argc == 1)
         {
             switch (atom_gettype(argv))
             {
@@ -86,7 +86,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("device")
-        if(argc >= 2)
+        if (argc >= 2)
         {
             int deviceIndex = (int)atom_getlong(argv);
             switchs(atom_getsym(argv + 1))
@@ -95,17 +95,17 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
                 break;
                 cases("subscribe")
-                if(argc == 4
-                   && atom_gettype(argv + 2) == A_SYM
-                   && atom_gettype(argv + 3) == A_SYM)
+                if (argc == 4
+                    && atom_gettype(argv + 2) == A_SYM
+                    && atom_gettype(argv + 3) == A_SYM)
                     bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
                                                          deviceIndex,
                                                          atom_getsym(argv + 2)->s_name,
                                                          atom_getsym(argv + 3)->s_name);
-                if(argc == 5
-                   && atom_gettype(argv + 2) == A_SYM
-                   && atom_gettype(argv + 3) == A_SYM
-                   && atom_gettype(argv + 4) == A_LONG)
+                if (argc == 5
+                    && atom_gettype(argv + 2) == A_SYM
+                    && atom_gettype(argv + 3) == A_SYM
+                    && atom_gettype(argv + 4) == A_LONG)
                 {
                     if (atom_getlong(argv + 4))
                     {
@@ -124,26 +124,21 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
                 }
                 break;
                 cases("unsubscribe")
-                if(argc == 2)
+                if (argc == 2)
                 {
-                    object_post( (t_object*)maxObjectPtr,
-                                "unsubscribe from all characteristics of device %d",
-                                deviceIndex);
+                    //object_post( (t_object*)maxObjectPtr,
+                    //            "unsubscribe from all characteristics of device %d",
+                    //            deviceIndex);
                 }
-                else if(argc == 4
-                        && atom_gettype(argv + 2) == A_SYM
-                        && atom_gettype(argv + 3) == A_SYM)
+                else if (argc == 4
+                         && atom_gettype(argv + 2) == A_SYM
+                         && atom_gettype(argv + 3) == A_SYM)
                 {
-                    //                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
-                    //                                                           deviceIndex,
-                    //                                                           atom_getsym(argv + 2)->s_name,
-                    //                                                           atom_getsym(argv + 3)->s_name);
-                    //
-                    object_post( (t_object*)maxObjectPtr,
-                                "unsubscribe from Char: %s of Service: %s of Device %s",
-                                atom_getsym(argv + 2)->s_name,
-                                atom_getsym(argv + 3)->s_name,
-                                bleCentralCGetDeviceUUID(maxObjectPtr->bleCentral, deviceIndex));
+                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                           deviceIndex,
+                                                           atom_getsym(argv + 2)->s_name,
+                                                           atom_getsym(argv + 3)->s_name);
+                    
                 }
                 break;
             } switchs_end
@@ -151,8 +146,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("filter")
-        
-        if(argc >= 1)
+        if (argc >= 1)
         {
             switchs(atom_getsym(argv))
             {
@@ -173,16 +167,16 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("report")
-        if(argc == 1)
+        if (argc == 1)
         {
-            if(atom_gettype(argv) == A_LONG)
+            if (atom_gettype(argv) == A_LONG)
                 bleCentralCSetReporting(maxObjectPtr->bleCentral,
                                         (bool)atom_getlong(argv));
         }
         break;
         //----------------------------------------------------------------------
         cases("scan")
-        if(argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
+        if (argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
             bleCentralCStopScan(maxObjectPtr->bleCentral);
         else if (argc && atom_gettype(argv) == A_SYM)
             bleCentralCScanForServices(maxObjectPtr->bleCentral,
@@ -197,14 +191,30 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("subscribe")
+        if (argc == 3
+            && atom_gettype(argv + 0) == A_LONG
+            && atom_gettype(argv + 1) == A_SYM
+            && atom_gettype(argv + 2) == A_SYM)
+            bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                 (int)atom_getlong(argv),
+                                                 atom_getsym(argv + 1)->s_name,
+                                                 atom_getsym(argv + 2)->s_name);
         break;
         //----------------------------------------------------------------------
         cases("unsubscribe")
+        if (argc == 3
+            && atom_gettype(argv + 0) == A_LONG
+            && atom_gettype(argv + 1) == A_SYM
+            && atom_gettype(argv + 2) == A_SYM)
+            bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                   (int)atom_getlong(argv),
+                                                   atom_getsym(argv + 1)->s_name,
+                                                   atom_getsym(argv + 2)->s_name);
         break;
         //----------------------------------------------------------------------
         cases("write")
-        if(argc >= 3)
-            bleCentralCWriteToCharactaristic (maxObjectPtr->bleCentral, argv, argc);        
+        if (argc >= 3)
+            bleCentralCWriteToCharactaristic (maxObjectPtr->bleCentral, argv, argc);
         break;
         //----------------------------------------------------------------------
         defaults

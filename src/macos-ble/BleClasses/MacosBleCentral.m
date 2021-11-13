@@ -349,9 +349,11 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
             
             characteristicUuid = [CBUUID UUIDWithString: cuuidString];
             serviceUuid = [CBUUID UUIDWithString: suuidString];
-            [self connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
+            [self connectToDevice:discoveredPeripherals[deviceIndex]
+                      withOptions:nil];
             
-            post("Subscribe to %s: %s\n",
+            post("%s %s: %s\n",
+                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
                  serviceUuid.UUIDString.UTF8String,
                  characteristicUuid.UUIDString.UTF8String);
         }
@@ -581,9 +583,12 @@ didDiscoverDescriptorsForCharacteristic:(CBDescriptor *)descriptor
     [peripheral readValueForDescriptor:descriptor];
 }
 //------------------------------------------------------------------------------
-- (void) peripheral: (CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+- (void) peripheral: (CBPeripheral *)peripheral
+didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
+              error:(NSError *)error
 {
-    
+    if (error)
+        post(error.localizedDescription.UTF8String);
 }
 //------------------------------------------------------------------------------
 - (void) peripheral: (CBPeripheral *)peripheral
