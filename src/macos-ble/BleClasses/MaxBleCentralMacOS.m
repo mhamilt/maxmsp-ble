@@ -134,10 +134,20 @@ void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc
     int deviceIndex = (int)atom_getlong(argv);
     const char* suuid = atom_getsym(argv + 1)->s_name;
     const char* cuuid = atom_getsym(argv + 2)->s_name;
-    
-    void* bytes[72];
+        
     size_t numBytes = 0;
         
+    for (int i = 3; i < argc; i++)
+    {
+        if(atom_gettype(argv + i) == A_SYM)
+            numBytes += strlen(atom_getsym(argv + i)->s_name);
+        else
+            numBytes += 4;
+    }
+    
+    void* bytes = malloc(numBytes);
+    numBytes = 0;
+    
     for (int i = 3; i < argc; i++)
     {
         if(atom_gettype(argv + i) == A_SYM)

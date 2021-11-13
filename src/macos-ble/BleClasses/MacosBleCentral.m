@@ -683,6 +683,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                       withOptions:nil];
         }
     }
+    free(values);
 }
 
 -(BOOL)isValidUUID : (NSString *)UUIDString
