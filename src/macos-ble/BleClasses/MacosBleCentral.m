@@ -212,7 +212,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     if([self isValidUUID: targetUUIDString])
     {
         targetDeviceUUID = [[NSUUID alloc] initWithUUIDString: targetUUIDString];
-    
+        
         BOOL isTargetDeviceFound = NO;
         for (CBPeripheral* device in discoveredPeripherals)
         {
@@ -341,7 +341,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
         NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
         NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
         
-       if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
+        if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
         {
             connectMode = ((shouldSubscribe) ?
                            BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
@@ -407,9 +407,8 @@ didDiscoverIncludedServicesForService:(CBService *)service
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
-    post("didDiscoverServices");
-    if(error)
-        post(error.localizedDescription.UTF8String);
+    if(error || (aPeripheral.services.count == 0))
+        post((error) ? error.localizedDescription.UTF8String : "No matching services found");
     else
     {
         switch (connectMode)
@@ -419,6 +418,7 @@ didDiscoverServices: (NSError *)error
             case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
                 [aPeripheral discoverCharacteristics:@[characteristicUuid]
                                           forService:aPeripheral.services[0]];
+                
                 break;
                 
             default:
@@ -437,41 +437,45 @@ didDiscoverServices: (NSError *)error
 - (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service
               error: (NSError *)error
 {
-    
-    switch (connectMode)
+    if(error || (service.characteristics.count == 0))
+        post((error) ? error.localizedDescription.UTF8String : "No matching characteristics found");
+    else
     {
-        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-            [aPeripheral setNotifyValue:YES
-                      forCharacteristic:service.characteristics[0]];
-            break;
-        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-            [aPeripheral setNotifyValue:NO
-                      forCharacteristic:service.characteristics[0]];
-            break;
-        case BLE_CONNECT_WRITE:
-            if (service.characteristics[0].properties & CBCharacteristicPropertyWriteWithoutResponse)
-                [aPeripheral writeValue:dataToWrite
-                      forCharacteristic:service.characteristics[0]
-                                   type:CBCharacteristicWriteWithoutResponse];
-            else
-                [aPeripheral writeValue:dataToWrite
-                      forCharacteristic:service.characteristics[0]
-                                   type:CBCharacteristicWriteWithResponse];
-            break;
-        default:
+        switch (connectMode)
         {
-            if(shouldReport)
+            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
+                [aPeripheral setNotifyValue:YES
+                          forCharacteristic:service.characteristics[0]];
+                break;
+            case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
+                [aPeripheral setNotifyValue:NO
+                          forCharacteristic:service.characteristics[0]];
+                break;
+            case BLE_CONNECT_WRITE:
+                if (service.characteristics[0].properties & CBCharacteristicPropertyWriteWithoutResponse)
+                    [aPeripheral writeValue:dataToWrite
+                          forCharacteristic:service.characteristics[0]
+                                       type:CBCharacteristicWriteWithoutResponse];
+                else
+                    [aPeripheral writeValue:dataToWrite
+                          forCharacteristic:service.characteristics[0]
+                                       type:CBCharacteristicWriteWithResponse];
+                break;
+            default:
             {
-                //                post("Service (%s) %s\n",
-                //                     service.UUID.UUIDString.UTF8String,
-                //                     ((service.UUID.UUIDString.length == 4) ? service.UUID.description.UTF8String : ""));
+                if(shouldReport)
+                {
+                    //                post("Service (%s) %s\n",
+                    //                     service.UUID.UUIDString.UTF8String,
+                    //                     ((service.UUID.UUIDString.length == 4) ? service.UUID.description.UTF8String : ""));
+                }
+                for (CBCharacteristic *aChar in service.characteristics)
+                {
+                    if (aChar.properties & CBCharacteristicPropertyRead)
+                        [aPeripheral readValueForCharacteristic:aChar];
+                }
+                break;
             }
-            for (CBCharacteristic *aChar in service.characteristics)
-            {
-                if (aChar.properties & CBCharacteristicPropertyRead)
-                    [aPeripheral readValueForCharacteristic:aChar];
-            }
-            break;
         }
     }
 }
@@ -668,7 +672,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
         NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
         
-        if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
+        if ([self isValidUUID: suuidString] && [self isValidUUID: cuuidString])
         {
             characteristicUuid = [CBUUID UUIDWithString: cuuidString];
             serviceUuid = [CBUUID UUIDWithString: suuidString];
@@ -683,13 +687,13 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 
 -(BOOL)isValidUUID : (NSString *)UUIDString
 {
-    if((BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString])
+    if(!((BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString]))
     {
         post("%s is not a valid UUID", UUIDString.UTF8String);
         return NO;
     }
-    else
-        return YES;
+    
+    return YES;
 }
 
 -(BOOL)isDeviceIndexInRange: (int) deviceIndex
