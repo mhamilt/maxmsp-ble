@@ -196,11 +196,9 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 }
 
 
-
-
 - (void) connectToFoundDevice: (int) deviceIndex
 {
-    if (deviceIndex < discoveredPeripherals.count)
+    if ([self isDeviceIndexInRange: deviceIndex])
     {
         connectMode = BLE_CONNECT_EVERYTHING;
         [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
@@ -210,26 +208,29 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void)connectToDeviceWithUUID: (const char*) uuid
 {
-    targetDeviceUUID = [[NSUUID alloc] initWithUUIDString:[[NSString alloc]
-                                                           initWithUTF8String:uuid]];
-    
-    BOOL isTargetDeviceFound = NO;
-    for (CBPeripheral* device in discoveredPeripherals)
+    NSString* targetUUIDString  = [[NSString alloc] initWithUTF8String:uuid];
+    if([self isValidUUID: targetUUIDString])
     {
-        if ([device.identifier isEqual:targetDeviceUUID])
+        targetDeviceUUID = [[NSUUID alloc] initWithUUIDString: targetUUIDString];
+    
+        BOOL isTargetDeviceFound = NO;
+        for (CBPeripheral* device in discoveredPeripherals)
         {
-            isTargetDeviceFound = YES;
-            [self  connectToDevice:device
-                       withOptions:nil];
-            break;
+            if ([device.identifier isEqual:targetDeviceUUID])
+            {
+                isTargetDeviceFound = YES;
+                [self  connectToDevice:device
+                           withOptions:nil];
+                break;
+            }
         }
-    }
-    
-    if (!isTargetDeviceFound)
-    {
-        connectMode = BLE_CONNECT_WITH_DEVICE_UUID;
-        [manager scanForPeripheralsWithServices:nil
-                                        options:nil];
+        
+        if (!isTargetDeviceFound)
+        {
+            connectMode = BLE_CONNECT_WITH_DEVICE_UUID;
+            [manager scanForPeripheralsWithServices:nil
+                                            options:nil];
+        }
     }
     
 }
@@ -269,7 +270,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 //------------------------------------------------------------------------------
 - (void) getRssiOfFoundDevice: (int) deviceIndex
 {
-    if (deviceIndex < discoveredPeripherals.count)
+    if ([self isDeviceIndexInRange: deviceIndex])
     {
         connectMode = BLE_CONNECT_GET_RSSI;
         [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
@@ -330,29 +331,32 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 }
 
 
-- (void) subscribeToCharacteristic: (const char *) cuuid
+- (void) subscribeToCharacteristic: (const char*) cuuid
                          OfService: (const char*)  suuid
                      OfFoundDevice: (int) deviceIndex
                    shouldSubscribe: (BOOL) shouldSubscribe
 {
-    if (deviceIndex < discoveredPeripherals.count) {
-        
-        connectMode = ((shouldSubscribe) ?
-                       BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
-                       BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
-        
-        characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
-        serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
-        [self connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
-        
-        post("Subscribe to %s: %s\n",
-             serviceUuid.UUIDString.UTF8String,
-             characteristicUuid.UUIDString.UTF8String);
-    }
-    else
+    if ([self isDeviceIndexInRange: deviceIndex])
     {
+        NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
+        NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
         
+       if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
+        {
+            connectMode = ((shouldSubscribe) ?
+                           BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
+                           BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+            
+            characteristicUuid = [CBUUID UUIDWithString: cuuidString];
+            serviceUuid = [CBUUID UUIDWithString: suuidString];
+            [self connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
+            
+            post("Subscribe to %s: %s\n",
+                 serviceUuid.UUIDString.UTF8String,
+                 characteristicUuid.UUIDString.UTF8String);
+        }
     }
+    
 }
 
 - (void)subscribeToCharacteristic: (const char*) cuuid
@@ -360,25 +364,32 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                  ofDeviceWithUUID: (const char*) duuid
                   shouldSubscribe: (BOOL) shouldSubscribe;
 {
-    connectMode = ((shouldSubscribe) ?
-                   BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
-                   BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+    NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
+    NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
     
-    characteristicUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: cuuid] ];
-    serviceUuid = [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String: suuid] ];
-    
-    BOOL isTargetDeviceFound = NO;
-    for (CBPeripheral* device in discoveredPeripherals)
+    if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
     {
-        if ([device.identifier isEqual:targetDeviceUUID])
+        connectMode = ((shouldSubscribe) ?
+                       BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
+                       BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
+        
+        
+        characteristicUuid = [CBUUID UUIDWithString: cuuidString];
+        serviceUuid = [CBUUID UUIDWithString: suuidString];
+        
+        BOOL isTargetDeviceFound = NO;
+        for (CBPeripheral* device in discoveredPeripherals)
         {
-            isTargetDeviceFound = YES;
-            [self  connectToDevice:device withOptions:nil];
-            break;
+            if ([device.identifier isEqual:targetDeviceUUID])
+            {
+                isTargetDeviceFound = YES;
+                [self  connectToDevice:device withOptions:nil];
+                break;
+            }
         }
+        if (!isTargetDeviceFound)
+            post("Device with UUID %s not found", duuid);
     }
-    if (!isTargetDeviceFound)
-        post("Device with UUID %s not found", duuid);
 }
 
 //------------------------------------------------------------------------------
@@ -652,30 +663,43 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                        ofLength: (size_t) numBytes
 
 {
-    if (deviceIndex < discoveredPeripherals.count)
+    if ([self isDeviceIndexInRange: deviceIndex])
     {
         NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
         NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
         
-        if (![self isValidUUID: cuuidString] || ![self isValidUUID: suuidString])
-        {
-            post("UUIDs are invalid");
-        }
-        else
+        if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
         {
             characteristicUuid = [CBUUID UUIDWithString: cuuidString];
             serviceUuid = [CBUUID UUIDWithString: suuidString];
             dataToWrite = [[NSData alloc] initWithBytes:values
                                                  length:numBytes];
             connectMode = BLE_CONNECT_WRITE;
-            [self connectToDevice:discoveredPeripherals[deviceIndex]   withOptions:nil];
+            [self connectToDevice:discoveredPeripherals[deviceIndex]
+                      withOptions:nil];
         }
     }
 }
 
 -(BOOL)isValidUUID : (NSString *)UUIDString
 {
-    return (BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString];
+    if((BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString])
+    {
+        post("%s is not a valid UUID", UUIDString.UTF8String);
+        return NO;
+    }
+    else
+        return YES;
+}
+
+-(BOOL)isDeviceIndexInRange: (int) deviceIndex
+{
+    if (!(deviceIndex < discoveredPeripherals.count))
+    {
+        post("Index %d is out of range", deviceIndex);
+        return NO;
+    }
+    return YES;
 }
 
 @end
