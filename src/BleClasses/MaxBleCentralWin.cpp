@@ -84,6 +84,12 @@ void bleCentralCScanForServices(MaxBleCentral* t, t_atom* argv, long argc)
     ((WinBleCentral*)t)->scanForService(argv, argc);
 }
 
+void bleCentralCWriteToCharactaristic(MaxBleCentral* t, t_atom* argv, long argc)
+{
+
+}
+
+
 void bleCentralCBlacklistStalledDevices(MaxBleCentral* t)
 {
     post("Not yet implemented");

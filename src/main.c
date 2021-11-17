@@ -47,183 +47,183 @@ void onBang(MaxExternalObject* maxObjectPtr)
 /// @param argv array of atoms holding the arguments.
 void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_atom *argv)
 {
-    //switchs(s)
-    //{
-    //    //----------------------------------------------------------------------
-    //    cases("blacklist")
-    //    bleCentralCBlacklistStalledDevices(maxObjectPtr->bleCentral);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("clear")
-    //    bleCentralCClearDiscovered(maxObjectPtr->bleCentral);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("connect")
-    //    if (argc == 1)
-    //    {
-    //        switch (atom_gettype(argv))
-    //        {
-    //            case A_LONG:
-    //                bleCentralCConnectToFoundDevice(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
-    //                break;
-    //            case A_SYM:
-    //                bleCentralCConnectToDeviceWithUUID(maxObjectPtr->bleCentral,
-    //                                                   atom_getsym(argv)->s_name);
-    //                break;
-    //        }
-    //    }
-    //    else if (argc >= 2)
-    //    {
-    //        switchs(atom_getsym(argv))
-    //        {
-    //            cases("service")
-    //            break;
-    //            cases("name")
-    //            bleCentralCConnectToDeviceWithName(maxObjectPtr->bleCentral, atom_getsym(argv + 1)->s_name);
-    //            break;
-    //        }switchs_end
-    //    }
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("device")
-    //    if (argc >= 2)
-    //    {
-    //        int deviceIndex = (int)atom_getlong(argv);
-    //        switchs(atom_getsym(argv + 1))
-    //        {
-    //            cases("rssi")
-    //            bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
-    //            break;
-    //            cases("subscribe")
-    //            if (argc == 4
-    //                && atom_gettype(argv + 2) == A_SYM
-    //                && atom_gettype(argv + 3) == A_SYM)
-    //                bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                                     deviceIndex,
-    //                                                     atom_getsym(argv + 2)->s_name,
-    //                                                     atom_getsym(argv + 3)->s_name);
-    //            if (argc == 5
-    //                && atom_gettype(argv + 2) == A_SYM
-    //                && atom_gettype(argv + 3) == A_SYM
-    //                && atom_gettype(argv + 4) == A_LONG)
-    //            {
-    //                if (atom_getlong(argv + 4))
-    //                {
-    //                    bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                                         deviceIndex,
-    //                                                         atom_getsym(argv + 2)->s_name,
-    //                                                         atom_getsym(argv + 3)->s_name);
-    //                }
-    //                else
-    //                {
-    //                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                                           deviceIndex,
-    //                                                           atom_getsym(argv + 2)->s_name,
-    //                                                           atom_getsym(argv + 3)->s_name);
-    //                }
-    //            }
-    //            break;
-    //            cases("unsubscribe")
-    //            if (argc == 2)
-    //            {
-    //                //object_post( (t_object*)maxObjectPtr,
-    //                //            "unsubscribe from all characteristics of device %d",
-    //                //            deviceIndex);
-    //            }
-    //            else if (argc == 4
-    //                     && atom_gettype(argv + 2) == A_SYM
-    //                     && atom_gettype(argv + 3) == A_SYM)
-    //            {
-    //                bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                                       deviceIndex,
-    //                                                       atom_getsym(argv + 2)->s_name,
-    //                                                       atom_getsym(argv + 3)->s_name);
-    //                
-    //            }
-    //            break;
-    //        } switchs_end
-    //    }
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("filter")
-    //    if (argc >= 1)
-    //    {
-    //        switchs(atom_getsym(argv))
-    //        {
-    //            cases("rssi")
-    //            bleCentralCSetRSSIScanThreshold (maxObjectPtr->bleCentral,
-    //                                             (int)atom_getlong(argv + 1));
-    //            break;
-    //            cases("iphone")
-    //            bleCentralCSetIgnoreiPhone(maxObjectPtr->bleCentral,
-    //                                       (bool)atom_getlong(argv + 1));
-    //            break;
-    //        }switchs_end;
-    //    }
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("found")
-    //    bleCentralCGetDeviceList(maxObjectPtr->bleCentral);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("report")
-    //    if (argc == 1)
-    //    {
-    //        if (atom_gettype(argv) == A_LONG)
-    //            bleCentralCSetReporting(maxObjectPtr->bleCentral,
-    //                                    (bool)atom_getlong(argv));
-    //    }
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("scan")
-    //    if (argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
-    //        bleCentralCStopScan(maxObjectPtr->bleCentral);
-    //    else if (argc && atom_gettype(argv) == A_SYM)
-    //        bleCentralCScanForServices(maxObjectPtr->bleCentral,
-    //                                   argv,
-    //                                   argc);
-    //    else
-    //        bleCentralCScan(maxObjectPtr->bleCentral);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("stop")
-    //    bleCentralCStopScan(maxObjectPtr->bleCentral);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("subscribe")
-    //    if (argc == 3
-    //        && atom_gettype(argv + 0) == A_LONG
-    //        && atom_gettype(argv + 1) == A_SYM
-    //        && atom_gettype(argv + 2) == A_SYM)
-    //        bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                             (int)atom_getlong(argv),
-    //                                             atom_getsym(argv + 1)->s_name,
-    //                                             atom_getsym(argv + 2)->s_name);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("unsubscribe")
-    //    if (argc == 3
-    //        && atom_gettype(argv + 0) == A_LONG
-    //        && atom_gettype(argv + 1) == A_SYM
-    //        && atom_gettype(argv + 2) == A_SYM)
-    //        bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
-    //                                               (int)atom_getlong(argv),
-    //                                               atom_getsym(argv + 1)->s_name,
-    //                                               atom_getsym(argv + 2)->s_name);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    cases("write")
-    //    if (argc >= 3)
-    //        bleCentralCWriteToCharactaristic (maxObjectPtr->bleCentral, argv, argc);
-    //    break;
-    //    //----------------------------------------------------------------------
-    //    defaults
-    //    object_post( (t_object*)maxObjectPtr,
-    //                "This method was invoked by sending the ’%s’ message to this object.",
-    //                s->s_name);
-    //    break;
-    //    
-    //} switchs_end;
+    switchs(s)
+    {
+        //----------------------------------------------------------------------
+        cases("blacklist")
+        bleCentralCBlacklistStalledDevices(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("clear")
+        bleCentralCClearDiscovered(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("connect")
+        if (argc == 1)
+        {
+            switch (atom_gettype(argv))
+            {
+                case A_LONG:
+                    bleCentralCConnectToFoundDevice(maxObjectPtr->bleCentral, (int)atom_getlong(argv));
+                    break;
+                case A_SYM:
+                    bleCentralCConnectToDeviceWithUUID(maxObjectPtr->bleCentral,
+                                                       atom_getsym(argv)->s_name);
+                    break;
+            }
+        }
+        else if (argc >= 2)
+        {
+            switchs(atom_getsym(argv))
+            {
+                cases("service")
+                break;
+                cases("name")
+                bleCentralCConnectToDeviceWithName(maxObjectPtr->bleCentral, atom_getsym(argv + 1)->s_name);
+                break;
+            }switchs_end
+        }
+        break;
+        //----------------------------------------------------------------------
+        cases("device")
+        if (argc >= 2)
+        {
+            int deviceIndex = (int)atom_getlong(argv);
+            switchs(atom_getsym(argv + 1))
+            {
+                cases("rssi")
+                bleCentralCGetRssi(maxObjectPtr->bleCentral, deviceIndex);
+                break;
+                cases("subscribe")
+                if (argc == 4
+                    && atom_gettype(argv + 2) == A_SYM
+                    && atom_gettype(argv + 3) == A_SYM)
+                    bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                         deviceIndex,
+                                                         atom_getsym(argv + 2)->s_name,
+                                                         atom_getsym(argv + 3)->s_name);
+                if (argc == 5
+                    && atom_gettype(argv + 2) == A_SYM
+                    && atom_gettype(argv + 3) == A_SYM
+                    && atom_gettype(argv + 4) == A_LONG)
+                {
+                    if (atom_getlong(argv + 4))
+                    {
+                        bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                             deviceIndex,
+                                                             atom_getsym(argv + 2)->s_name,
+                                                             atom_getsym(argv + 3)->s_name);
+                    }
+                    else
+                    {
+                        bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                               deviceIndex,
+                                                               atom_getsym(argv + 2)->s_name,
+                                                               atom_getsym(argv + 3)->s_name);
+                    }
+                }
+                break;
+                cases("unsubscribe")
+                if (argc == 2)
+                {
+                    //object_post( (t_object*)maxObjectPtr,
+                    //            "unsubscribe from all characteristics of device %d",
+                    //            deviceIndex);
+                }
+                else if (argc == 4
+                         && atom_gettype(argv + 2) == A_SYM
+                         && atom_gettype(argv + 3) == A_SYM)
+                {
+                    bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                           deviceIndex,
+                                                           atom_getsym(argv + 2)->s_name,
+                                                           atom_getsym(argv + 3)->s_name);
+                    
+                }
+                break;
+            } switchs_end
+        }
+        break;
+        //----------------------------------------------------------------------
+        cases("filter")
+        if (argc >= 1)
+        {
+            switchs(atom_getsym(argv))
+            {
+                cases("rssi")
+                bleCentralCSetRSSIScanThreshold (maxObjectPtr->bleCentral,
+                                                 (int)atom_getlong(argv + 1));
+                break;
+                cases("iphone")
+                bleCentralCSetIgnoreiPhone(maxObjectPtr->bleCentral,
+                                           (bool)atom_getlong(argv + 1));
+                break;
+            }switchs_end;
+        }
+        break;
+        //----------------------------------------------------------------------
+        cases("found")
+        bleCentralCGetDeviceList(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("report")
+        if (argc == 1)
+        {
+            if (atom_gettype(argv) == A_LONG)
+                bleCentralCSetReporting(maxObjectPtr->bleCentral,
+                                        (bool)atom_getlong(argv));
+        }
+        break;
+        //----------------------------------------------------------------------
+        cases("scan")
+        if (argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
+            bleCentralCStopScan(maxObjectPtr->bleCentral);
+        else if (argc && atom_gettype(argv) == A_SYM)
+            bleCentralCScanForServices(maxObjectPtr->bleCentral,
+                                       argv,
+                                       argc);
+        else
+            bleCentralCScan(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("stop")
+        bleCentralCStopScan(maxObjectPtr->bleCentral);
+        break;
+        //----------------------------------------------------------------------
+        cases("subscribe")
+        if (argc == 3
+            && atom_gettype(argv + 0) == A_LONG
+            && atom_gettype(argv + 1) == A_SYM
+            && atom_gettype(argv + 2) == A_SYM)
+            bleCentralCSubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                 (int)atom_getlong(argv),
+                                                 atom_getsym(argv + 1)->s_name,
+                                                 atom_getsym(argv + 2)->s_name);
+        break;
+        //----------------------------------------------------------------------
+        cases("unsubscribe")
+        if (argc == 3
+            && atom_gettype(argv + 0) == A_LONG
+            && atom_gettype(argv + 1) == A_SYM
+            && atom_gettype(argv + 2) == A_SYM)
+            bleCentralCUnsubscribeToCharacteristic(maxObjectPtr->bleCentral,
+                                                   (int)atom_getlong(argv),
+                                                   atom_getsym(argv + 1)->s_name,
+                                                   atom_getsym(argv + 2)->s_name);
+        break;
+        //----------------------------------------------------------------------
+        cases("write")
+        if (argc >= 3)
+            bleCentralCWriteToCharactaristic (maxObjectPtr->bleCentral, argv, argc);
+        break;
+        //----------------------------------------------------------------------
+        defaults
+        object_post( (t_object*)maxObjectPtr,
+                    "This method was invoked by sending the ’%s’ message to this object.",
+                    s->s_name);
+        break;
+        
+    } switchs_end;
 }
 
 void onPrintMessage(MaxExternalObject* maxObjectPtr)
