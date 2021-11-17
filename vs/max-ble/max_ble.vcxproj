@@ -79,7 +79,7 @@
       <CompileAs>Default</CompileAs>
     </ClCompile>
     <Link>
-      <OutputFile>$(USERPROFILE)\$(ProjectName).mxe64</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName).mxe64</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>
@@ -94,13 +94,13 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
-      <ProfileGuidedDatabase>$(USERPROFILE)\$(TargetName).pgd</ProfileGuidedDatabase>
+      <ProfileGuidedDatabase>$(OutDir)$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
     <Xdcmake>
-      <OutputFile>$(USERPROFILE)\$(TargetName).xml</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).xml</OutputFile>
     </Xdcmake>
     <Bscmake>
-      <OutputFile>$(USERPROFILE)\$(TargetName).bsc</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName).bsc</OutputFile>
     </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <OutputFile>$(USERPROFILE)\$(ProjectName).mxe64</OutputFile>
+      <OutputFile>$(OutDir)$(ProjectName).mxe64</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
