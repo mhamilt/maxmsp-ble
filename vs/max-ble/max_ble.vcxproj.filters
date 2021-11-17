@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
+    <ClCompile Include="Source.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\main.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\MaxObject.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BleClasses\MaxBleCentralWin.cpp">
+      <Filter>src\BleClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\BleClasses\WinBleCentral.cpp">
+      <Filter>src\BleClasses</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="max_extern_common.props">
+      <Filter>prop_sheets</Filter>
+    </None>
+    <None Include="max_extern_x64.props">
+      <Filter>prop_sheets</Filter>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{ca0ea9d2-2f74-4e05-8001-47e028e3a04a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="prop_sheets">
+      <UniqueIdentifier>{3bb220b3-d8f3-4718-8f7e-a49aa99f6858}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\BleClasses">
+      <UniqueIdentifier>{d31abcc9-ad26-4b9e-a589-48c4f1dac37b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\MaxObject.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BleClasses\pch.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\SwitchString.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BleClasses\MaxBleCentral.h">
+      <Filter>src\BleClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\BleClasses\WinBleCentral.hpp">
+      <Filter>src\BleClasses</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
