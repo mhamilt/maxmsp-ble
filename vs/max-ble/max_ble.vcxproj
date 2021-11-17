@@ -94,7 +94,14 @@
       <DataExecutionPrevention />
       <ImportLibrary>$(IntDir)$(ProjectName).lib</ImportLibrary>
       <TargetMachine>MachineX64</TargetMachine>
+      <ProfileGuidedDatabase>$(USERPROFILE)\$(TargetName).pgd</ProfileGuidedDatabase>
     </Link>
+    <Xdcmake>
+      <OutputFile>$(USERPROFILE)\$(TargetName).xml</OutputFile>
+    </Xdcmake>
+    <Bscmake>
+      <OutputFile>$(USERPROFILE)\$(TargetName).bsc</OutputFile>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -126,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <OutputFile>$(OutDir)$(ProjectName).mxe64</OutputFile>
+      <OutputFile>$(USERPROFILE)\$(ProjectName).mxe64</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -150,9 +157,6 @@
     <ClCompile Include="..\..\src\BleClasses\WinBleCentral.cpp" />
     <ClCompile Include="..\..\src\main.c" />
     <ClCompile Include="..\..\src\MaxObject.c" />
-    <ClCompile Include="Source.cpp">
-      <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Default</CompileAs>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="max_extern_common.props" />
