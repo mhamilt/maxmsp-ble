@@ -14,6 +14,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{DF4B6B02-2063-4CD1-A7F4-0EC7CAEDFA94}</ProjectGuid>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>max-ble</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
