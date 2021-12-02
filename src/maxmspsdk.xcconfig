@@ -9,15 +9,10 @@
 // Copyright © 2012, Cycling '74
 
 
-
-// Name & Version
-PRODUCT_NAME = $(PROJECT_NAME)
-//PRODUCT_VERSION = 7.0.3
-//PRODUCT_VERSION = 7.1.0
-//PRODUCT_VERSION = 7.3.3
-PRODUCT_VERSION = 0.1.0
-ARCHS = i386 x86_64
-
+PRODUCT_NAME = $(TARGET_NAME)
+PRODUCT_VERSION = 1.0.0
+PRODUCT_BUNDLE_IDENTIFIER = com.cycling74.$(PRODUCT_NAME)
+ARCHS = $(ARCHS_STANDARD)
 
 // Paths
 C74SUPPORT = max-sdk-base/c74support
@@ -30,10 +25,6 @@ INSTALL_PATH = /
 // Special Files
 GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch"
 INFOPLIST_FILE = ./src/Info.plist
-
-
-// Architecture and Deployment
-ARCHS = i386 x86_64
 
 // The following section sets the Mac SDK version to be used.
 // For most projects this has little to no impact because there are no direct dependencies on OS function calls.
@@ -60,7 +51,6 @@ WRAPPER_EXTENSION = mxo;
 WARNING_CFLAGS = -Wmost -Wno-four-char-constants -Wno-unknown-pragmas
 DEPLOYMENT_LOCATION = YES
 GENERATE_PKGINFO_FILE = YES
-
 
 // Flags to enforce some build-time checks for the symbols used while not actually performing a hard link
 C74_SYM_LINKER_FLAGS = @$(C74SUPPORT)/max-includes/c74_linker_flags.txt
