@@ -12,6 +12,7 @@
 #endif
 //------------------------------------------------------------------------------
 
+
 typedef enum : NSUInteger {
 //    BLE_CONNECT_WITH_MANU_DATA,
     BLE_CONNECT_WITH_DEVICE_UUID,
@@ -32,10 +33,12 @@ typedef enum : NSUInteger {
     NSData *dataToWrite;
     CBUUID *serviceUuid;
     CBUUID *characteristicUuid;
-    NSMutableArray *servicesToScan;
+    NSMutableArray *servicesToScan;    
     MaxExternalObject* maxObjectRef;
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray<CBPeripheral*> *discoveredPeripherals;
+    NSMutableArray<NSMutableDictionary*> *orderedDeviceDict;
+    NSMutableDictionary <NSString*, NSMutableDictionary*> *devices;
     NSMutableArray *blacklistPeripherals;
     dispatch_queue_t bleQueue;
     CBCentralManager *manager;
@@ -46,6 +49,7 @@ typedef enum : NSUInteger {
     BOOL ignoreUnconnectable;
     BOOL ignoreiPhone;
     int rssiSensitivity;
+    NSDictionary* avertisementDataFunctions;
 }
 //------------------------------------------------------------------------------
 - (instancetype)init;
