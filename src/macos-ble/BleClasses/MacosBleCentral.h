@@ -80,10 +80,16 @@ typedef enum : NSUInteger {
                  ofDeviceWithUUID: (const char*) duuid
                   shouldSubscribe: (BOOL) shouldSubscribe;
 
-- (void)writeToToCharacteristic: (const char*) cuuid
-                      OfService: (const char*) suuid
-                  OfFoundDevice: (int)   deviceIndex
-                      withBytes: (void*) values
-                       ofLength: (size_t)   numBytes;
+- (void)writeToCharacteristic: (const char*) cuuid
+                    OfService: (const char*) suuid
+             ofDeviceWithUUID: (const char*) duuid
+                    withBytes: (void*)  values
+                     ofLength: (size_t) numBytes;
+
+- (void)writeToCharacteristic: (const char*)   cuuid
+                    OfService: (const char*) suuid
+                OfFoundDevice: (int)    deviceIndex
+                    withBytes: (void*)  values
+                     ofLength: (size_t) numBytes;
 //------------------------------------------------------------------------------
 @end

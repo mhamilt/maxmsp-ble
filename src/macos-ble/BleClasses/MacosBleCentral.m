@@ -121,6 +121,7 @@
             [aPeripheral readRSSI]; // goto didReadRSSI
             break;
         case BLE_CONNECT_WRITE:
+            post("Try Writing to %s", serviceUuid.UUIDString.UTF8String);
         case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
         case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
             [aPeripheral discoverServices:@[serviceUuid]];
@@ -241,6 +242,7 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
             if ([device.identifier isEqual:targetDeviceUUID])
             {
                 isTargetDeviceFound = YES;
+                connectMode = BLE_CONNECT_EVERYTHING;
                 [self  connectToDevice:device
                            withOptions:nil];
                 break;
@@ -254,7 +256,6 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                                             options:nil];
         }
     }
-    
 }
 
 - (void)connectToDeviceWithName: (const char*) name
@@ -392,17 +393,20 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 {
     NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
     NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
+    NSString* duuidString = [[NSString alloc] initWithUTF8String: duuid];
     
-    if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
+    if ([self isValidUUID: cuuidString] &&
+        [self isValidUUID: suuidString] &&
+        [self isValidUUID: duuidString])
     {
         connectMode = ((shouldSubscribe) ?
                        BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
                        BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
-        
-        
+                
         characteristicUuid = [CBUUID UUIDWithString: cuuidString];
         serviceUuid = [CBUUID UUIDWithString: suuidString];
-        
+        targetDeviceUUID = [[NSUUID alloc] initWithUUIDString:duuidString];
+
         BOOL isTargetDeviceFound = NO;
         for (CBPeripheral* device in discoveredPeripherals)
         {
@@ -434,7 +438,9 @@ didDiscoverIncludedServicesForService:(CBService *)service
 didDiscoverServices: (NSError *)error
 {
     if(error || (aPeripheral.services.count == 0))
+    {
         post((error) ? error.localizedDescription.UTF8String : "No matching services found");
+    }
     else
     {
         switch (connectMode)
@@ -444,7 +450,6 @@ didDiscoverServices: (NSError *)error
             case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
                 [aPeripheral discoverCharacteristics:@[characteristicUuid]
                                           forService:aPeripheral.services[0]];
-                
                 break;
                 
             default:
@@ -464,28 +469,44 @@ didDiscoverServices: (NSError *)error
               error: (NSError *)error
 {
     if(error || (service.characteristics.count == 0))
+    {
         post((error) ? error.localizedDescription.UTF8String : "No matching characteristics found");
+    }
     else
     {
         switch (connectMode)
         {
             case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-                [aPeripheral setNotifyValue:YES
-                          forCharacteristic:service.characteristics[0]];
+                for (CBCharacteristic* aChar in service.characteristics)
+                {
+                    if([aChar.UUID isEqual:characteristicUuid])
+                    {
+                        [aPeripheral setNotifyValue:YES
+                                  forCharacteristic:aChar];
+                    }
+                }
                 break;
             case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-                [aPeripheral setNotifyValue:NO
-                          forCharacteristic:service.characteristics[0]];
+                for (CBCharacteristic* aChar in service.characteristics)
+                {
+                    if([aChar.UUID isEqual:characteristicUuid])
+                    {
+                        [aPeripheral setNotifyValue:NO
+                                  forCharacteristic:aChar];
+                    }
+                }
                 break;
-            case BLE_CONNECT_WRITE:
-                if (service.characteristics[0].properties & CBCharacteristicPropertyWriteWithoutResponse)
-                    [aPeripheral writeValue:dataToWrite
-                          forCharacteristic:service.characteristics[0]
-                                       type:CBCharacteristicWriteWithoutResponse];
-                else
-                    [aPeripheral writeValue:dataToWrite
-                          forCharacteristic:service.characteristics[0]
-                                       type:CBCharacteristicWriteWithResponse];
+            case BLE_CONNECT_WRITE:                
+                for (CBCharacteristic* aChar in service.characteristics)
+                {
+                    if([aChar.UUID isEqual:characteristicUuid])
+                    {
+                        if(aChar.properties & CBCharacteristicPropertyWriteWithoutResponse)
+                            [aPeripheral writeValue:dataToWrite  forCharacteristic:aChar type:CBCharacteristicWriteWithoutResponse];
+                        else if(aChar.properties &  CBCharacteristicPropertyWrite)
+                            [aPeripheral writeValue:dataToWrite forCharacteristic:aChar type:CBCharacteristicWriteWithResponse];
+                    }
+                }
                 break;
             default:
             {
@@ -543,7 +564,9 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
         post("Error Getting Characteristic %s\n",[[error localizedDescription] UTF8String]);
     }
 }
-
+//------------------------------------------------------------------------------
+/// <#Description#>
+/// @param characteristic <#characteristic description#>
 - (NSString*) getCharacteristicPropertiesDescription:(CBCharacteristic *)characteristic
 {
     
@@ -580,7 +603,9 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     
     return [NSString stringWithString: propertiesDescription];
 }
-
+//------------------------------------------------------------------------------
+/// <#Description#>
+/// @param characteristic <#characteristic description#>
 - (void) postCharacteristicDescription: (CBCharacteristic *)characteristic
 {
     NSString* valueString = nil;
@@ -594,6 +619,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
         else
             valueString = characteristic.value.description;
     }
+    
     NSString* propertiesDescription = [self getCharacteristicPropertiesDescription:characteristic];
   
     CBPeripheral* device = characteristic.service.peripheral;
@@ -675,7 +701,6 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 }
 
 
-
 /// blacklist a specific device so that it is no longer discovered and no longer possible to to attekpt connection
 /// this method will update the found device list.
 /// @param device device to blacklist
@@ -700,13 +725,45 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 }
 
 
+- (void)writeToCharacteristic: (const char*) cuuid
+                    OfService: (const char*) suuid
+             ofDeviceWithUUID: (const char*) duuid
+                    withBytes: (void*)  values
+                     ofLength: (size_t) numBytes
+{
+    post("Write with UUID");
+    NSString* duuidString = [[NSString alloc] initWithUTF8String: duuid];
+    
+    if ([self isValidUUID:duuidString])
+    {
+        NSUUID* deviceUUID = [[NSUUID alloc] initWithUUIDString:duuidString];
+        BOOL isTargetDeviceFound = NO;
+        
+        for (int i = 0; i < discoveredPeripherals.count; i++)
+        {
+            if ([discoveredPeripherals[i].identifier isEqual:deviceUUID])
+            {
+                isTargetDeviceFound = YES;
+                [self writeToCharacteristic:cuuid
+                                  OfService:suuid
+                              OfFoundDevice:i
+                                  withBytes:values
+                                   ofLength:numBytes];
+                break;
+            }
+        }
+        
+        if (!isTargetDeviceFound)
+            post("Device with UUID %s not found", duuid);
+    }
+}
 
-- (void)writeToToCharacteristic: (const char*) cuuid
-                      OfService: (const char*) suuid
-                  OfFoundDevice: (int)    deviceIndex
-                      withBytes: (void*)  values
-                       ofLength: (size_t) numBytes
 
+- (void)writeToCharacteristic: (const char*) cuuid
+                    OfService: (const char*) suuid
+                OfFoundDevice: (int)    deviceIndex
+                    withBytes: (void*)  values
+                     ofLength: (size_t) numBytes
 {
     if ([self isDeviceIndexInRange: deviceIndex])
     {
@@ -720,6 +777,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
             dataToWrite = [[NSData alloc] initWithBytes:values
                                                  length:numBytes];
             connectMode = BLE_CONNECT_WRITE;
+            post("Start Connecting");
             [self connectToDevice:discoveredPeripherals[deviceIndex]
                       withOptions:nil];
         }
@@ -729,12 +787,11 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 
 -(BOOL)isValidUUID : (NSString *)UUIDString
 {
-    if(!((BOOL)[[NSUUID alloc] initWithUUIDString: UUIDString]))
+    if(!([[NSUUID alloc] initWithUUIDString: UUIDString]))
     {
         post("%s is not a valid UUID", UUIDString.UTF8String);
         return NO;
     }
-    
     return YES;
 }
 
