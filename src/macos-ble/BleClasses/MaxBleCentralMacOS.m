@@ -123,7 +123,7 @@ void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, 
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
-                                                                 ofDeviceAtIndex:deviceIndex
+                                             ofDeviceAtIndex:deviceIndex
                                              shouldSubscribe:NO];
 }
 
@@ -154,43 +154,44 @@ void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
 
 void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc)
 {
-        const char* suuid = atom_getsym(argv + 1)->s_name;
-        const char* cuuid = atom_getsym(argv + 2)->s_name;
-        
-        size_t numBytes = 0;
-        
-        for (int i = 3; i < argc; i++)
+    const char* suuid = atom_getsym(argv + 1)->s_name;
+    const char* cuuid = atom_getsym(argv + 2)->s_name;
+    
+    size_t numBytes = 0;
+    
+    for (int i = 3; i < argc; i++)
+    {
+        if(atom_gettype(argv + i) == A_SYM)
+            numBytes += strlen(atom_getsym(argv + i)->s_name);
+        else
+            numBytes += 4;
+    }
+    
+    void* bytes = malloc(numBytes);
+    numBytes = 0;
+    
+    for (int i = 3; i < argc; i++)
+    {
+        if(atom_gettype(argv + i) == A_SYM)
         {
-            if(atom_gettype(argv + i) == A_SYM)
-                numBytes += strlen(atom_getsym(argv + i)->s_name);
-            else
-                numBytes += 4;
+            const char* value = atom_getsym(argv + i)->s_name;
+            memcpy((void*)(bytes + numBytes), value, strlen(value));
+            numBytes += strlen(value);
         }
-        
-        void* bytes = malloc(numBytes);
-        numBytes = 0;
-        
-        for (int i = 3; i < argc; i++)
+        else if(atom_gettype(argv + i) == A_FLOAT)
         {
-            if(atom_gettype(argv + i) == A_SYM)
-            {
-                const char* value = atom_getsym(argv + i)->s_name;
-                memcpy((void*)(bytes + numBytes), value, strlen(value));
-            }
-            else if(atom_gettype(argv + i) == A_FLOAT)
-            {
-                float value = (float)atom_getfloat(argv + i);
-                memcpy((void*)(bytes + numBytes), &value, 4);
-                numBytes += 4;
-            }
-            else if(atom_gettype(argv + i) == A_LONG)
-            {
-                int value = (int)atom_getlong(argv + i);
-                memcpy((void*)(bytes + numBytes), &value, 4);
-                numBytes += 4;
-            }
+            float value = (float)atom_getfloat(argv + i);
+            memcpy((void*)(bytes + numBytes), &value, 4);
+            numBytes += 4;
         }
-        
+        else if(atom_gettype(argv + i) == A_LONG)
+        {
+            int value = (int)atom_getlong(argv + i);
+            memcpy((void*)(bytes + numBytes), &value, 4);
+            numBytes += 4;
+        }
+    }
+    
     if(atom_gettype(argv) == A_SYM)
     {
         t_symbol* duuid = atom_getsym(argv);

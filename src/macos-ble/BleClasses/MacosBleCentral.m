@@ -912,10 +912,9 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     for (int i = 0; i < discoveredPeripherals.count; i++)
     {
         if ([discoveredPeripherals[i].identifier isEqual:peripheralUUID])
-        {
             return discoveredPeripherals[i];
-        }
     }
+    post("Device %s not found", peripheralUUID.UUIDString.UTF8String);
     return nil;
 }
 //------------------------------------------------------------------------------
