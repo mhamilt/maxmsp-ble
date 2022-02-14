@@ -797,7 +797,6 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                     withBytes: (void*)  values
                      ofLength: (size_t) numBytes
 {
-    
     __block NSData* dataToWrite = [[NSData alloc] initWithBytes:values
                                                          length:numBytes];
     [self forCharacteristic:cuuid
