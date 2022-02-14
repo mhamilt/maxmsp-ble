@@ -18,7 +18,6 @@
         discoveredPeripherals = [[NSMutableArray alloc] init];
         discoveredPeripheralsRSSIs = [[NSMutableArray alloc] init];
         blacklistPeripherals = [[NSMutableArray alloc] init];
-        
         orderedDeviceDict = [[NSMutableArray alloc] init];
         devices = [[NSMutableDictionary alloc] init];
         
@@ -30,7 +29,6 @@
         ignoreUnconnectable = NO;
         rssiSensitivity = 127;
         ignoreiPhone = NO;
-        servicesToScan = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -44,6 +42,7 @@
      advertisementData:(NSDictionary<NSString *,id> *)advertisementData
                   RSSI:(NSNumber *)RSSI
 {
+    
     if (![discoveredPeripherals containsObject: aPeripheral]
         && ! [blacklistPeripherals containsObject: aPeripheral]
         && (abs(RSSI.intValue) < abs(rssiSensitivity) && RSSI.intValue < 0)
@@ -92,14 +91,6 @@
                               deviceIndex,
                               aPeripheral.identifier.UUIDString.UTF8String,
                               RSSI.intValue);
-        
-        if (connectMode == BLE_CONNECT_WITH_DEVICE_UUID
-            && ([aPeripheral.identifier isEqual:targetDeviceUUID]))
-        {
-            [self connectToDevice:aPeripheral
-                      withOptions:nil];
-            [manager stopScan];
-        }
     }
 }
 
@@ -107,6 +98,7 @@
 - (void) centralManager: (CBCentralManager *)central
    didConnectPeripheral: (CBPeripheral *)aPeripheral
 {
+    
     if (shouldReport)
         post("Connected to %s\n",
              ((aPeripheral.name) ?
@@ -114,22 +106,7 @@
               : aPeripheral.identifier.UUIDString.UTF8String));
     
     [aPeripheral setDelegate:self];
-    
-    switch (connectMode)
-    {
-        case BLE_CONNECT_GET_RSSI:
-            [aPeripheral readRSSI]; // goto didReadRSSI
-            break;
-        case BLE_CONNECT_WRITE:
-            post("Try Writing to %s", serviceUuid.UUIDString.UTF8String);
-        case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-        case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-            [aPeripheral discoverServices:@[serviceUuid]];
-            break;
-        default:
-            [aPeripheral discoverServices:nil];
-            break;
-    }
+    [aPeripheral discoverServices:nil];
 }
 //------------------------------------------------------------------------------
 - (void)centralManagerDidUpdateState:(CBCentralManager *)manager
@@ -179,13 +156,11 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) startScan
 {
-    
     if (![manager isScanning])
     {
         post("Start scanning\n");
         post("------------------------");
     }
-    
     
     [manager scanForPeripheralsWithServices: ((servicesToScan.count) ? servicesToScan : nil)
                                     options: @{CBCentralManagerScanOptionAllowDuplicatesKey: @YES}];
@@ -221,40 +196,23 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 
 - (void) connectToFoundDevice: (int) deviceIndex
 {
-    if ([self isDeviceIndexInRange: deviceIndex])
-    {
-        connectMode = BLE_CONNECT_EVERYTHING;
-        [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
-    }
-    
+    CBPeripheral* device = [self getDeviceAtIndex:deviceIndex];
+    if (device)
+        [self connectToDevice:device
+                  withOptions:nil];
 }
 
-- (void)connectToDeviceWithUUID: (const char*) uuid
+- (void)connectToDeviceWithUUID: (const char*) duuid
 {
-    NSString* targetUUIDString  = [[NSString alloc] initWithUTF8String:uuid];
-    if([self isValidUUID: targetUUIDString])
+    NSUUID* deviceUUID = [self getValidUUID: [[NSString alloc] initWithUTF8String:duuid]];
+    if(deviceUUID)
     {
-        targetDeviceUUID = [[NSUUID alloc] initWithUUIDString: targetUUIDString];
-        
-        BOOL isTargetDeviceFound = NO;
-        for (CBPeripheral* device in discoveredPeripherals)
-        {
-            if ([device.identifier isEqual:targetDeviceUUID])
-            {
-                isTargetDeviceFound = YES;
-                connectMode = BLE_CONNECT_EVERYTHING;
-                [self  connectToDevice:device
-                           withOptions:nil];
-                break;
-            }
-        }
-        
-        if (!isTargetDeviceFound)
-        {
-            connectMode = BLE_CONNECT_WITH_DEVICE_UUID;
-            [manager scanForPeripheralsWithServices:nil
-                                            options:nil];
-        }
+        CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
+        if (device)
+            [self  connectToDevice:device
+                       withOptions:nil];
+        else
+            post("Device %s not found", duuid);
     }
 }
 
@@ -288,6 +246,8 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     [orderedDeviceDict removeAllObjects];
 }
 
+//------------------------------------------------------------------------------
+
 - (void)blacklistDevicesStillConnecting
 {
     
@@ -295,17 +255,19 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 //------------------------------------------------------------------------------
 - (void) getRssiOfFoundDevice: (int) deviceIndex
 {
-    if ([self isDeviceIndexInRange: deviceIndex])
-    {
-        connectMode = BLE_CONNECT_GET_RSSI;
-        [self  connectToDevice:discoveredPeripherals[deviceIndex] withOptions:nil];
-    }
+    CBPeripheral* device = [self getDeviceAtIndex:deviceIndex];
+    if (device)
+        [device readRSSI];
 }
+
+//------------------------------------------------------------------------------
 
 - (void)setRssiSensitivity:(int)newRSSISensitivity
 {    
     rssiSensitivity = newRSSISensitivity;
 }
+
+//------------------------------------------------------------------------------
 
 - (void)setIgnoreiPhone:(BOOL)shouldIgnore
 {
@@ -318,10 +280,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     maxObjectRef = extMaxObjectRef;
 }
 
+//------------------------------------------------------------------------------
+
 - (void)setReporting: (BOOL) reportingMode
 {
     shouldReport = reportingMode;
 }
+
+//------------------------------------------------------------------------------
 
 - (void)getFoundDeviceList
 {
@@ -343,83 +309,19 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
     }
 }
 
+//------------------------------------------------------------------------------
+
 - (const char*)getDeviceUUIDatIndex: (int) deviceIndex
 {
     CBPeripheral* device = discoveredPeripherals[deviceIndex];
     return device.identifier.UUIDString.UTF8String;
 }
 
+//------------------------------------------------------------------------------
 
 - (int)getNumberOfDevices
 {
     return (int)discoveredPeripherals.count;
-}
-
-
-- (void) subscribeToCharacteristic: (const char*) cuuid
-                         OfService: (const char*)  suuid
-                     OfFoundDevice: (int) deviceIndex
-                   shouldSubscribe: (BOOL) shouldSubscribe
-{
-    if ([self isDeviceIndexInRange: deviceIndex])
-    {
-        NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
-        NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
-        
-        if ([self isValidUUID: cuuidString] && [self isValidUUID: suuidString])
-        {
-            connectMode = ((shouldSubscribe) ?
-                           BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
-                           BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
-            
-            characteristicUuid = [CBUUID UUIDWithString: cuuidString];
-            serviceUuid = [CBUUID UUIDWithString: suuidString];
-            [self connectToDevice:discoveredPeripherals[deviceIndex]
-                      withOptions:nil];
-            
-            post("%s %s: %s\n",
-                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
-                 serviceUuid.UUIDString.UTF8String,
-                 characteristicUuid.UUIDString.UTF8String);
-        }
-    }
-    
-}
-
-- (void)subscribeToCharacteristic: (const char*) cuuid
-                        OfService: (const char*) suuid
-                 ofDeviceWithUUID: (const char*) duuid
-                  shouldSubscribe: (BOOL) shouldSubscribe;
-{
-    NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
-    NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
-    NSString* duuidString = [[NSString alloc] initWithUTF8String: duuid];
-    
-    if ([self isValidUUID: cuuidString] &&
-        [self isValidUUID: suuidString] &&
-        [self isValidUUID: duuidString])
-    {
-        connectMode = ((shouldSubscribe) ?
-                       BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC :
-                       BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC);
-                
-        characteristicUuid = [CBUUID UUIDWithString: cuuidString];
-        serviceUuid = [CBUUID UUIDWithString: suuidString];
-        targetDeviceUUID = [[NSUUID alloc] initWithUUIDString:duuidString];
-
-        BOOL isTargetDeviceFound = NO;
-        for (CBPeripheral* device in discoveredPeripherals)
-        {
-            if ([device.identifier isEqual:targetDeviceUUID])
-            {
-                isTargetDeviceFound = YES;
-                [self  connectToDevice:device withOptions:nil];
-                break;
-            }
-        }
-        if (!isTargetDeviceFound)
-            post("Device with UUID %s not found", duuid);
-    }
 }
 
 //------------------------------------------------------------------------------
@@ -432,8 +334,8 @@ didDiscoverIncludedServicesForService:(CBService *)service
     post("didDiscoverIncludedServicesForService");
 }
 //------------------------------------------------------------------------------
-// Invoked upon completion of a -[discoverServices:] request.
-// Discover available characteristics on interested services
+/// Invoked upon completion of a -[discoverServices:] request.
+/// Discover available characteristics on interested services
 - (void) peripheral: (CBPeripheral *)aPeripheral
 didDiscoverServices: (NSError *)error
 {
@@ -443,22 +345,10 @@ didDiscoverServices: (NSError *)error
     }
     else
     {
-        switch (connectMode)
+        for (CBService *aService in aPeripheral.services)
         {
-            case BLE_CONNECT_WRITE:
-            case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-                [aPeripheral discoverCharacteristics:@[characteristicUuid]
-                                          forService:aPeripheral.services[0]];
-                break;
-                
-            default:
-                for (CBService *aService in aPeripheral.services)
-                {
-                    [aPeripheral discoverCharacteristics: nil
-                                              forService: aService];
-                }
-                break;
+            [aPeripheral discoverCharacteristics: nil
+                                      forService: aService];
         }
     }
 }
@@ -474,51 +364,12 @@ didDiscoverServices: (NSError *)error
     }
     else
     {
-        switch (connectMode)
+        for (CBCharacteristic *aChar in service.characteristics)
         {
-            case BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC:
-                for (CBCharacteristic* aChar in service.characteristics)
-                {
-                    if([aChar.UUID isEqual:characteristicUuid])
-                    {
-                        [aPeripheral setNotifyValue:YES
-                                  forCharacteristic:aChar];
-                    }
-                }
-                break;
-            case BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC:
-                for (CBCharacteristic* aChar in service.characteristics)
-                {
-                    if([aChar.UUID isEqual:characteristicUuid])
-                    {
-                        [aPeripheral setNotifyValue:NO
-                                  forCharacteristic:aChar];
-                    }
-                }
-                break;
-            case BLE_CONNECT_WRITE:                
-                for (CBCharacteristic* aChar in service.characteristics)
-                {
-                    if([aChar.UUID isEqual:characteristicUuid])
-                    {
-                        if(aChar.properties & CBCharacteristicPropertyWriteWithoutResponse)
-                            [aPeripheral writeValue:dataToWrite  forCharacteristic:aChar type:CBCharacteristicWriteWithoutResponse];
-                        else if(aChar.properties &  CBCharacteristicPropertyWrite)
-                            [aPeripheral writeValue:dataToWrite forCharacteristic:aChar type:CBCharacteristicWriteWithResponse];
-                    }
-                }
-                break;
-            default:
-            {
-                for (CBCharacteristic *aChar in service.characteristics)
-                {
-                    if (aChar.properties & CBCharacteristicPropertyRead)
-                        [aPeripheral readValueForCharacteristic:aChar];
-                    else
-                        [self postCharacteristicDescription:aChar];
-                }
-                break;
-            }
+            if (aChar.properties & CBCharacteristicPropertyRead)
+                [aPeripheral readValueForCharacteristic:aChar];
+            else
+                [self postCharacteristicDescription:aChar];
         }
     }
 }
@@ -535,7 +386,9 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 }
 //------------------------------------------------------------------------------
 // Invoked upon completion of a -[readValueForCharacteristic:] request or on the reception of a notification/indication.
-- (void) peripheral: (CBPeripheral *)aPeripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error
+- (void) peripheral: (CBPeripheral *)aPeripheral
+didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
+              error:(NSError *)error
 {
     if(!error)
     {
@@ -569,7 +422,6 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
 /// @param characteristic <#characteristic description#>
 - (NSString*) getCharacteristicPropertiesDescription:(CBCharacteristic *)characteristic
 {
-    
     NSMutableArray* properties = [[NSMutableArray alloc] init];
     
     if (characteristic.properties & CBCharacteristicPropertyBroadcast)
@@ -595,7 +447,8 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     
     NSMutableString* propertiesDescription = [[NSMutableString alloc] initWithString:@""];
     
-    for (NSString* property in properties) {
+    for (NSString* property in properties)
+    {
         [propertiesDescription appendString:property];
         if(!(property == properties.lastObject))
             [propertiesDescription appendString:@", "];
@@ -621,7 +474,7 @@ didUpdateValueForDescriptor:(CBDescriptor *)descriptor
     }
     
     NSString* propertiesDescription = [self getCharacteristicPropertiesDescription:characteristic];
-  
+    
     CBPeripheral* device = characteristic.service.peripheral;
     CBService* service = characteristic.service;
     
@@ -699,8 +552,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                        options:options];
     
 }
-
-
+//------------------------------------------------------------------------------
 /// blacklist a specific device so that it is no longer discovered and no longer possible to to attekpt connection
 /// this method will update the found device list.
 /// @param device device to blacklist
@@ -724,6 +576,220 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     }
 }
 
+//------------------------------------------------------------------------------
+#pragma mark Main Peripheral Interface
+
+- (void)forCharacteristic:(const char *)cuuid
+                OfService:(const char *)suuid
+          ofDeviceAtIndex:(int)i
+             performBlock:(void (^)(CBUUID* charUUID, CBUUID* serviceUUID, CBPeripheral* device)) callback
+
+{
+    CBUUID* serviceCBUUID = nil;
+    CBUUID* characteristicCBUUID = nil;
+    
+    if (strlen(cuuid) == 4)
+        characteristicCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:cuuid]];
+    else
+    {
+        NSUUID* cuuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: cuuid]];
+        if (cuuid)
+            characteristicCBUUID =  [CBUUID UUIDWithNSUUID: cuuidString];
+    }
+    
+    if (strlen(suuid) == 4)
+        serviceCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:suuid]];
+    else
+    {
+        NSUUID* suuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: suuid]];
+        if (suuid)
+            serviceCBUUID =  [CBUUID UUIDWithNSUUID: suuidString];
+    }
+    
+    if (serviceCBUUID && characteristicCBUUID)
+    {
+        CBPeripheral* device = [self getDeviceAtIndex:i];
+        if (device)
+            callback(characteristicCBUUID, serviceCBUUID, device);
+        
+    }
+}
+
+//------------------------------------------------------------------------------
+
+- (void) forCharacteristic:(const char *)cuuid
+                 ofService:(const char *)suuid
+                  ofDevice:(const char *)duuid
+              performBlock:(void (^)(CBUUID* charUUID, CBUUID* serviceUUID, CBPeripheral* device)) callback
+{
+    NSUUID* deviceUUID = [self getValidUUID: [[NSString alloc] initWithUTF8String:duuid]];
+    
+    if (deviceUUID)
+    {
+        CBUUID* serviceCBUUID = nil;
+        CBUUID* characteristicCBUUID = nil;
+        
+        if (strlen(cuuid) == 4)
+            characteristicCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:cuuid]];
+        else
+        {
+            NSUUID* cuuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: cuuid]];
+            if (cuuid)
+                characteristicCBUUID =  [CBUUID UUIDWithNSUUID: cuuidString];
+        }
+        
+        if (strlen(suuid) == 4)
+            serviceCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:suuid]];
+        else
+        {
+            NSUUID* suuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: suuid]];
+            if (suuid)
+                serviceCBUUID =  [CBUUID UUIDWithNSUUID: suuidString];
+        }
+        
+        if (serviceCBUUID && characteristicCBUUID)
+        {
+            CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
+            if (device)
+                callback(characteristicCBUUID, serviceCBUUID, device);
+        }
+    }
+}
+
+
+//------------------------------------------------------------------------------
+
+- (void)readCharacteristic:(const char *)cuuid
+                 OfService:(const char *)suuid
+          ofDeviceWithUUID:(const char *)duuid
+{
+    [self forCharacteristic:cuuid
+                  ofService:suuid
+                   ofDevice:duuid
+               performBlock:^(CBUUID *charUUID,
+                              CBUUID *serviceUUID,
+                              CBPeripheral *device) {
+        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                          forServiceWithUUID:serviceUUID];
+        if(characteristic)
+            [device readValueForCharacteristic:characteristic];
+    }];
+}
+
+//------------------------------------------------------------------------------
+
+- (void)readCharacteristic:(const char *)cuuid
+                 OfService:(const char *)suuid
+           ofDeviceAtIndex:(int)i
+{
+    [self forCharacteristic:cuuid
+                  OfService:suuid
+            ofDeviceAtIndex:i
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
+        
+        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                          forServiceWithUUID:serviceUUID];
+        if(characteristic)
+            [device readValueForCharacteristic:characteristic];
+    }];
+}
+
+//------------------------------------------------------------------------------
+
+- (void)readCharacteristicsOfDeviceWithUUID:(const char*)duuid
+{
+    NSUUID* deviceUUID = [self getValidUUID: [[NSString alloc] initWithUTF8String:duuid]];
+    if(deviceUUID)
+    {
+        CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
+        if (device)
+        {
+            for (CBService* service in [device services])
+            {
+                for (CBCharacteristic* characteristic in [service characteristics])
+                {
+                    if (characteristic.properties & CBCharacteristicPropertyRead)
+                        [device readValueForCharacteristic:characteristic];
+                }
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+- (void)readAllCharacteristicOfDeviceAtIndex:(int)i
+{
+    CBPeripheral* device = [self getDeviceAtIndex:i];
+    if (device)
+    {
+        for (CBService* service in [device services])
+        {
+            for (CBCharacteristic* characteristic in [service characteristics])
+            {
+                if (characteristic.properties & CBCharacteristicPropertyRead)
+                    [device readValueForCharacteristic:characteristic];
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+
+- (void)subscribeToCharacteristic:(const char *)cuuid
+                        OfService:(const char *)suuid
+                 ofDeviceWithUUID:(const char *)duuid
+                  shouldSubscribe:(BOOL)subscriptionStatus
+{
+    __block BOOL shouldSubscribe = subscriptionStatus;
+    
+    [self forCharacteristic:cuuid
+                  ofService:suuid
+                   ofDevice:duuid
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
+     {
+        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                          forServiceWithUUID:serviceUUID];
+        if(characteristic)
+        {
+            post("%s %s: %s\n",
+                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
+                 serviceUUID.UUIDString.UTF8String,
+                 charUUID.UUIDString.UTF8String);
+            
+            [device setNotifyValue:shouldSubscribe
+                 forCharacteristic:characteristic];
+        }
+    }];
+}
+
+- (void)subscribeToCharacteristic:(const char *)cuuid
+                        OfService:(const char *)suuid
+                  ofDeviceAtIndex:(int)i
+                  shouldSubscribe:(BOOL)subscriptionStatus
+{
+    __block BOOL shouldSubscribe = subscriptionStatus;
+    
+    [self forCharacteristic:cuuid
+                  OfService:suuid
+            ofDeviceAtIndex:i
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
+        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                          forServiceWithUUID:serviceUUID];
+        if(characteristic)
+        {
+            post("%s %s: %s\n",
+                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
+                 serviceUUID.UUIDString.UTF8String,
+                 charUUID.UUIDString.UTF8String);
+            
+            [device setNotifyValue:shouldSubscribe
+                 forCharacteristic:characteristic];
+        }
+    }];
+}
+
+//------------------------------------------------------------------------------
 
 - (void)writeToCharacteristic: (const char*) cuuid
                     OfService: (const char*) suuid
@@ -731,33 +797,21 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                     withBytes: (void*)  values
                      ofLength: (size_t) numBytes
 {
-    post("Write with UUID");
-    NSString* duuidString = [[NSString alloc] initWithUTF8String: duuid];
     
-    if ([self isValidUUID:duuidString])
-    {
-        NSUUID* deviceUUID = [[NSUUID alloc] initWithUUIDString:duuidString];
-        BOOL isTargetDeviceFound = NO;
-        
-        for (int i = 0; i < discoveredPeripherals.count; i++)
-        {
-            if ([discoveredPeripherals[i].identifier isEqual:deviceUUID])
-            {
-                isTargetDeviceFound = YES;
-                [self writeToCharacteristic:cuuid
-                                  OfService:suuid
-                              OfFoundDevice:i
-                                  withBytes:values
-                                   ofLength:numBytes];
-                break;
-            }
-        }
-        
-        if (!isTargetDeviceFound)
-            post("Device with UUID %s not found", duuid);
-    }
+    __block NSData* dataToWrite = [[NSData alloc] initWithBytes:values
+                                                         length:numBytes];
+    [self forCharacteristic:cuuid
+                  ofService:suuid
+                   ofDevice:duuid
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
+        [self writeToCharacteristic:charUUID
+                          OfService:serviceUUID
+                      OfFoundDevice:device
+                           withData:dataToWrite];
+    }];
 }
 
+//------------------------------------------------------------------------------
 
 - (void)writeToCharacteristic: (const char*) cuuid
                     OfService: (const char*) suuid
@@ -765,25 +819,47 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                     withBytes: (void*)  values
                      ofLength: (size_t) numBytes
 {
-    if ([self isDeviceIndexInRange: deviceIndex])
-    {
-        NSString* cuuidString = [[NSString alloc] initWithUTF8String: cuuid];
-        NSString* suuidString = [[NSString alloc] initWithUTF8String: suuid];
+    __block NSData* dataToWrite = [[NSData alloc] initWithBytes:values
+                                                         length:numBytes];
+    [self forCharacteristic:cuuid
+                  OfService:suuid
+            ofDeviceAtIndex:deviceIndex
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
         
-        if ([self isValidUUID: suuidString] && [self isValidUUID: cuuidString])
-        {
-            characteristicUuid = [CBUUID UUIDWithString: cuuidString];
-            serviceUuid = [CBUUID UUIDWithString: suuidString];
-            dataToWrite = [[NSData alloc] initWithBytes:values
-                                                 length:numBytes];
-            connectMode = BLE_CONNECT_WRITE;
-            post("Start Connecting");
-            [self connectToDevice:discoveredPeripherals[deviceIndex]
-                      withOptions:nil];
-        }
-    }
-    free(values);
+        [self writeToCharacteristic:charUUID
+                          OfService:serviceUUID
+                      OfFoundDevice:device
+                           withData:dataToWrite];
+    }];
 }
+
+//------------------------------------------------------------------------------
+
+- (void)writeToCharacteristic: (CBUUID*) cuuid
+                    OfService: (CBUUID*) suuid
+                OfFoundDevice: (CBPeripheral*) device
+                     withData: (NSData*)  data
+
+{
+    CBCharacteristic* characteristic = [device getCharacteristicWithUUID:cuuid
+                                                      forServiceWithUUID:suuid];
+    if(characteristic)
+    {
+        if(characteristic.properties & CBCharacteristicPropertyWriteWithoutResponse)
+            [device writeValue:data
+             forCharacteristic:characteristic
+                          type:CBCharacteristicWriteWithoutResponse];
+        else if(characteristic.properties & CBCharacteristicPropertyWrite)
+            [device writeValue:data
+             forCharacteristic:characteristic
+                          type:CBCharacteristicWriteWithResponse];
+        else
+            post("Unable to Write to Chracteritic %s", cuuid);
+    }
+}
+
+//------------------------------------------------------------------------------
+#pragma mark Sanity Checking
 
 -(BOOL)isValidUUID : (NSString *)UUIDString
 {
@@ -795,6 +871,19 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     return YES;
 }
 
+//------------------------------------------------------------------------------
+
+-(NSUUID*)getValidUUID : (NSString *)UUIDString
+{
+    NSUUID* validUUID = [[NSUUID alloc] initWithUUIDString: UUIDString];
+    if(!validUUID)
+        post("%s is not a valid UUID", UUIDString.UTF8String);
+    
+    return validUUID;
+}
+
+//------------------------------------------------------------------------------
+
 -(BOOL)isDeviceIndexInRange: (int) deviceIndex
 {
     if (!(deviceIndex < discoveredPeripherals.count))
@@ -805,4 +894,30 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     return YES;
 }
 
+//------------------------------------------------------------------------------
+
+-(CBPeripheral*)getDeviceAtIndex: (int) i
+{
+    if (i >= discoveredPeripherals.count)
+    {
+        post("Index %d is out of range", i);
+        return nil;
+    }
+    return discoveredPeripherals[i];
+}
+
+//------------------------------------------------------------------------------
+
+-(CBPeripheral*) getPeriphralWithUUID: (NSUUID*)peripheralUUID
+{
+    for (int i = 0; i < discoveredPeripherals.count; i++)
+    {
+        if ([discoveredPeripherals[i].identifier isEqual:peripheralUUID])
+        {
+            return discoveredPeripherals[i];
+        }
+    }
+    return nil;
+}
+//------------------------------------------------------------------------------
 @end

@@ -80,11 +80,34 @@ void bleCentralCSetReporting (MaxBleCentral *t, bool shouldReport)
     [(__bridge MacosBleCentral *)t setReporting:shouldReport];
 }
 
+void bleCentralCReadCharacteristicWithDeviceAtIndex (MaxBleCentral *t, int deviceIndex, const char *suuid, const char *cuuid)
+{
+    [(__bridge MacosBleCentral *)t readCharacteristic:cuuid
+                                            OfService:suuid
+                                      ofDeviceAtIndex:deviceIndex];
+}
+
+void bleCentralCReadCharacteristicWithDeviceUUID (MaxBleCentral *t, const char* duuid, const char *suuid, const char *cuuid)
+{
+    [(__bridge MacosBleCentral *)t readCharacteristic:cuuid
+                                            OfService:suuid
+                                     ofDeviceWithUUID:duuid];
+}
+
+void bleCentralCReadAllCharacteristicWithDeviceUUID (MaxBleCentral *t, const char *duuid)
+{
+    [(__bridge MacosBleCentral *)t readCharacteristicsOfDeviceWithUUID: duuid];
+}
+void bleCentralCReadAllCharacteristicWithDeviceAtIndex (MaxBleCentral *t, int deviceIndex)
+{
+    [(__bridge MacosBleCentral *)t readAllCharacteristicOfDeviceAtIndex: deviceIndex];
+}
+
 void bleCentralCSubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, const char* suuid, const char* cuuid)
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
-                                               OfFoundDevice:deviceIndex
+                                             ofDeviceAtIndex:deviceIndex
                                              shouldSubscribe:YES];
 }
 
@@ -100,7 +123,7 @@ void bleCentralCUnsubscribeToCharacteristic (MaxBleCentral *t, int deviceIndex, 
 {
     [(__bridge MacosBleCentral *)t subscribeToCharacteristic:cuuid
                                                    OfService:suuid
-                                               OfFoundDevice:deviceIndex
+                                                                 ofDeviceAtIndex:deviceIndex
                                              shouldSubscribe:NO];
 }
 
@@ -188,7 +211,7 @@ void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc
                                                     withBytes: bytes
                                                      ofLength: numBytes];
     }
-    
+    free(bytes);
 }
 
 void bleCentralCBlacklistStalledDevices (MaxBleCentral *t)

@@ -5,23 +5,13 @@
 #include <stdio.h>
 #include <objc/runtime.h>
 #include "../MaxObject.h"
+#import "CBPeripheral+PeripheralUtility.h"
+
 #ifdef MAXMSP
 #include "ext.h"
 #else
 #define post printf
 #endif
-//------------------------------------------------------------------------------
-
-
-typedef enum : NSUInteger {
-//    BLE_CONNECT_WITH_MANU_DATA,
-    BLE_CONNECT_WITH_DEVICE_UUID,
-    BLE_CONNECT_GET_RSSI,
-    BLE_CONNECT_EVERYTHING,
-    BLE_CONNECT_SUBSCRIBE_CHARACTERISTIC,
-    BLE_CONNECT_UNSUBSCRIBE_CHARACTERISTIC,
-    BLE_CONNECT_WRITE,
-} BleConnectMode;
 
 //------------------------------------------------------------------------------
 
@@ -29,11 +19,7 @@ typedef enum : NSUInteger {
 @interface MacosBleCentral: NSObject
 <CBCentralManagerDelegate, CBPeripheralDelegate>
 {
-    NSUUID *targetDeviceUUID;
-    NSData *dataToWrite;
-    CBUUID *serviceUuid;
-    CBUUID *characteristicUuid;
-    NSMutableArray *servicesToScan;    
+    NSMutableArray *servicesToScan;
     MaxExternalObject* maxObjectRef;
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray<CBPeripheral*> *discoveredPeripherals;
@@ -42,8 +28,6 @@ typedef enum : NSUInteger {
     NSMutableArray *blacklistPeripherals;
     dispatch_queue_t bleQueue;
     CBCentralManager *manager;
-    NSUInteger connectDeviceIndex;
-    BleConnectMode connectMode;
     BOOL shouldReport;
     BOOL shouldConnect;
     BOOL ignoreUnconnectable;
@@ -68,11 +52,23 @@ typedef enum : NSUInteger {
 - (void)setMaxObjectRef: (MaxExternalObject *) extMaxObjectRef;
 - (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
+- (int) getNumberOfDevices;
 - (const char*)getDeviceUUIDatIndex: (int) deviceIndex;
-- (int)getNumberOfDevices;
+
+- (void)readCharacteristic: (const char*) cuuid
+                 OfService: (const char*) suuid
+          ofDeviceWithUUID: (const char*) duuid;
+
+- (void)readCharacteristic:(const char *)cuuid
+                 OfService:(const char *)suuid
+           ofDeviceAtIndex:(int)i;
+
+- (void)readCharacteristicsOfDeviceWithUUID: (const char*) duuid;
+- (void)readAllCharacteristicOfDeviceAtIndex:(int)i;
+
 - (void)subscribeToCharacteristic: (const char*) cuuid
                         OfService: (const char*) suuid
-                    OfFoundDevice: (int)  deviceIndex
+                  ofDeviceAtIndex: (int)  deviceIndex
                   shouldSubscribe: (BOOL) shouldSubscribe;
 
 - (void)subscribeToCharacteristic: (const char*) cuuid
@@ -80,13 +76,14 @@ typedef enum : NSUInteger {
                  ofDeviceWithUUID: (const char*) duuid
                   shouldSubscribe: (BOOL) shouldSubscribe;
 
+
 - (void)writeToCharacteristic: (const char*) cuuid
                     OfService: (const char*) suuid
              ofDeviceWithUUID: (const char*) duuid
                     withBytes: (void*)  values
                      ofLength: (size_t) numBytes;
 
-- (void)writeToCharacteristic: (const char*)   cuuid
+- (void)writeToCharacteristic: (const char*) cuuid
                     OfService: (const char*) suuid
                 OfFoundDevice: (int)    deviceIndex
                     withBytes: (void*)  values
