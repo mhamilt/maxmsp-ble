@@ -21,9 +21,9 @@ typedef struct _MaxExternalObject
 } MaxExternalObject;
 
 ///
-void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
+void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
 ///
-void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* cuuid, uint8_t* byteArray, size_t numBytes);
+void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
 ///
 void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
 ///

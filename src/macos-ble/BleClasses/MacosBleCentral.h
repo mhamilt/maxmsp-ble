@@ -6,6 +6,7 @@
 #include <objc/runtime.h>
 #include "../MaxObject.h"
 #import "CBPeripheral+PeripheralUtility.h"
+#import "PeripheralConnectionManager.h"
 
 #ifdef MAXMSP
 #include "ext.h"
@@ -18,13 +19,13 @@
 /// <#Description#>
 @interface MacosBleCentral: NSObject
 <CBCentralManagerDelegate, CBPeripheralDelegate>
-{
+{    
     NSMutableArray *servicesToScan;
     MaxExternalObject* maxObjectRef;
     NSMutableArray *discoveredPeripheralsRSSIs;
     NSMutableArray<CBPeripheral*> *discoveredPeripherals;
-    NSMutableArray<NSMutableDictionary*> *orderedDeviceDict;
-    NSMutableDictionary <NSString*, NSMutableDictionary*> *devices;
+    NSMutableArray<PeripheralConnectionManager*> *orderedDeviceDict;
+    NSMutableDictionary <NSString*, PeripheralConnectionManager*> *devices;
     NSMutableArray *blacklistPeripherals;
     dispatch_queue_t bleQueue;
     CBCentralManager *manager;
@@ -53,6 +54,7 @@
 - (void)setReporting: (BOOL) reportingMode;
 - (void)getFoundDeviceList;
 - (int) getNumberOfDevices;
+- (void)shouldKeepDeviceAtIndex:(int)i connectionAlive:(BOOL)shouldKeepAlive;
 - (const char*)getDeviceUUIDatIndex: (int) deviceIndex;
 
 - (void)readCharacteristic: (const char*) cuuid

@@ -32,9 +32,9 @@
     }
     return self;
 }
-//------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+
 #pragma mark Manager Methods
 
 - (void)centralManager:(CBCentralManager *)central
@@ -48,7 +48,7 @@
         && (abs(RSSI.intValue) < abs(rssiSensitivity) && RSSI.intValue < 0)
         && !(advertisementData[@"kCBAdvDataAppleMfgData"] && ignoreiPhone)
         )
-    {
+    {        
         NSUInteger deviceIndex = discoveredPeripherals.count;
         
         if(shouldReport)
@@ -71,39 +71,44 @@
             }
             
             post("------------------------");
-            
         }
         
         [discoveredPeripherals addObject:aPeripheral];
         [discoveredPeripheralsRSSIs addObject:RSSI];
         
-        [devices setObject: [[NSMutableDictionary alloc] initWithDictionary:@{
-            @"CBPeripheral":aPeripheral,
-            @"RSSI": RSSI,
-            @"AdvertisementData":advertisementData
-        }]
+        [devices setObject: [[PeripheralConnectionManager alloc] initWithDevice:aPeripheral]
                     forKey: aPeripheral.identifier.UUIDString];
         
         [orderedDeviceDict addObject:devices[aPeripheral.identifier.UUIDString]];
-        
-        
+                
         outputFoundDeviceList(maxObjectRef,
                               deviceIndex,
-                              aPeripheral.identifier.UUIDString.UTF8String,
+                              (aPeripheral.name) ? aPeripheral.name.UTF8String : aPeripheral.identifier.UUIDString.UTF8String,
                               RSSI.intValue);
     }
 }
 
 //------------------------------------------------------------------------------
-- (void) centralManager: (CBCentralManager *)central
-   didConnectPeripheral: (CBPeripheral *)aPeripheral
+- (void) centralManager:(CBCentralManager *)central
+   didConnectPeripheral:(CBPeripheral *)aPeripheral
 {
-    
     if (shouldReport)
+    {
         post("Connected to %s\n",
              ((aPeripheral.name) ?
               aPeripheral.name.UTF8String
               : aPeripheral.identifier.UUIDString.UTF8String));
+    }
+    devices[aPeripheral.identifier.UUIDString].connectionAttempts = 0;
+    
+    if (devices[aPeripheral.identifier.UUIDString].tasks.count)
+    {
+//        for (PeripheralTask* task in devices[aPeripheral.identifier.UUIDString].tasks)
+//        {
+//
+//            // [devices[aPeripheral.identifier.UUIDString].tasks removeObject:task];
+//        }
+    }
     
     [aPeripheral setDelegate:self];
     [aPeripheral discoverServices:nil];
@@ -121,6 +126,10 @@
 didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                   error: (NSError *)error
 {
+    if(devices[aPeripheral.identifier.UUIDString].keepAlive &&
+       devices[aPeripheral.identifier.UUIDString].connectionAttempts < devices[aPeripheral.identifier.UUIDString].maxConnectionAttempts)
+        [central connectPeripheral:aPeripheral
+                           options:nil];
     if(error)
     {
         post("Error %d: %s Device: %s\n",
@@ -131,13 +140,14 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 }
 //------------------------------------------------------------------------------
 // Invoked whenever the central manager fails to create a connection with the peripheral.
-- (void) centralManager: (CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
+- (void) centralManager:(CBCentralManager *)central
+didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
                   error:(NSError *)error
 {
+    devices[aPeripheral.identifier.UUIDString].connectionAttempts++;
+    
     if(shouldReport)
     {
-        post("Connection Failed\n");
-        NSLog(@"Fail to connect to peripheral: %@ with error = %@", aPeripheral, [error localizedDescription]);
         post("Failed to connect to peripheral: %s Error: %s",
              ((aPeripheral.name) ?
               aPeripheral.name.UTF8String
@@ -325,6 +335,13 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 }
 
 //------------------------------------------------------------------------------
+
+- (void)shouldKeepDeviceAtIndex:(int)i connectionAlive:(BOOL)shouldKeepAlive
+{
+    orderedDeviceDict[i].keepAlive = shouldKeepAlive;
+}
+
+//------------------------------------------------------------------------------
 #pragma mark Peripheral Methods
 
 - (void) peripheral: (CBPeripheral *)peripheral
@@ -365,10 +382,7 @@ didDiscoverServices: (NSError *)error
     else
     {
         for (CBCharacteristic *aChar in service.characteristics)
-        {
-            if (aChar.properties & CBCharacteristicPropertyRead)
-                [aPeripheral readValueForCharacteristic:aChar];
-            else
+        {            
                 [self postCharacteristicDescription:aChar];
         }
     }
@@ -395,6 +409,8 @@ didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
         if(characteristic.isNotifying)
         {
             onNotificationRead(maxObjectRef,
+                               aPeripheral.identifier.UUIDString.UTF8String,
+                               characteristic.service.UUID.UUIDString.UTF8String,
                                characteristic.UUID.UUIDString.UTF8String,
                                (uint8_t*)characteristic.value.bytes,
                                characteristic.value.length);
@@ -405,6 +421,7 @@ didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
                 [self postCharacteristicDescription:characteristic];
             
             onCharacteristicRead(maxObjectRef,
+                                 aPeripheral.identifier.UUIDString.UTF8String,
                                  characteristic.service.UUID.UUIDString.UTF8String,
                                  characteristic.UUID.UUIDString.UTF8String,
                                  (uint8_t*)characteristic.value.bytes,
@@ -505,13 +522,18 @@ didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
     if (error)
         post(error.localizedDescription.UTF8String);
 }
+
 //------------------------------------------------------------------------------
+
 - (void) peripheral: (CBPeripheral *)peripheral
   didModifyServices: (NSArray<CBService *> *)invalidatedServices
 {
     post("Service Modified\n");
     [manager cancelPeripheralConnection:peripheral];
 }
+
+//------------------------------------------------------------------------------
+
 - (void) peripheral:(CBPeripheral *)peripheral
         didReadRSSI:(NSNumber *)RSSI
               error:(NSError *)error
@@ -685,13 +707,14 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     [self forCharacteristic:cuuid
                   OfService:suuid
             ofDeviceAtIndex:i
-               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
-        
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
+     {
         CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
                                                           forServiceWithUUID:serviceUUID];
         if(characteristic)
             [device readValueForCharacteristic:characteristic];
-    }];
+     }
+    ];
 }
 
 //------------------------------------------------------------------------------
@@ -860,18 +883,6 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 //------------------------------------------------------------------------------
 #pragma mark Sanity Checking
 
--(BOOL)isValidUUID : (NSString *)UUIDString
-{
-    if(!([[NSUUID alloc] initWithUUIDString: UUIDString]))
-    {
-        post("%s is not a valid UUID", UUIDString.UTF8String);
-        return NO;
-    }
-    return YES;
-}
-
-//------------------------------------------------------------------------------
-
 -(NSUUID*)getValidUUID : (NSString *)UUIDString
 {
     NSUUID* validUUID = [[NSUUID alloc] initWithUUIDString: UUIDString];
@@ -879,18 +890,6 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         post("%s is not a valid UUID", UUIDString.UTF8String);
     
     return validUUID;
-}
-
-//------------------------------------------------------------------------------
-
--(BOOL)isDeviceIndexInRange: (int) deviceIndex
-{
-    if (!(deviceIndex < discoveredPeripherals.count))
-    {
-        post("Index %d is out of range", deviceIndex);
-        return NO;
-    }
-    return YES;
 }
 
 //------------------------------------------------------------------------------

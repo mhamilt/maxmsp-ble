@@ -39,6 +39,7 @@ void bleCentralCClearDiscovered (MaxBleCentral *t);
 void bleCentralCGetRssi         (MaxBleCentral *t, int deviceIndex);
 void bleCentralCSetRSSISensitity(MaxBleCentral *t, int rssiLimit);
 void bleCentralCSetReporting    (MaxBleCentral *t, bool shouldReport);
+void bleCentralCShouldKeepDeviceAtIndexAlive(MaxBleCentral *t, int deviceIndex, bool shouldKeepAlive);
 void bleCentralCReadCharacteristicWithDeviceUUID (MaxBleCentral *t, const char *duuid, const char *suuid, const char *cuuid);
 void bleCentralCReadCharacteristicWithDeviceAtIndex (MaxBleCentral *t, int deviceIndex, const char *suuid, const char *cuuid);
 void bleCentralCReadAllCharacteristicWithDeviceUUID (MaxBleCentral *t, const char *duuid);

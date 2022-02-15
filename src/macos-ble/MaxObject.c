@@ -2,10 +2,11 @@
 
 //------------------------------------------------------------------------------
 
-void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
+void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
 {
-    atom_setsym(maxObjectPtr->outputList,     gensym(suuid));
-    atom_setsym(maxObjectPtr->outputList + 1, gensym(cuuid));
+    atom_setsym(maxObjectPtr->outputList + 0, gensym(duuid));
+    atom_setsym(maxObjectPtr->outputList + 1, gensym(suuid));
+    atom_setsym(maxObjectPtr->outputList + 2, gensym(cuuid));
     
     if (numBytes > (maxObjectPtr->maxListSize - 2))
     {
@@ -14,14 +15,16 @@ void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, co
     }
     
     for (short i = 0; i < numBytes; i++)
-        atom_setlong(maxObjectPtr->outputList + 2 + i, (t_atom_long) byteArray[i]);
+        atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
     
-    outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 2, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 3, maxObjectPtr->outputList);
 }
 
-void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* cuuid, uint8_t* byteArray, size_t numBytes)
+void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
 {
-    atom_setsym(maxObjectPtr->outputList, gensym(cuuid));
+    atom_setsym(maxObjectPtr->outputList + 0, gensym(duuid));
+    atom_setsym(maxObjectPtr->outputList + 1, gensym(suuid));
+    atom_setsym(maxObjectPtr->outputList + 2, gensym(cuuid));
     
     if (numBytes > (maxObjectPtr->maxListSize - 1))
     {
@@ -30,9 +33,9 @@ void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* cuuid, uint
     }
     
     for (short i = 0; i < numBytes; i++)
-        atom_setlong(maxObjectPtr->outputList + 1 + i, (t_atom_long) byteArray[i]);
+        atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
     
-    outlet_list(maxObjectPtr->list_outlet2, 0L, numBytes + 1, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->list_outlet2, 0L, numBytes + 3, maxObjectPtr->outputList);
 }
 
 void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi)

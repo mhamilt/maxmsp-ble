@@ -80,6 +80,12 @@ void bleCentralCSetReporting (MaxBleCentral *t, bool shouldReport)
     [(__bridge MacosBleCentral *)t setReporting:shouldReport];
 }
 
+void bleCentralCShouldKeepDeviceAtIndexAlive(MaxBleCentral *t, int deviceIndex, bool shouldKeepAlive)
+{
+    [(__bridge MacosBleCentral *)t shouldKeepDeviceAtIndex:deviceIndex
+                                           connectionAlive:shouldKeepAlive];
+}
+
 void bleCentralCReadCharacteristicWithDeviceAtIndex (MaxBleCentral *t, int deviceIndex, const char *suuid, const char *cuuid)
 {
     [(__bridge MacosBleCentral *)t readCharacteristic:cuuid
