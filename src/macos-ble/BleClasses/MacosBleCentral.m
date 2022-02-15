@@ -48,7 +48,7 @@
         && (abs(RSSI.intValue) < abs(rssiSensitivity) && RSSI.intValue < 0)
         && !(advertisementData[@"kCBAdvDataAppleMfgData"] && ignoreiPhone)
         )
-    {        
+    {
         NSUInteger deviceIndex = discoveredPeripherals.count;
         
         if(shouldReport)
@@ -80,7 +80,7 @@
                     forKey: aPeripheral.identifier.UUIDString];
         
         [orderedDeviceDict addObject:devices[aPeripheral.identifier.UUIDString]];
-                
+        
         outputFoundDeviceList(maxObjectRef,
                               deviceIndex,
                               (aPeripheral.name) ? aPeripheral.name.UTF8String : aPeripheral.identifier.UUIDString.UTF8String,
@@ -99,15 +99,39 @@
               aPeripheral.name.UTF8String
               : aPeripheral.identifier.UUIDString.UTF8String));
     }
-    devices[aPeripheral.identifier.UUIDString].connectionAttempts = 0;
     
-    if (devices[aPeripheral.identifier.UUIDString].tasks.count)
+    PeripheralConnectionManager* connectionManager = devices[aPeripheral.identifier.UUIDString];
+    connectionManager.connectionAttempts = 0;
+    
+    if (connectionManager.tasks.count)
     {
-//        for (PeripheralTask* task in devices[aPeripheral.identifier.UUIDString].tasks)
-//        {
-//
-//            // [devices[aPeripheral.identifier.UUIDString].tasks removeObject:task];
-//        }
+        for (PeripheralTask* task in connectionManager.tasks)
+        {
+            switch (task.type)
+            {
+                case BLEPeripheralRead:
+                    if(task.service && task.characteristic)
+                       [self readCharacteristic:task.characteristic.UUIDString.UTF8String
+                                      OfService:task.service.UUIDString.UTF8String
+                               ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String];
+                    else
+                        [self readAllCharacteristicsOfDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String];
+                    break;
+                case BLEPeripheralSubscribe:
+                    [self subscribeToCharacteristic:task.characteristic.UUIDString.UTF8String
+                                          OfService:task.service.UUIDString.UTF8String
+                                   ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String
+                                    shouldSubscribe:YES];
+                    break;
+                case BLEPeripheralWrite:
+                    [self writeToCharacteristic:task.characteristic
+                                      OfService:task.service
+                                  OfFoundDevice:aPeripheral
+                                       withData:task.dataToWrite];
+                    break;
+            }
+            [connectionManager.tasks removeObject:task];
+        }
     }
     
     [aPeripheral setDelegate:self];
@@ -126,11 +150,10 @@
 didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                   error: (NSError *)error
 {
-    if(devices[aPeripheral.identifier.UUIDString].keepAlive &&
-       devices[aPeripheral.identifier.UUIDString].connectionAttempts < devices[aPeripheral.identifier.UUIDString].maxConnectionAttempts)
+    if(devices[aPeripheral.identifier.UUIDString].keepAlive)
         [central connectPeripheral:aPeripheral
                            options:nil];
-    if(error)
+    else if(error)
     {
         post("Error %d: %s Device: %s\n",
              error.code,
@@ -144,7 +167,15 @@ didDisconnectPeripheral: (CBPeripheral *)aPeripheral
 didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
                   error:(NSError *)error
 {
-    devices[aPeripheral.identifier.UUIDString].connectionAttempts++;
+    PeripheralConnectionManager* connectionManager = devices[aPeripheral.identifier.UUIDString];
+    
+    connectionManager.connectionAttempts++;
+    
+    if(connectionManager.connectionAttempts < connectionManager.maxConnectionAttempts)
+        [central connectPeripheral:aPeripheral
+                           options:nil];
+    else
+        [connectionManager.tasks removeAllObjects];
     
     if(shouldReport)
     {
@@ -338,7 +369,15 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
 
 - (void)shouldKeepDeviceAtIndex:(int)i connectionAlive:(BOOL)shouldKeepAlive
 {
-    orderedDeviceDict[i].keepAlive = shouldKeepAlive;
+    CBPeripheral* device = [self getDeviceAtIndex:i];
+    if(device)
+    {
+        devices[device.identifier.UUIDString].keepAlive = shouldKeepAlive;
+        if (orderedDeviceDict[i].keepAlive)
+            post("keep alive");
+        else
+            post("don't keep alive");
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -382,8 +421,8 @@ didDiscoverServices: (NSError *)error
     else
     {
         for (CBCharacteristic *aChar in service.characteristics)
-        {            
-                [self postCharacteristicDescription:aChar];
+        {
+            [self postCharacteristicDescription:aChar];
         }
     }
 }
@@ -631,6 +670,21 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     if (serviceCBUUID && characteristicCBUUID)
     {
         CBPeripheral* device = [self getDeviceAtIndex:i];
+        switch (device.state)
+        {
+            case CBPeripheralStateDisconnected:
+                post("CBPeripheralStateDisconnected");
+                break;
+            case CBPeripheralStateConnecting:
+                post("CBPeripheralStateConnecting");
+                break;
+            case CBPeripheralStateConnected:
+                post("CBPeripheralStateConnected");
+                break;
+            case CBPeripheralStateDisconnecting:
+                post("CBPeripheralStateDisconnecting");
+                break;
+        }
         if (device)
             callback(characteristicCBUUID, serviceCBUUID, device);
         
@@ -672,6 +726,21 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         if (serviceCBUUID && characteristicCBUUID)
         {
             CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
+            switch (device.state)
+            {
+                case CBPeripheralStateDisconnected:
+                    post("CBPeripheralStateDisconnected");
+                    break;
+                case CBPeripheralStateConnecting:
+                    post("CBPeripheralStateConnecting");
+                    break;
+                case CBPeripheralStateConnected:
+                    post("CBPeripheralStateConnected");
+                    break;
+                case CBPeripheralStateDisconnecting:
+                    post("CBPeripheralStateDisconnecting");
+                    break;
+            }
             if (device)
                 callback(characteristicCBUUID, serviceCBUUID, device);
         }
@@ -691,10 +760,23 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                performBlock:^(CBUUID *charUUID,
                               CBUUID *serviceUUID,
                               CBPeripheral *device) {
-        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                          forServiceWithUUID:serviceUUID];
-        if(characteristic)
-            [device readValueForCharacteristic:characteristic];
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:nil]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                              forServiceWithUUID:serviceUUID];
+            if(characteristic)
+                [device readValueForCharacteristic:characteristic];
+        }
     }];
 }
 
@@ -709,17 +791,30 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
             ofDeviceAtIndex:i
                performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
      {
-        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                          forServiceWithUUID:serviceUUID];
-        if(characteristic)
-            [device readValueForCharacteristic:characteristic];
-     }
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:nil]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                              forServiceWithUUID:serviceUUID];
+            if(characteristic)
+                [device readValueForCharacteristic:characteristic];
+        }
+    }
     ];
 }
 
 //------------------------------------------------------------------------------
 
-- (void)readCharacteristicsOfDeviceWithUUID:(const char*)duuid
+- (void)readAllCharacteristicsOfDeviceWithUUID:(const char*)duuid
 {
     NSUUID* deviceUUID = [self getValidUUID: [[NSString alloc] initWithUTF8String:duuid]];
     if(deviceUUID)
@@ -727,12 +822,25 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
         if (device)
         {
-            for (CBService* service in [device services])
+            if (device.state != CBPeripheralStateConnected) {
+                PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+                
+                [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
+                                                                          serviceCBUUID:nil
+                                                                   characteristicCBUUID:nil
+                                                                                andData:nil]];
+                if (device.state != CBPeripheralStateConnecting)
+                    [self->manager connectPeripheral:device options:nil];
+            }
+            else
             {
-                for (CBCharacteristic* characteristic in [service characteristics])
+                for (CBService* service in [device services])
                 {
-                    if (characteristic.properties & CBCharacteristicPropertyRead)
-                        [device readValueForCharacteristic:characteristic];
+                    for (CBCharacteristic* characteristic in [service characteristics])
+                    {
+                        if (characteristic.properties & CBCharacteristicPropertyRead)
+                            [device readValueForCharacteristic:characteristic];
+                    }
                 }
             }
         }
@@ -746,12 +854,25 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     CBPeripheral* device = [self getDeviceAtIndex:i];
     if (device)
     {
-        for (CBService* service in [device services])
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
+                                                                      serviceCBUUID:nil
+                                                               characteristicCBUUID:nil
+                                                                            andData:nil]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
         {
-            for (CBCharacteristic* characteristic in [service characteristics])
+            for (CBService* service in [device services])
             {
-                if (characteristic.properties & CBCharacteristicPropertyRead)
-                    [device readValueForCharacteristic:characteristic];
+                for (CBCharacteristic* characteristic in [service characteristics])
+                {
+                    if (characteristic.properties & CBCharacteristicPropertyRead)
+                        [device readValueForCharacteristic:characteristic];
+                }
             }
         }
     }
@@ -771,17 +892,30 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                    ofDevice:duuid
                performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
      {
-        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                          forServiceWithUUID:serviceUUID];
-        if(characteristic)
-        {
-            post("%s %s: %s\n",
-                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
-                 serviceUUID.UUIDString.UTF8String,
-                 charUUID.UUIDString.UTF8String);
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
             
-            [device setNotifyValue:shouldSubscribe
-                 forCharacteristic:characteristic];
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralSubscribe
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:nil]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                              forServiceWithUUID:serviceUUID];
+            if(characteristic)
+            {
+                post("%s %s: %s\n",
+                     (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
+                     serviceUUID.UUIDString.UTF8String,
+                     charUUID.UUIDString.UTF8String);
+                
+                [device setNotifyValue:shouldSubscribe
+                     forCharacteristic:characteristic];
+            }
         }
     }];
 }
@@ -796,18 +930,33 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     [self forCharacteristic:cuuid
                   OfService:suuid
             ofDeviceAtIndex:i
-               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
-        CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                          forServiceWithUUID:serviceUUID];
-        if(characteristic)
-        {
-            post("%s %s: %s\n",
-                 (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
-                 serviceUUID.UUIDString.UTF8String,
-                 charUUID.UUIDString.UTF8String);
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
+     {
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
             
-            [device setNotifyValue:shouldSubscribe
-                 forCharacteristic:characteristic];
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralSubscribe
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:nil]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
+                                                              forServiceWithUUID:serviceUUID];
+            
+            if(characteristic)
+            {
+                post("%s %s: %s\n",
+                     (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
+                     serviceUUID.UUIDString.UTF8String,
+                     charUUID.UUIDString.UTF8String);
+                
+                [device setNotifyValue:shouldSubscribe
+                     forCharacteristic:characteristic];
+            }
         }
     }];
 }
@@ -826,10 +975,23 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                   ofService:suuid
                    ofDevice:duuid
                performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
-        [self writeToCharacteristic:charUUID
-                          OfService:serviceUUID
-                      OfFoundDevice:device
-                           withData:dataToWrite];
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralWrite
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:dataToWrite]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            [self writeToCharacteristic:charUUID
+                              OfService:serviceUUID
+                          OfFoundDevice:device
+                               withData:dataToWrite];
+        }
     }];
 }
 
@@ -846,12 +1008,25 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     [self forCharacteristic:cuuid
                   OfService:suuid
             ofDeviceAtIndex:deviceIndex
-               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device) {
-        
-        [self writeToCharacteristic:charUUID
-                          OfService:serviceUUID
-                      OfFoundDevice:device
-                           withData:dataToWrite];
+               performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
+     {
+        if (device.state != CBPeripheralStateConnected) {
+            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            
+            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralWrite
+                                                                      serviceCBUUID:serviceUUID
+                                                               characteristicCBUUID:charUUID
+                                                                            andData:dataToWrite]];
+            if (device.state != CBPeripheralStateConnecting)
+                [self->manager connectPeripheral:device options:nil];
+        }
+        else
+        {
+            [self writeToCharacteristic:charUUID
+                              OfService:serviceUUID
+                          OfFoundDevice:device
+                               withData:dataToWrite];
+        }
     }];
 }
 

@@ -107,12 +107,12 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         bleCentralCGetDeviceList(maxObjectPtr->bleCentral);
         break;
         cases("keep-alive")
-        if (argc == 1 &&
-            atom_gettype(argv + 0) == A_SYM &&
+        if (argc == 2 &&
+            atom_gettype(argv + 0) == A_LONG &&
             atom_gettype(argv + 1) == A_LONG)
         {
         bleCentralCShouldKeepDeviceAtIndexAlive(maxObjectPtr->bleCentral,
-                                                atom_getsym(argv)->s_name,
+                                                (int)atom_getlong(argv + 0),
                                                 (int)atom_getlong(argv + 1));
         }
         break;

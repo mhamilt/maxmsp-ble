@@ -65,7 +65,7 @@
                  OfService:(const char *)suuid
            ofDeviceAtIndex:(int)i;
 
-- (void)readCharacteristicsOfDeviceWithUUID: (const char*) duuid;
+- (void)readAllCharacteristicsOfDeviceWithUUID: (const char*) duuid;
 - (void)readAllCharacteristicOfDeviceAtIndex:(int)i;
 
 - (void)subscribeToCharacteristic: (const char*) cuuid
