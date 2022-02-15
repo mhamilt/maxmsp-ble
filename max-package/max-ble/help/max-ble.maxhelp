@@ -56,7 +56,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -86,6 +86,17 @@
 						"showontab" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
+									"id" : "obj-16",
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 0.0, 57.0, 247.0, 20.0 ],
+									"text" : "Subscribe to characteristics that are notifying"
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"id" : "obj-17",
 									"maxclass" : "newobj",
 									"numinlets" : 1,
@@ -103,7 +114,6 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 217.0, 308.5, 151.0, 22.0 ],
-									"presentation_linecount" : 2,
 									"text" : "unsubscribe 1 FFFF EEEE"
 								}
 
@@ -264,7 +274,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 0.0, 0.0, 539.0, 117.0 ]
+									"patching_rect" : [ 0.0, 0.0, 539.0, 55.0 ]
 								}
 
 							}
@@ -329,7 +339,6 @@
 					}
 ,
 					"patching_rect" : [ 15.0, 139.539130434782606, 79.0, 22.0 ],
-					"presentation_linecount" : 3,
 					"saved_object_attributes" : 					{
 						"description" : "",
 						"digest" : "",
@@ -358,7 +367,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -387,6 +396,55 @@
 						"subpatcher_template" : "",
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-18",
+									"linecount" : 3,
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 0.0, 58.0, 261.0, 47.0 ],
+									"text" : "Use the write message to write data to a device\n\ndata can be a list of strings, floats or ints"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"bubble" : 1,
+									"id" : "obj-16",
+									"linecount" : 2,
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 378.0, 304.5, 307.0, 37.0 ],
+									"text" : "Int lists will write in lowest byte format to express the number"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"bubble" : 1,
+									"id" : "obj-15",
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 328.0, 277.5, 195.0, 24.0 ],
+									"text" : "Strings will write in UTF8 format"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-11",
+									"maxclass" : "message",
+									"numinlets" : 2,
+									"numoutlets" : 1,
+									"outlettype" : [ "" ],
+									"patching_rect" : [ 226.25, 312.0, 142.0, 22.0 ],
+									"text" : "write 1 FFFF EEEE 1 2 3"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"id" : "obj-13",
 									"maxclass" : "message",
@@ -542,7 +600,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 0.0, 0.0, 539.0, 117.0 ]
+									"patching_rect" : [ 0.0, 0.0, 538.0, 56.0 ]
 								}
 
 							}
@@ -551,6 +609,13 @@
 								"patchline" : 								{
 									"destination" : [ "obj-2", 0 ],
 									"source" : [ "obj-1", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-2", 0 ],
+									"source" : [ "obj-11", 0 ]
 								}
 
 							}
@@ -621,7 +686,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -650,6 +715,17 @@
 						"subpatcher_template" : "",
 						"showontab" : 1,
 						"boxes" : [ 							{
+								"box" : 								{
+									"id" : "obj-24",
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 0.0, 50.0, 407.0, 20.0 ],
+									"text" : "Use the Read message to read all or a specific Service / Characteristic pair"
+								}
+
+							}
+, 							{
 								"box" : 								{
 									"bubble" : 1,
 									"id" : "obj-15",
@@ -829,7 +905,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"parameter_enable" : 0,
-									"patching_rect" : [ 0.0, 0.0, 539.0, 117.0 ]
+									"patching_rect" : [ 0.0, 0.0, 544.0, 48.0 ]
 								}
 
 							}
@@ -915,7 +991,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -950,7 +1026,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 16.0, 65.0, 670.0, 47.0 ],
+									"patching_rect" : [ 0.0, 65.0, 670.0, 47.0 ],
 									"text" : "A connect message with a UUID will attempt to connect to a matching, previosuly discovered device.\n\nIf no device has been discovered, the connect message will trigger scanning to start. Once the device is found it will connect."
 								}
 
@@ -1151,7 +1227,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 34.0, 88.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -1185,7 +1261,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 6.0, 65.0, 514.0, 20.0 ],
+									"patching_rect" : [ 0.0, 65.0, 514.0, 20.0 ],
 									"text" : "To reduce the amount of printing, reporting to the Max console window can be toggle on and of "
 								}
 
@@ -1381,7 +1457,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -1411,6 +1487,30 @@
 						"showontab" : 1,
 						"boxes" : [ 							{
 								"box" : 								{
+									"id" : "obj-25",
+									"maxclass" : "comment",
+									"numinlets" : 1,
+									"numoutlets" : 0,
+									"patching_rect" : [ 89.5, 352.0, 157.0, 20.0 ],
+									"presentation_linecount" : 2,
+									"text" : "Ignore Device UUID"
+								}
+
+							}
+, 							{
+								"box" : 								{
+									"id" : "obj-21",
+									"maxclass" : "newobj",
+									"numinlets" : 2,
+									"numoutlets" : 2,
+									"outlettype" : [ "", "" ],
+									"patching_rect" : [ 23.0, 352.0, 55.0, 22.0 ],
+									"text" : "zl.slice 1"
+								}
+
+							}
+, 							{
+								"box" : 								{
 									"bubble" : 1,
 									"id" : "obj-18",
 									"linecount" : 2,
@@ -1430,7 +1530,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 174.0, 277.5, 105.0, 22.0 ],
-									"text" : "read 4 180F 2A19"
+									"text" : "read 0 180F 2A19"
 								}
 
 							}
@@ -1441,7 +1541,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 23.0, 69.0, 300.0, 33.0 ],
+									"patching_rect" : [ 0.0, 58.0, 300.0, 33.0 ],
 									"text" : "Use the Service and Characteristic UUIDs with the route object to parse data"
 								}
 
@@ -1463,7 +1563,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 96.0, 400.0, 111.0, 20.0 ],
+									"patching_rect" : [ 96.0, 423.0, 111.0, 20.0 ],
 									"text" : "Battery Level UUID"
 								}
 
@@ -1474,7 +1574,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 96.0, 361.0, 79.0, 20.0 ],
+									"patching_rect" : [ 96.0, 384.0, 79.0, 20.0 ],
 									"text" : "Battery UUID"
 								}
 
@@ -1486,7 +1586,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 2,
 									"outlettype" : [ "", "" ],
-									"patching_rect" : [ 23.0, 400.0, 67.0, 22.0 ],
+									"patching_rect" : [ 23.0, 423.0, 67.0, 22.0 ],
 									"text" : "route 2A19"
 								}
 
@@ -1498,8 +1598,8 @@
 									"numinlets" : 2,
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
-									"patching_rect" : [ 23.0, 449.0, 243.0, 22.0 ],
-									"text" : "74"
+									"patching_rect" : [ 23.0, 472.0, 243.0, 22.0 ],
+									"text" : "58"
 								}
 
 							}
@@ -1510,7 +1610,7 @@
 									"numinlets" : 2,
 									"numoutlets" : 2,
 									"outlettype" : [ "", "" ],
-									"patching_rect" : [ 23.0, 360.0, 67.0, 22.0 ],
+									"patching_rect" : [ 23.0, 383.0, 67.0, 22.0 ],
 									"text" : "route 180F"
 								}
 
@@ -1607,7 +1707,7 @@
 									"numoutlets" : 1,
 									"outlettype" : [ "" ],
 									"patching_rect" : [ 152.0, 240.0, 61.0, 22.0 ],
-									"text" : "connect 4"
+									"text" : "connect 0"
 								}
 
 							}
@@ -1694,7 +1794,7 @@
 							}
 , 							{
 								"patchline" : 								{
-									"destination" : [ "obj-13", 0 ],
+									"destination" : [ "obj-21", 0 ],
 									"source" : [ "obj-2", 0 ]
 								}
 
@@ -1703,6 +1803,13 @@
 								"patchline" : 								{
 									"destination" : [ "obj-15", 1 ],
 									"source" : [ "obj-20", 0 ]
+								}
+
+							}
+, 							{
+								"patchline" : 								{
+									"destination" : [ "obj-13", 0 ],
+									"source" : [ "obj-21", 1 ]
 								}
 
 							}
@@ -1759,7 +1866,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 34.0, 114.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -1804,7 +1911,7 @@
 									"maxclass" : "comment",
 									"numinlets" : 1,
 									"numoutlets" : 0,
-									"patching_rect" : [ 16.0, 63.0, 314.0, 20.0 ],
+									"patching_rect" : [ 0.0, 63.0, 314.0, 20.0 ],
 									"text" : "Use a umenu object to keep a handy log of found devices"
 								}
 
@@ -2103,7 +2210,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -2935,7 +3042,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -3676,7 +3783,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
@@ -4104,7 +4211,7 @@
 						}
 ,
 						"classnamespace" : "box",
-						"rect" : [ 0.0, 26.0, 723.0, 534.0 ],
+						"rect" : [ 0.0, 26.0, 723.0, 508.0 ],
 						"bglocked" : 0,
 						"openinpresentation" : 0,
 						"default_fontsize" : 12.0,
