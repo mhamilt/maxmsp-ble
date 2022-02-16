@@ -20,7 +20,7 @@
         blacklistPeripherals = [[NSMutableArray alloc] init];
         orderedDeviceDict = [[NSMutableArray alloc] init];
         devices = [[NSMutableDictionary alloc] init];
-        
+        servicesToScan = [[NSMutableArray alloc] init];
         bleQueue = centralDelegateQueue;
         manager = [[CBCentralManager alloc] initWithDelegate: self
                                                        queue: bleQueue];
@@ -210,21 +210,23 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
 - (void)scanForService: (t_atom*) serviceUUIDs
                  count: (long) argc
 {
-    if (!argc)
+    for (int i = 0; i < argc; i++)
     {
-        [servicesToScan removeAllObjects];
+        CBUUID* serviceToScanFor =  [self getValidCBUUID:[[NSString alloc]
+                                                          initWithUTF8String:atom_getsym(serviceUUIDs + i)->s_name]];
+        
+        if(serviceToScanFor)
+            [servicesToScan addObject:serviceToScanFor];
+    }
+    
+    if(servicesToScan)
+    {
+        [self startScan];
     }
     else
     {
-        for (int i = 0; i < argc; i++)
-        {
-            [servicesToScan addObject:[CBUUID UUIDWithString:
-                                       [[NSString alloc]
-                                        initWithUTF8String:atom_getsym(serviceUUIDs + i)->s_name]]];
-        }
+        post("no valid service to scan for");
     }
-    
-    [self startScan];
 }
 
 - (void) stop;
@@ -281,6 +283,7 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
 
 - (void) clearDicoveredPeripherals
 {
+    [servicesToScan removeAllObjects];
     [discoveredPeripherals removeAllObjects];
     [discoveredPeripheralsRSSIs removeAllObjects];
     [devices removeAllObjects];
@@ -646,26 +649,8 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
              performBlock:(void (^)(CBUUID* charUUID, CBUUID* serviceUUID, CBPeripheral* device)) callback
 
 {
-    CBUUID* serviceCBUUID = nil;
-    CBUUID* characteristicCBUUID = nil;
-    
-    if (strlen(cuuid) == 4)
-        characteristicCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:cuuid]];
-    else
-    {
-        NSUUID* cuuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: cuuid]];
-        if (cuuid)
-            characteristicCBUUID =  [CBUUID UUIDWithNSUUID: cuuidString];
-    }
-    
-    if (strlen(suuid) == 4)
-        serviceCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:suuid]];
-    else
-    {
-        NSUUID* suuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: suuid]];
-        if (suuid)
-            serviceCBUUID =  [CBUUID UUIDWithNSUUID: suuidString];
-    }
+    CBUUID* serviceCBUUID = [self getValidCBUUID:[[NSString alloc] initWithUTF8String:suuid]];
+    CBUUID* characteristicCBUUID = [self getValidCBUUID:[[NSString alloc] initWithUTF8String:cuuid]];
     
     if (serviceCBUUID && characteristicCBUUID)
     {
@@ -702,26 +687,8 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     
     if (deviceUUID)
     {
-        CBUUID* serviceCBUUID = nil;
-        CBUUID* characteristicCBUUID = nil;
-        
-        if (strlen(cuuid) == 4)
-            characteristicCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:cuuid]];
-        else
-        {
-            NSUUID* cuuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: cuuid]];
-            if (cuuid)
-                characteristicCBUUID =  [CBUUID UUIDWithNSUUID: cuuidString];
-        }
-        
-        if (strlen(suuid) == 4)
-            serviceCBUUID =  [CBUUID UUIDWithString: [[NSString alloc] initWithUTF8String:suuid]];
-        else
-        {
-            NSUUID* suuidString = [self getValidUUID: [[NSString alloc] initWithUTF8String: suuid]];
-            if (suuid)
-                serviceCBUUID =  [CBUUID UUIDWithNSUUID: suuidString];
-        }
+        CBUUID* serviceCBUUID = [self getValidCBUUID:[[NSString alloc] initWithUTF8String:suuid]];
+        CBUUID* characteristicCBUUID = [self getValidCBUUID:[[NSString alloc] initWithUTF8String:cuuid]];
         
         if (serviceCBUUID && characteristicCBUUID)
         {
@@ -945,8 +912,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         else
         {
             CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                              forServiceWithUUID:serviceUUID];
-            
+                                                              forServiceWithUUID:serviceUUID];            
             if(characteristic)
             {
                 post("%s %s: %s\n",
@@ -1065,6 +1031,19 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         post("%s is not a valid UUID", UUIDString.UTF8String);
     
     return validUUID;
+}
+
+-(CBUUID*)getValidCBUUID : (NSString *)UUIDString
+{
+    CBUUID* validCBUUID = nil;
+    
+    @try {
+        validCBUUID = [CBUUID UUIDWithString:UUIDString];
+    } @catch (NSException *exception) {
+        post("%s is not a valid UUID", UUIDString.UTF8String);
+    }
+
+    return validCBUUID;
 }
 
 //------------------------------------------------------------------------------
