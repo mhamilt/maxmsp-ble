@@ -4,7 +4,7 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 #include <stdio.h>
 #include <objc/runtime.h>
-#include "../MaxObject.h"
+#include "../common/MaxObject.h"
 #import "CBPeripheral+PeripheralUtility.h"
 #import "PeripheralConnectionManager.h"
 

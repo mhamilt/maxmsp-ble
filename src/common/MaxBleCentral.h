@@ -4,7 +4,7 @@
  Bridging techinque by Rob Napier. https://github.com/rnapier
  */
 #pragma once
-#include "../MaxObject.h"
+#include "MaxObject.h"
 
 #ifdef __APPLE__
 #include "TargetConditionals.h"
@@ -12,7 +12,7 @@
 #import <CoreFoundation/CoreFoundation.h>
 #include <objc/runtime.h>
 #ifdef __OBJC__
-#import "MacosBleCentral.h"
+#import "../macos/MacosBleCentral.h"
 #endif
 #endif
 #elif defined _WIN32 || defined _WIN64

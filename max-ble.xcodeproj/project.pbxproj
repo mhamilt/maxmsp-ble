@@ -7,11 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		583308812433178F00331097 /* MacosBleCentral.m in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC09242E3205004FE028 /* MacosBleCentral.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
-		583308822433178F00331097 /* MaxBleCentralMacOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
-		5849241E2444B0C000FB0C24 /* MaxObject.c in Sources */ = {isa = PBXBuildFile; fileRef = 5849241D2444B0C000FB0C24 /* MaxObject.c */; };
 		589D3E7A2448204C00FFA01E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589D3E792448204C00FFA01E /* CoreBluetooth.framework */; };
-		58F0AC07242E3161004FE028 /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58F0AC06242E3161004FE028 /* main.c */; };
+		58B9213A27BD92310074582D /* MaxObject.c in Sources */ = {isa = PBXBuildFile; fileRef = 58B9212827BD92310074582D /* MaxObject.c */; };
+		58B9213B27BD92310074582D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58B9212C27BD92310074582D /* main.c */; };
+		58B9213C27BD92310074582D /* PeripheralConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213027BD92310074582D /* PeripheralConnectionManager.m */; };
+		58B9213D27BD92310074582D /* MaxBleCentralMacOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213127BD92310074582D /* MaxBleCentralMacOS.m */; };
+		58B9213E27BD92310074582D /* MacosBleCentral.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213327BD92310074582D /* MacosBleCentral.m */; };
+		58B9213F27BD92310074582D /* CBPeripheral+PeripheralUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213727BD92310074582D /* CBPeripheral+PeripheralUtility.m */; };
+		58B9214027BD92310074582D /* PeripheralTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213827BD92310074582D /* PeripheralTask.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -20,21 +23,27 @@
 		5815159D242F9C9F0003A2A8 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		5833088724332BA500331097 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		5833088C24332BC500331097 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
-		5849241C2444A64000FB0C24 /* MaxObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MaxObject.h; sourceTree = "<group>"; };
-		5849241D2444B0C000FB0C24 /* MaxObject.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = MaxObject.c; sourceTree = "<group>"; };
-		584F58072698596C007E0BC8 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
 		587196D324324E410059E189 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = DEVELOPER_DIR; };
 		589D3E792448204C00FFA01E /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
-		58B8B884268F1BFD004B4F2E /* MaxBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxBleCentral.h; sourceTree = "<group>"; };
-		58E0BF0226652DA700DCB7A0 /* SwitchString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SwitchString.h; sourceTree = "<group>"; };
+		58B9212827BD92310074582D /* MaxObject.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = MaxObject.c; sourceTree = "<group>"; };
+		58B9212927BD92310074582D /* MaxBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxBleCentral.h; sourceTree = "<group>"; };
+		58B9212A27BD92310074582D /* SwitchString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwitchString.h; sourceTree = "<group>"; };
+		58B9212B27BD92310074582D /* MaxObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxObject.h; sourceTree = "<group>"; };
+		58B9212C27BD92310074582D /* main.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		58B9212E27BD92310074582D /* maxmspsdk.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = maxmspsdk.xcconfig; sourceTree = "<group>"; };
+		58B9213027BD92310074582D /* PeripheralConnectionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeripheralConnectionManager.m; sourceTree = "<group>"; };
+		58B9213127BD92310074582D /* MaxBleCentralMacOS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MaxBleCentralMacOS.m; sourceTree = "<group>"; };
+		58B9213227BD92310074582D /* CBPeripheral+PeripheralUtility.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "CBPeripheral+PeripheralUtility.h"; sourceTree = "<group>"; };
+		58B9213327BD92310074582D /* MacosBleCentral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacosBleCentral.m; sourceTree = "<group>"; };
+		58B9213427BD92310074582D /* PeripheralTask.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeripheralTask.h; sourceTree = "<group>"; };
+		58B9213527BD92310074582D /* PeripheralConnectionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeripheralConnectionManager.h; sourceTree = "<group>"; };
+		58B9213627BD92310074582D /* MacosBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacosBleCentral.h; sourceTree = "<group>"; };
+		58B9213727BD92310074582D /* CBPeripheral+PeripheralUtility.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "CBPeripheral+PeripheralUtility.m"; sourceTree = "<group>"; };
+		58B9213827BD92310074582D /* PeripheralTask.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeripheralTask.m; sourceTree = "<group>"; };
+		58B9213927BD92310074582D /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		58F0AC04242E3110004FE028 /* max-ble.mxo */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "max-ble.mxo"; sourceTree = BUILT_PRODUCTS_DIR; };
-		58F0AC06242E3161004FE028 /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
-		58F0AC09242E3205004FE028 /* MacosBleCentral.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MacosBleCentral.m; sourceTree = "<group>"; };
-		58F0AC0A242E3205004FE028 /* MacosBleCentral.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MacosBleCentral.h; sourceTree = "<group>"; };
 		58F0AC0E242E3241004FE028 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		58F0AC10242E3248004FE028 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.11.sdk/System/Library/Frameworks/CoreBluetooth.framework; sourceTree = DEVELOPER_DIR; };
-		58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MaxBleCentralMacOS.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,34 +79,40 @@
 		58567A37242A0A0A00271066 /* src */ = {
 			isa = PBXGroup;
 			children = (
-				584F58072698596C007E0BC8 /* Info.plist */,
-				5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */,
-				58F0AC05242E3140004FE028 /* macos-ble */,
+				58B9212727BD92310074582D /* common */,
+				58B9212D27BD92310074582D /* macos */,
 			);
 			path = src;
 			sourceTree = "<group>";
 		};
-		58F0AC05242E3140004FE028 /* macos-ble */ = {
+		58B9212727BD92310074582D /* common */ = {
 			isa = PBXGroup;
 			children = (
-				58F0AC08242E31AC004FE028 /* BleClasses */,
-				58F0AC06242E3161004FE028 /* main.c */,
-				5849241C2444A64000FB0C24 /* MaxObject.h */,
-				5849241D2444B0C000FB0C24 /* MaxObject.c */,
-				58E0BF0226652DA700DCB7A0 /* SwitchString.h */,
+				58B9212C27BD92310074582D /* main.c */,
+				58B9212927BD92310074582D /* MaxBleCentral.h */,
+				58B9212B27BD92310074582D /* MaxObject.h */,
+				58B9212827BD92310074582D /* MaxObject.c */,
+				58B9212A27BD92310074582D /* SwitchString.h */,
 			);
-			path = "macos-ble";
+			path = common;
 			sourceTree = "<group>";
 		};
-		58F0AC08242E31AC004FE028 /* BleClasses */ = {
+		58B9212D27BD92310074582D /* macos */ = {
 			isa = PBXGroup;
 			children = (
-				58F0AC0A242E3205004FE028 /* MacosBleCentral.h */,
-				58F0AC09242E3205004FE028 /* MacosBleCentral.m */,
-				58B8B884268F1BFD004B4F2E /* MaxBleCentral.h */,
-				58F0AC12242E3680004FE028 /* MaxBleCentralMacOS.m */,
+				58B9213127BD92310074582D /* MaxBleCentralMacOS.m */,
+				58B9213627BD92310074582D /* MacosBleCentral.h */,
+				58B9213327BD92310074582D /* MacosBleCentral.m */,
+				58B9213527BD92310074582D /* PeripheralConnectionManager.h */,
+				58B9213027BD92310074582D /* PeripheralConnectionManager.m */,
+				58B9213427BD92310074582D /* PeripheralTask.h */,
+				58B9213827BD92310074582D /* PeripheralTask.m */,
+				58B9213227BD92310074582D /* CBPeripheral+PeripheralUtility.h */,
+				58B9213727BD92310074582D /* CBPeripheral+PeripheralUtility.m */,
+				58B9212E27BD92310074582D /* maxmspsdk.xcconfig */,
+				58B9213927BD92310074582D /* Info.plist */,
 			);
-			path = BleClasses;
+			path = macos;
 			sourceTree = "<group>";
 		};
 		58F0AC0D242E3241004FE028 /* Frameworks */ = {
@@ -223,10 +238,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				583308812433178F00331097 /* MacosBleCentral.m in Sources */,
-				5849241E2444B0C000FB0C24 /* MaxObject.c in Sources */,
-				583308822433178F00331097 /* MaxBleCentralMacOS.m in Sources */,
-				58F0AC07242E3161004FE028 /* main.c in Sources */,
+				58B9213F27BD92310074582D /* CBPeripheral+PeripheralUtility.m in Sources */,
+				58B9213D27BD92310074582D /* MaxBleCentralMacOS.m in Sources */,
+				58B9213E27BD92310074582D /* MacosBleCentral.m in Sources */,
+				58B9213B27BD92310074582D /* main.c in Sources */,
+				58B9213C27BD92310074582D /* PeripheralConnectionManager.m in Sources */,
+				58B9213A27BD92310074582D /* MaxObject.c in Sources */,
+				58B9214027BD92310074582D /* PeripheralTask.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -235,6 +253,7 @@
 /* Begin XCBuildConfiguration section */
 		2FBBEAD008F335010078DB84 /* Development */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -272,6 +291,7 @@
 		};
 		2FBBEAD108F335010078DB84 /* Deployment */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
@@ -307,7 +327,7 @@
 		};
 		58F0AC02242E3110004FE028 /* Development */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
+			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
@@ -331,6 +351,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				INFOPLIST_FILE = src/macos/Info.plist;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = NO;
@@ -350,7 +371,7 @@
 		};
 		58F0AC03242E3110004FE028 /* Deployment */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5868BA8D241A6C1600152060 /* maxmspsdk.xcconfig */;
+			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
@@ -373,6 +394,7 @@
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
 				GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch";
 				GCC_TREAT_IMPLICIT_FUNCTION_DECLARATIONS_AS_ERRORS = YES;
+				INFOPLIST_FILE = src/macos/Info.plist;
 				LINK_WITH_STANDARD_LIBRARIES = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = NO;

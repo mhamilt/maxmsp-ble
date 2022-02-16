@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "58F0ABFA242E3110004FE028"
-               BuildableName = "max-ble.mxo"
+               BuildableName = "max-ble.bundle"
                BlueprintName = "max-ble"
                ReferencedContainer = "container:max-ble.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "58F0ABFA242E3110004FE028"
-            BuildableName = "max-ble.mxo"
+            BuildableName = "max-ble.bundle"
             BlueprintName = "max-ble"
             ReferencedContainer = "container:max-ble.xcodeproj">
          </BuildableReference>
