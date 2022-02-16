@@ -151,12 +151,13 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
         break;
         //----------------------------------------------------------------------
         cases("scan")
+        
         if (argc && atom_gettype(argv) == A_LONG && !atom_getlong(argv))
             bleCentralCStopScan(maxObjectPtr->bleCentral);
         else if (argc && atom_gettype(argv) == A_SYM)
             bleCentralCScanForServices(maxObjectPtr->bleCentral,
                                        argv,
-                                       argc);
+                                       argc);        
         else
             bleCentralCScan(maxObjectPtr->bleCentral);
         break;
