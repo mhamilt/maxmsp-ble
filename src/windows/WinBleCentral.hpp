@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <string>
 #include "ext.h"
-#include "../MaxObject.h"
+#include "..\common\MaxObject.h"
 
 using winrt::Windows::Devices::Bluetooth::BluetoothConnectionStatus;
 using winrt::Windows::Devices::Bluetooth::BluetoothLEDevice;
@@ -28,7 +28,7 @@ using namespace winrt::Windows::Foundation;
 using namespace winrt::Windows::Foundation::Collections;
 using namespace winrt::Windows::Devices::Bluetooth::GenericAttributeProfile;
 
-/// @brief Bluetooth Low Energy Central Delegate Class 
+/// @brief Bluetooth Low Energy Central Delegate Class
 ///        The structure of the WinBleClass mimic that of the central manager delegate of the CoreBluetooth API
 class WinBleCentral
 {
@@ -36,118 +36,118 @@ class WinBleCentral
 public:
     WinBleCentral();
     ~WinBleCentral();
-    /// @brief 
+    /// @brief
     void scan();
-    /// @brief 
-    /// @param serviceUUID 
-    /// @param argc 
+    /// @brief
+    /// @param serviceUUID
+    /// @param argc
     void scanForService(t_atom* serviceUUID, long argc);
-    /// @brief 
+    /// @brief
     void stop();
-    /// @brief 
-    /// @param deviceIndex 
+    /// @brief
+    /// @param deviceIndex
     void connectToFoundDevice(int deviceIndex);
-    /// @brief 
-    /// @param uuid 
+    /// @brief
+    /// @param uuid
     void connectToDeviceWithUUID(const char* uuid);
-    /// @brief 
-    /// @param name 
+    /// @brief
+    /// @param name
     void connectToDeviceWithName(const char* name);
-    /// @brief 
+    /// @brief
     void clearDicoveredPeripherals();
-    /// @brief 
-    /// @param deviceIndex 
+    /// @brief
+    /// @param deviceIndex
     void getRssiOfFoundDevice(int deviceIndex);
-    /// @brief 
+    /// @brief
     void getFoundDeviceList();
-    /// @brief 
-    /// @param rssiSensitivity 
+    /// @brief
+    /// @param rssiSensitivity
     void setRssiSensitivity(int rssiSensitivity);
-    /// @brief  
-    /// @param shouldIgnore 
+    /// @brief
+    /// @param shouldIgnore
     void setIgnoreiPhone(bool shouldIgnore);
     //void setMaxObjectRef(MaxExternalObject* extMaxObjectRef);
     void setReporting(bool reportingMode);
     void subscribeToCharacteristic(const char* cuuid,
         const char* suuid,
         int deviceIndex);
-    /// @brief 
-    /// @param extObjRef 
+    /// @brief
+    /// @param extObjRef
     void setMaxObjectRef(MaxExternalObject* extObjRef);
 private:
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief
+    /// @param
+    /// @return
     std::string winrtGuidToString(winrt::guid);
-    
+
     std::string bluetoothAddressToString(uint64_t);
-    /// @brief 
-    /// @param windowsDeviceAddress 
+    /// @brief
+    /// @param windowsDeviceAddress
     void connectPeripheral(uint64_t windowsDeviceAddress);
-    /// @brief 
-    /// @param device 
+    /// @brief
+    /// @param device
     void discoverServices(BluetoothLEDevice device);
-    /// @brief 
-    /// @param service 
+    /// @brief
+    /// @param service
     void discoverCharacteristicsForService(GattDeviceService service);
-    /// @brief 
-    /// @param characteristic 
+    /// @brief
+    /// @param characteristic
     void readValueForCharacteristic(GattCharacteristic characteristic);
-    /// @brief 
-    /// @param watcher 
-    /// @param eventArgs 
+    /// @brief
+    /// @param watcher
+    /// @param eventArgs
     void didDiscoverPeripheral(BluetoothLEAdvertisementWatcher watcher, BluetoothLEAdvertisementReceivedEventArgs eventArgs);
-    /// @brief 
+    /// @brief
     void didCancelScanning();
-    /// @brief 
-    /// @param device 
+    /// @brief
+    /// @param device
     void didConnectPeripheral(BluetoothLEDevice& device);
-    /// @brief 
+    /// @brief
     void didDisconnectPeripheral();
-    /// @brief 
+    /// @brief
     void didFailToConnectPeripheral();
 
-    /// @brief 
+    /// @brief
     void didFailToDiscoverCharacteristicsForService();
-    /// @brief 
+    /// @brief
     void didFailToDiscoverServices();
-    /// @brief 
+    /// @brief
     void didFailToReadValueForCharacteristic();
-    /// @brief 
+    /// @brief
     void didDiscoverIncludedServicesForService();
-    /// @brief 
-    /// @param services 
-    /// @param error 
+    /// @brief
+    /// @param services
+    /// @param error
     void didDiscoverServices(IVectorView<GattDeviceService> services, GattCommunicationStatus error);
-    /// @brief 
-    /// @param characteristics 
-    /// @param error 
+    /// @brief
+    /// @param characteristics
+    /// @param error
     void didDiscoverCharacteristicsForService(IVectorView<GattCharacteristic> characteristics, GattCommunicationStatus error);
-    /// @brief 
-    /// @param value 
-    /// @param error 
+    /// @brief
+    /// @param value
+    /// @param error
     void didReadValueForCharacteristic(GattCharacteristic characteristic, winrt::Windows::Storage::Streams::IBuffer value, GattCommunicationStatus error);
-    /// @brief 
+    /// @brief
     void didUpdateValueForDescriptor();
-    /// @brief 
+    /// @brief
     void didUpdateValueForCharacteristic();
-    /// @brief 
+    /// @brief
     void didDiscoverDescriptorsForCharacteristic();
-    /// @brief 
+    /// @brief
     void postCharacteristicDescription();
-    /// @brief 
-    /// @param device 
+    /// @brief
+    /// @param device
     void printDeviceDescription(BluetoothLEAdvertisementReceivedEventArgs device);
-    /// @brief 
-    /// @param  
-    /// @return 
+    /// @brief
+    /// @param
+    /// @return
     bool isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs);
 
-    /// @brief 
-    /// @param maxObjectPtr 
-    /// @param index 
-    /// @param uuid 
-    /// @param rssi 
+    /// @brief
+    /// @param maxObjectPtr
+    /// @param index
+    /// @param uuid
+    /// @param rssi
     void outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
 
     void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
@@ -156,7 +156,7 @@ private:
     /// @param  GattCommunicationStatus from Async operation
     void appendGattCommunicationStatus(std::stringstream&, GattCommunicationStatus);
 private:
-    /// @brief 
+    /// @brief
     std::vector<uint64_t> discoveredPeripheralUUIDs;
     ///
     std::vector<BluetoothLEAdvertisementReceivedEventArgs> discoveredPeripherals;
@@ -168,9 +168,8 @@ private:
     int rssiSensitivity = 127;
     ///
     BluetoothLEAdvertisementWatcher bleWatcher;
-    /// @brief 
+    /// @brief
     bool connecting = false;
     /// @brief pointer to max object that own the WinBleCentral object
     MaxExternalObject* maxObjectRef;
 };
-

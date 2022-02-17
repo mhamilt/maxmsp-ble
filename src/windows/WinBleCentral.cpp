@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "WinBleCentral.hpp"
-#include "..\MaxObject.h"
+#include "..\common\MaxObject.h"
 
 //--------------------------------------------------------------------------------------------
 
@@ -128,7 +128,7 @@ void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suu
     if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
 }
 
-//--------------------------------------------------------------------------------------------    
+//--------------------------------------------------------------------------------------------
 
 void WinBleCentral::setMaxObjectRef(MaxExternalObject* extObjRef)
 {
@@ -364,7 +364,7 @@ void WinBleCentral::didReadValueForCharacteristic(GattCharacteristic characteris
             << " Value: ";
 
         appendGattCommunicationStatus(ss, status);
-        
+
         if (shouldReport) object_post((t_object*)maxObjectRef, "%s", ss.str().c_str());
     }
 }

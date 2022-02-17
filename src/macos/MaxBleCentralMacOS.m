@@ -2,7 +2,7 @@
  C Bridge for CoreBluetooth Central on macOS
  */
 
-#import "MaxBleCentral.h"
+#import "../common/MaxBleCentral.h"
 //------------------------------------------------------------------------------
 MaxBleCentral* newBleCentralC(void)
 {

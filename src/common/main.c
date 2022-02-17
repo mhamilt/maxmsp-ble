@@ -6,7 +6,7 @@
 #include "ext.h"
 #include "ext_proto.h"
 #include "MaxObject.h"
-#include "BleClasses/MaxBleCentral.h"
+#include "MaxBleCentral.h"
 #include "SwitchString.h"
 //------------------------------------------------------------------------------
 void* myExternClass;
