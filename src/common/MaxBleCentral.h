@@ -21,8 +21,6 @@ extern "C" {
 #endif
 #endif
 
-//typedef CFTypeRef MacosBleCentralRef;
-//MacosBleCentralRef MacosBleCentralRefCreate(void);
 typedef const void MaxBleCentral; // 'const void *' is more CF-like, but either is fine
 MaxBleCentral* newBleCentralC(void);
 void bleCentralCScan            (MaxBleCentral *t);
