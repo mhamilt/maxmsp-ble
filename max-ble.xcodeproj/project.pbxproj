@@ -10,10 +10,10 @@
 		589D3E7A2448204C00FFA01E /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 589D3E792448204C00FFA01E /* CoreBluetooth.framework */; };
 		58B9213A27BD92310074582D /* MaxObject.c in Sources */ = {isa = PBXBuildFile; fileRef = 58B9212827BD92310074582D /* MaxObject.c */; };
 		58B9213B27BD92310074582D /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 58B9212C27BD92310074582D /* main.c */; };
-		58B9213C27BD92310074582D /* PeripheralConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213027BD92310074582D /* PeripheralConnectionManager.m */; };
+		58B9213C27BD92310074582D /* PeripheralConnectionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213027BD92310074582D /* PeripheralConnectionManager.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
 		58B9213D27BD92310074582D /* MaxBleCentralMacOS.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213127BD92310074582D /* MaxBleCentralMacOS.m */; };
-		58B9213E27BD92310074582D /* MacosBleCentral.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213327BD92310074582D /* MacosBleCentral.m */; };
-		58B9213F27BD92310074582D /* CBPeripheral+PeripheralUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213727BD92310074582D /* CBPeripheral+PeripheralUtility.m */; };
+		58B9213E27BD92310074582D /* MacosBleCentral.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213327BD92310074582D /* MacosBleCentral.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
+		58B9213F27BD92310074582D /* CBPeripheral+PeripheralUtility.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213727BD92310074582D /* CBPeripheral+PeripheralUtility.m */; settings = {COMPILER_FLAGS = "-D MAXMSP"; }; };
 		58B9214027BD92310074582D /* PeripheralTask.m in Sources */ = {isa = PBXBuildFile; fileRef = 58B9213827BD92310074582D /* PeripheralTask.m */; };
 /* End PBXBuildFile section */
 
