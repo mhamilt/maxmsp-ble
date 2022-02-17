@@ -2,17 +2,17 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
-    <ClCompile Include="..\..\src\macos-ble\main.c">
+    <ClCompile Include="..\..\src\common\main.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\macos-ble\MaxObject.c">
+    <ClCompile Include="..\..\src\common\MaxObject.c">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.cpp">
-      <Filter>src\BLEClasses</Filter>
+    <ClCompile Include="..\..\src\windows\MaxBleCentralWin.cpp">
+      <Filter>src\windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\WinBleCentral.cpp">
-      <Filter>src\BLEClasses</Filter>
+    <ClCompile Include="..\..\src\windows\WinBleCentral.cpp">
+      <Filter>src\windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -20,17 +20,17 @@
     <ClInclude Include="..\..\src\macos-ble\MaxObject.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\pch.h">
+    <ClInclude Include="..\..\src\windows\pch.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\macos-ble\SwitchString.h">
+    <ClInclude Include="..\..\src\common\SwitchString.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\MaxBleCentral.h">
-      <Filter>src\BLEClasses</Filter>
+    <ClInclude Include="..\..\src\common\MaxBleCentral.h">
+      <Filter>src\windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\WinBleCentral.hpp">
-      <Filter>src\BLEClasses</Filter>
+    <ClInclude Include="..\..\src\windows\WinBleCentral.hpp">
+      <Filter>src\windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -52,7 +52,7 @@
     <Filter Include="src">
       <UniqueIdentifier>{de7b9d01-13e4-4582-bb83-a5512f397f2f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\BLEClasses">
+    <Filter Include="src\windows">
       <UniqueIdentifier>{dc13ee07-0f41-4c41-87f7-9e1ebf9ba71b}</UniqueIdentifier>
     </Filter>
     <Filter Include="prop_files">

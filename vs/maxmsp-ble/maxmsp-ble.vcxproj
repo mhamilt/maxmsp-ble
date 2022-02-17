@@ -271,10 +271,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="$(C74SUPPORT)\max-includes\common\dllmain_win.c" />
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\MaxBleCentralWin.cpp" />
-    <ClCompile Include="..\..\src\macos-ble\BleClasses\WinBleCentral.cpp" />
-    <ClCompile Include="..\..\src\macos-ble\main.c" />
-    <ClCompile Include="..\..\src\macos-ble\MaxObject.c" />
+    <ClCompile Include="..\..\src\windows\MaxBleCentralWin.cpp" />
+    <ClCompile Include="..\..\src\windows\WinBleCentral.cpp" />
+    <ClCompile Include="..\..\src\common\main.c" />
+    <ClCompile Include="..\..\src\common\MaxObject.c" />
   </ItemGroup>
   <ItemGroup>
     <None Include="max_extern_common.props" />
@@ -283,11 +283,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\MaxBleCentral.h" />
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\pch.h" />
-    <ClInclude Include="..\..\src\macos-ble\BleClasses\WinBleCentral.hpp" />
-    <ClInclude Include="..\..\src\macos-ble\MaxObject.h" />
-    <ClInclude Include="..\..\src\macos-ble\SwitchString.h" />
+    <ClInclude Include="..\..\src\windows\MaxBleCentral.h" />
+    <ClInclude Include="..\..\src\windows\pch.h" />
+    <ClInclude Include="..\..\src\windows\WinBleCentral.hpp" />
+    <ClInclude Include="..\..\src\common\MaxObject.h" />
+    <ClInclude Include="..\..\src\common\SwitchString.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
