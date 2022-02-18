@@ -47,6 +47,16 @@ void bleCentralCGetDeviceList(MaxBleCentral* t)
     ((WinBleCentral*)t)->getFoundDeviceList();
 }
 
+const char* bleCentralCGetDeviceUUID(MaxBleCentral* t, int deviceIndex)
+{
+    return "";
+}
+int bleCentralCGetNumberOfDevices(MaxBleCentral* t)
+{
+    return 0;
+}
+
+
 void bleCentralCClearDiscovered(MaxBleCentral* t)
 {
     ((WinBleCentral*)t)->clearDicoveredPeripherals();
@@ -63,14 +73,46 @@ void bleCentralCSetReporting(MaxBleCentral* t, bool shouldReport)
 {
     ((WinBleCentral*)t)->setReporting(shouldReport);
 }
+
+void bleCentralCShouldKeepDeviceAtIndexAlive(MaxBleCentral* t, int deviceIndex, bool shouldKeepAlive) 
+{
+}
+void bleCentralCReadCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid, const char* suuid, const char* cuuid) 
+{
+}
+void bleCentralCReadCharacteristicWithDeviceAtIndex(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid) 
+{
+}
+void bleCentralCReadAllCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid) 
+{
+}
+void bleCentralCReadAllCharacteristicWithDeviceAtIndex(MaxBleCentral* t, int deviceIndex) 
+{
+}
+
+
 void bleCentralCSubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid)
 {
     ((WinBleCentral*)t)->subscribeToCharacteristic(cuuid, suuid, deviceIndex);
 }
+
+void bleCentralCSubscribeToCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid, const char* suuid, const char* cuuid)
+{
+
+}
+
+
 void bleCentralCUnsubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid)
 {
     ((WinBleCentral*)t);
 }
+
+void bleCentralCUnsubscribeToCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid, const char* suuid, const char* cuuid)
+{
+
+}
+
+
 void bleCentralCSetRSSIScanThreshold(MaxBleCentral* t, int rssiLimit)
 {
     ((WinBleCentral*)t)->setRssiSensitivity(abs(rssiLimit));
@@ -83,6 +125,12 @@ void bleCentralCScanForServices(MaxBleCentral* t, t_atom* argv, long argc)
 {
     ((WinBleCentral*)t)->scanForService(argv, argc);
 }
+
+void bleCentralCWriteToCharactaristic(MaxBleCentral* t, t_atom* argv, long argc)
+{
+
+}
+
 
 void bleCentralCBlacklistStalledDevices(MaxBleCentral* t)
 {
