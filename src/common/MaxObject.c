@@ -17,7 +17,7 @@ void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, co
     for (short i = 0; i < numBytes; i++)
         atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
     
-    outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 3, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->read_event_outlet1, 0L, numBytes + 3, maxObjectPtr->outputList);
 }
 
 void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
@@ -35,7 +35,7 @@ void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, cons
     for (short i = 0; i < numBytes; i++)
         atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
     
-    outlet_list(maxObjectPtr->list_outlet2, 0L, numBytes + 3, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->notify_event_outlet2, 0L, numBytes + 3, maxObjectPtr->outputList);
 }
 
 void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi)
@@ -44,13 +44,23 @@ void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index,
     atom_setsym (maxObjectPtr->outputList + 1, gensym(uuid));
     atom_setsym (maxObjectPtr->outputList + 2, gensym(name));
     atom_setlong(maxObjectPtr->outputList + 3, (t_atom_long) rssi);
-    outlet_list(maxObjectPtr->list_outlet3, 0L, 4, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->device_discovery_outlet3, 0L, 4, maxObjectPtr->outputList);
 }
+
+void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, bool connected)
+{
+    atom_setsym (maxObjectPtr->outputList + 0, gensym(( (connected) ? "connected" : "disconnected" )) );
+    atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)index);
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(uuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(name));
+    outlet_list(maxObjectPtr->device_discovery_outlet3, 0L, 4, maxObjectPtr->outputList);
+}
+
 
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi)
 {
     atom_setsym (maxObjectPtr->outputList,     gensym(uuid));
     atom_setsym (maxObjectPtr->outputList + 1, gensym("rssi"));
     atom_setlong(maxObjectPtr->outputList + 2, (t_atom_long) rssi);
-    outlet_list (maxObjectPtr->list_outlet1, 0L, 3, maxObjectPtr->outputList);
+    outlet_list (maxObjectPtr->read_event_outlet1, 0L, 3, maxObjectPtr->outputList);
 }

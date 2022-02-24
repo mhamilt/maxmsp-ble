@@ -19,9 +19,11 @@ void* myExternalConstructor()
     bleCentralCSetMaxObjRef(maxObjectPtr->bleCentral, maxObjectPtr);
     maxObjectPtr->maxListSize = 100;
     
-    maxObjectPtr->list_outlet3 = listout(maxObjectPtr);
-    maxObjectPtr->list_outlet2 = listout(maxObjectPtr);
-    maxObjectPtr->list_outlet1 = listout(maxObjectPtr);
+    
+    maxObjectPtr->device_status_outlet4 = listout(maxObjectPtr);
+    maxObjectPtr->device_discovery_outlet3 = listout(maxObjectPtr);
+    maxObjectPtr->notify_event_outlet2 = listout(maxObjectPtr);
+    maxObjectPtr->read_event_outlet1 = listout(maxObjectPtr);
     
     atom_alloc_array(maxObjectPtr->maxListSize,
                      &maxObjectPtr->listSize,

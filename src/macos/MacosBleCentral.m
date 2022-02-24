@@ -29,6 +29,7 @@
         ignoreUnconnectable = NO;
         rssiSensitivity = 127;
         ignoreiPhone = NO;
+        noNameString = "<no name>";
     }
     return self;
 }
@@ -84,7 +85,7 @@
         outputFoundDeviceList(maxObjectRef,
                               deviceIndex,
                               aPeripheral.identifier.UUIDString.UTF8String,
-                              (aPeripheral.name) ? aPeripheral.name.UTF8String : "<no name>",
+                              (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
                               RSSI.intValue);
     }
 }
@@ -100,6 +101,12 @@
               aPeripheral.name.UTF8String
               : aPeripheral.identifier.UUIDString.UTF8String));
     }
+    
+    onDeviceConnectionStateChange(maxObjectRef,
+                                  [self getIndexOfDevice:aPeripheral],
+                                  aPeripheral.identifier.UUIDString.UTF8String,
+                                  (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
+                                  true);
     
     PeripheralConnectionManager* connectionManager = devices[aPeripheral.identifier.UUIDString];
     connectionManager.connectionAttempts = 0;
@@ -151,6 +158,12 @@
 didDisconnectPeripheral: (CBPeripheral *)aPeripheral
                   error: (NSError *)error
 {
+    onDeviceConnectionStateChange(maxObjectRef,
+                                  [self getIndexOfDevice:aPeripheral],
+                                  aPeripheral.identifier.UUIDString.UTF8String,
+                                  (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
+                                  false);
+    
     if(devices[aPeripheral.identifier.UUIDString].keepAlive)
         [central connectPeripheral:aPeripheral
                            options:nil];
@@ -375,7 +388,7 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
         outputFoundDeviceList(maxObjectRef,
                               index,
                               device.identifier.UUIDString.UTF8String,
-                              (device.name) ? device.name.UTF8String : "<no name>",
+                              (device.name) ? device.name.UTF8String : noNameString,
                               rssi.intValue);
     }
 }
@@ -1083,6 +1096,11 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         return nil;
     }
     return discoveredPeripherals[i];
+}
+
+-(NSUInteger)getIndexOfDevice: (CBPeripheral*) device
+{
+    return [discoveredPeripherals indexOfObject:device];
 }
 
 //------------------------------------------------------------------------------

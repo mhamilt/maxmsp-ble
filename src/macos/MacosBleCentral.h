@@ -34,6 +34,7 @@
     BOOL ignoreUnconnectable;
     BOOL ignoreiPhone;
     int rssiSensitivity;
+    const char* noNameString;
     NSDictionary* avertisementDataFunctions;
 }
 //------------------------------------------------------------------------------
@@ -47,7 +48,6 @@
 - (void)connectToDeviceWithName: (const char*) name;
 - (void)disconnectFromFoundDevice: (int) deviceIndex;
 - (void)disconnectFromDeviceWithUUID: (const char*) uuid;
-
 - (void)clearDicoveredPeripherals;
 - (void)blacklistDevicesStillConnecting;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;
