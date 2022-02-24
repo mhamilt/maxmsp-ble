@@ -30,4 +30,6 @@ void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index,
 ///
 void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, bool connected);
 ///
+void onCharacteristicDiscovery(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, const char* suuid, const char* cuuid);
+///
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi);
