@@ -48,12 +48,12 @@ void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index,
 }
 
 void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, bool connected)
-{
+{    
     atom_setsym (maxObjectPtr->outputList + 0, gensym(( (connected) ? "connected" : "disconnected" )) );
     atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)index);
     atom_setsym (maxObjectPtr->outputList + 2, gensym(uuid));
     atom_setsym (maxObjectPtr->outputList + 3, gensym(name));
-    outlet_list(maxObjectPtr->device_discovery_outlet4, 0L, 4, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->device_status_outlet3, 0L, 4, maxObjectPtr->outputList);
 }
 
 

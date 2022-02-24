@@ -87,8 +87,7 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }switchs_end
         }
         break;
-        cases("disconnect")
-        post("---------%d-------", argc);
+        cases("disconnect") 
         if (argc == 1)
         {
             switch (atom_gettype(argv))
