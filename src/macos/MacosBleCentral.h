@@ -45,6 +45,9 @@
 - (void)connectToFoundDevice: (int) deviceIndex;
 - (void)connectToDeviceWithUUID: (const char*) uuid;
 - (void)connectToDeviceWithName: (const char*) name;
+- (void)disconnectFromFoundDevice: (int) deviceIndex;
+- (void)disconnectFromDeviceWithUUID: (const char*) uuid;
+
 - (void)clearDicoveredPeripherals;
 - (void)blacklistDevicesStillConnecting;
 - (void)getRssiOfFoundDevice: (int) deviceIndex;

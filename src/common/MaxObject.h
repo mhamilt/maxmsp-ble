@@ -25,6 +25,6 @@ void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, co
 ///
 void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
 ///
-void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, int rssi);
+void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi);
 ///
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi);

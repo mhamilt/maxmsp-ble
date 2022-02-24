@@ -34,6 +34,16 @@ void bleCentralCConnectToDeviceWithName (MaxBleCentral *t, const char *name)
     [(__bridge MacosBleCentral *)t connectToDeviceWithName:name];
 }
 
+void bleCentralCDisconnectFromFoundDevice    (MaxBleCentral *t, int deviceIndex)
+{
+    [(__bridge MacosBleCentral *)t disconnectFromFoundDevice:deviceIndex];
+}
+void bleCentralCDisconnectFromDeviceWithUUID (MaxBleCentral *t, const char *uuid)
+{
+    [(__bridge MacosBleCentral *)t disconnectFromDeviceWithUUID:uuid];
+}
+
+
 void bleCentralCClearDiscovered (MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t clearDicoveredPeripherals];
@@ -191,7 +201,7 @@ void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc
     numBytes = 0;
     
     
-        
+    
     for (int i = 3; i < argc; i++)
     {
         if(atom_gettype(argv + i) == A_SYM)
@@ -229,7 +239,7 @@ void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc
             }
         }
     }
-
+    
     if(atom_gettype(argv) == A_SYM)
     {
         t_symbol* duuid = atom_getsym(argv);

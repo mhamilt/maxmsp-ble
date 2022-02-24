@@ -1,5 +1,5 @@
 /*
- * Max Ble: A macOS BLE
+ * max-ble: A MAXMSP BLE Object
  */
 //------------------------------------------------------------------------------
 #define MAXMSP
@@ -85,6 +85,21 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }switchs_end
         }
         break;
+        cases("diconnect")
+        if (argc == 1)
+        {
+            switch (atom_gettype(argv))
+            {
+                case A_LONG:
+                    bleCentralCDisconnectFromFoundDevice(maxObjectPtr->bleCentral,
+                                                         (int)atom_getlong(argv));
+                    break;
+                case A_SYM:
+                    bleCentralCDisconnectFromDeviceWithUUID(maxObjectPtr->bleCentral,
+                                                            atom_getsym(argv)->s_name);
+                    break;
+            }
+        }
         //----------------------------------------------------------------------
         cases("filter")
         if (argc >= 1)

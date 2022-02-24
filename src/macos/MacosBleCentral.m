@@ -83,7 +83,8 @@
         
         outputFoundDeviceList(maxObjectRef,
                               deviceIndex,
-                              (aPeripheral.name) ? aPeripheral.name.UTF8String : aPeripheral.identifier.UUIDString.UTF8String,
+                              aPeripheral.identifier.UUIDString.UTF8String,
+                              (aPeripheral.name) ? aPeripheral.name.UTF8String : "<no name>",
                               RSSI.intValue);
     }
 }
@@ -281,6 +282,31 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
 
 //------------------------------------------------------------------------------
 
+- (void)disconnectFromFoundDevice: (int) deviceIndex
+{
+    CBPeripheral* device = [self getDeviceAtIndex:deviceIndex];
+    if (device)
+        [manager cancelPeripheralConnection:device];
+}
+
+//------------------------------------------------------------------------------
+
+- (void)disconnectFromDeviceWithUUID:(const char *)duuid
+{
+    NSUUID* deviceUUID = [self getValidUUID: [[NSString alloc] initWithUTF8String:duuid]];
+    if(deviceUUID)
+    {
+        CBPeripheral* device = [self getPeriphralWithUUID: deviceUUID];
+        if (device)
+            [manager cancelPeripheralConnection:device];
+        else
+            post("Device %s not found", duuid);
+    }
+}
+
+
+//------------------------------------------------------------------------------
+
 - (void) clearDicoveredPeripherals
 {
     [servicesToScan removeAllObjects];
@@ -349,6 +375,7 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
         outputFoundDeviceList(maxObjectRef,
                               index,
                               device.identifier.UUIDString.UTF8String,
+                              (device.name) ? device.name.UTF8String : "<no name>",
                               rssi.intValue);
     }
 }
@@ -622,22 +649,22 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 /// @param device device to blacklist
 - (void)blacklistDevice: (CBPeripheral*) device
 {
-    [manager cancelPeripheralConnection:device];
-    NSUInteger index = [discoveredPeripherals indexOfObject:device];
-    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
-    [discoveredPeripherals removeObject:device];
-    [blacklistPeripherals addObject:device];
-    
-    for(CBPeripheral* device in discoveredPeripherals)
-    {
-        NSUInteger index = [discoveredPeripherals indexOfObject:device];
-        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
+//    [manager cancelPeripheralConnection:device];
+//    NSUInteger index = [discoveredPeripherals indexOfObject:device];
+//    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
+//    [discoveredPeripherals removeObject:device];
+//    [blacklistPeripherals addObject:device];
+//
+//    for(CBPeripheral* device in discoveredPeripherals)
+//    {
+//        NSUInteger index = [discoveredPeripherals indexOfObject:device];
+//        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
         
-        outputFoundDeviceList(maxObjectRef,
-                              index,
-                              device.identifier.UUIDString.UTF8String,
-                              rssi.intValue);
-    }
+//        outputFoundDeviceList(maxObjectRef,
+//                              index,
+//                              device.identifier.UUIDString.UTF8String,
+//                              rssi.intValue);
+//    }
 }
 
 //------------------------------------------------------------------------------
@@ -1071,4 +1098,5 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     return nil;
 }
 //------------------------------------------------------------------------------
+
 @end
