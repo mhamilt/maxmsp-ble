@@ -13,8 +13,8 @@ typedef struct _MaxExternalObject
     MacosBleCentralRef* bleCentral;
     void*   read_event_outlet1;
     void*   notify_event_outlet2;
-    void*   device_discovery_outlet3;
-    void*   device_status_outlet4;
+    void*   device_discovery_outlet4;
+    void*   device_status_outlet3;
     size_t  maxListSize;
     t_atom* outputList;
     long listSize;

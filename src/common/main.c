@@ -20,8 +20,8 @@ void* myExternalConstructor()
     maxObjectPtr->maxListSize = 100;
     
     
-    maxObjectPtr->device_status_outlet4 = listout(maxObjectPtr);
-    maxObjectPtr->device_discovery_outlet3 = listout(maxObjectPtr);
+    maxObjectPtr->device_discovery_outlet4 = listout(maxObjectPtr);
+    maxObjectPtr->device_status_outlet3 = listout(maxObjectPtr);
     maxObjectPtr->notify_event_outlet2 = listout(maxObjectPtr);
     maxObjectPtr->read_event_outlet1 = listout(maxObjectPtr);
     
@@ -87,7 +87,8 @@ void onAnyMessage(MaxExternalObject* maxObjectPtr, t_symbol *s, long argc, t_ato
             }switchs_end
         }
         break;
-        cases("diconnect")
+        cases("disconnect")
+        post("---------%d-------", argc);
         if (argc == 1)
         {
             switch (atom_gettype(argv))
@@ -316,6 +317,9 @@ void inletAssistant(MaxExternalObject* maxObjectPtr,
                     sprintf(destination, "list: out on notification recieved from subscribed device");
                     break;
                 case 2:
+                    sprintf(destination, "list: output on device connection status change");
+                    break;
+                case 3:
                     sprintf(destination, "list: output when new device found or on 'found' message");
                     break;
                 default:
