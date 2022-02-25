@@ -20,14 +20,23 @@
 
   <outletlist>
     <outlet id="0" type="list">
-      <digest>List Outlet: The found message will output a list of found device UUIDs and RSSIs in series. A connect message will output Service and Charachteristic UUIDs with raw bytes in series.</digest>
-      <description>List ID: The found message will output a list of found device UUIDs and RSSIs in series. A connect message will output Service and Charachteristic UUIDs with raw bytes in series.</description>
+      <digest>Read Outlet: The found message will output a list of found device UUIDs and RSSIs in series. A connect message will output Service and Charachteristic UUIDs with raw bytes in series.</digest>
+      <description>Read Outlet: The found message will output a list of found device UUIDs and RSSIs in series. A connect message will output Service and Charachteristic UUIDs with raw bytes in series.</description>
     </outlet>
     <outlet id="1" type="list">
       <digest>Notification outlet: Subscribed charateristics will output a list of Characteristic UUID and raw bytes on value change</digest>
       <description>Notification outlet: Subscribed charateristics will output a list of Characteristic UUID and raw bytes on value change</description>
     </outlet>
+    <outlet id="2" type="list">
+      <digest>Connection outlet: output on connection status change</digest>
+      <description>Connection outlet: This outlet will output on connection status change. Messages in the format "connected" or "disconnected" followed by "DeviceIndex UUID Name"</description>
+    </outlet>
+    <outlet id="3" type="list">
+      <digest>Discovery outlet: output on device discovery</digest>
+      <description>Discovery outlet: This outlet will output a message when a new device is discovered. Messages in the format "DeviceIndex UUID Name RSSI"</description>
+    </outlet>
   </outletlist>
+
   <methodlist>
     <method name="clear"><arglist/>
       <digest>clear the internal list of found devices.</digest>
@@ -46,6 +55,14 @@
         connect followed by name then a symbol will interpret the symbol as device name. This will connect to the first device in found devices matching the name.
       </description>
     </method>
+
+    <method name="disconnect"><arglist/>
+      <digest>Disconnect from device</digest>
+      <description>
+        Message format for disconnect is the same as <m>connect</m>
+      </description>
+    </method>
+
     <method name="filter"><arglist/>
       <digest>filter out devices during scanning
       </digest>
@@ -71,7 +88,7 @@
       </digest>
       <description>output, in series, the list of found devices and their RSSIs from outlet 3 and post this to the Max Console if reporting is on.</description>
     </method>
-    <method name="found"><arglist/>
+    <method name="keep-alive"><arglist/>
       <digest>"<m>keep-alive</m> device" will force a reconnect on the device if it disconnects
       </digest>
       <description>"<m>keep-alive</m> device" will force a reconnect on the device if it disconnects</description>

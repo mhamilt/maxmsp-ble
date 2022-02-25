@@ -28,6 +28,8 @@ void bleCentralCStopScan        (MaxBleCentral *t);
 void bleCentralCConnectToFoundDevice (MaxBleCentral *t, int deviceIndex);
 void bleCentralCConnectToDeviceWithUUID (MaxBleCentral *t, const char *uuid);
 void bleCentralCConnectToDeviceWithName (MaxBleCentral *t, const char *name);
+void bleCentralCDisconnectFromFoundDevice    (MaxBleCentral *t, int deviceIndex);
+void bleCentralCDisconnectFromDeviceWithUUID (MaxBleCentral *t, const char *uuid);
 void bleCentralCRelease         (MaxBleCentral *t);
 void bleCentralCSetMaxObjRef    (MaxBleCentral *t, MaxExternalObject *maxObjRef);
 void bleCentralCGetDeviceList   (MaxBleCentral *t);
