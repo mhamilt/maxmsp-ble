@@ -34,6 +34,10 @@ void WindowsBleCentral::subscribeToCharacteristic()
 {
 }
 
+void WindowsBleCentral::getFoundDevices()
+{
+}
+
 void WindowsBleCentral::clearDiscoveredDevices()
 {
 }
