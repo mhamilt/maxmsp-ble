@@ -16,6 +16,17 @@ std::string bytesToHexString(const uint8_t* v, const size_t s)
     return ss.str();
 }
 
+winrt::guid charUUIDToGUID(const char* uuid)
+{
+    std::string uuidString = uuid;
+    if (uuidString.length() == 4)
+    {
+        return GattCharacteristic::ConvertShortIdToUuid((uint16_t)std::stoul(uuidString, nullptr, 16));
+    }
+
+    std::wstring wuuid = std::wstring(uuidString.begin(), uuidString.end());
+    return winrt::guid(wuuid);
+}
 
 //--------------------------------------------------------------------------------------------
 WinBleCentral::WinBleCentral()
@@ -130,12 +141,116 @@ void WinBleCentral::subscribeToCharacteristic(const char* cuuid, const char* suu
 
 //--------------------------------------------------------------------------------------------
 
+void WinBleCentral::setDeviceShouldKeepAlive(int i, bool keepAlive)
+{
+
+}
+
+//--------------------------------------------------------------------------------------------
+
+
 void WinBleCentral::setMaxObjectRef(MaxExternalObject* extObjRef)
 {
     maxObjectRef = extObjRef;
 }
 
+void WinBleCentral::getValueOfCharacteristicOfServiceOfDeviceAtIndex(const char* cuuid, const char* suuid, int deviceIndex)
+{
+    winrt::guid charGuid = charUUIDToGUID(cuuid);
+    winrt::guid serviceGuid = charUUIDToGUID(suuid);
+    auto deviceAdvert = getDeviceAtIndex(deviceIndex);
+    if (deviceAdvert)
+    {
+        BluetoothLEDevice::FromBluetoothAddressAsync(deviceAdvert->BluetoothAddress()).Completed(
+            [=](IAsyncOperation<BluetoothLEDevice> sender, AsyncStatus status)
+            {
+
+               
+                if (auto device = sender.GetResults(); device && status == winrt::Windows::Foundation::AsyncStatus::Completed)
+                {
+                    
+                    this->forCharacteristicOfServiceOfDevicePerformCallback(charGuid,
+                        serviceGuid, 
+                        device, 
+                        [=](IAsyncOperation<GattCharacteristicsResult>sender, AsyncStatus status) 
+                        {
+                            if (auto result = sender.GetResults(); result)
+                            {
+                                this->didDiscoverCharacteristicsForService(result.Characteristics(), result.Status());
+                            }
+                        });
+                }
+                else
+                {
+                    this->didFailToConnectPeripheral();
+                }
+            });
+    }
+}
+
+
+void WinBleCentral::    (const char* cuuid, const char* suuid, int deviceIndex)
+{
+    
+    post("subscribe to %s", cuuid);
+    winrt::guid charGuid = charUUIDToGUID(cuuid);
+    winrt::guid serviceGuid = charUUIDToGUID(suuid);
+    auto deviceAdvert = getDeviceAtIndex(deviceIndex);
+
+    if (deviceAdvert)
+    {
+        post("device exists");
+        BluetoothLEDevice::FromBluetoothAddressAsync(deviceAdvert->BluetoothAddress()).Completed(
+            [=](IAsyncOperation<BluetoothLEDevice> sender, AsyncStatus status)
+            {
+                if (auto device = sender.GetResults(); device && status == winrt::Windows::Foundation::AsyncStatus::Completed)
+                {
+                    post("device connected");
+                    this->forCharacteristicOfServiceOfDevicePerformCallback(charGuid,
+                        serviceGuid,
+                        device,
+                        [=](IAsyncOperation<GattCharacteristicsResult>sender, AsyncStatus status)
+                        {
+                            
+                            if (auto result = sender.GetResults(); result)
+                            {
+                                post("got characteristics");
+                                for (auto& character : result.Characteristics())
+                                {
+                                    post("%s", winrtGuidToString(character.Uuid()).c_str() );
+                                    this->subscriptionHandler = TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs>([this](GattCharacteristic characteristic, GattValueChangedEventArgs args)
+                                        {
+                                            post("subscribe");
+                                        });
+                                    character.ValueChanged(this->subscriptionHandler);
+                                    character.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue::Notify).Completed(
+                                        [this, &character](IAsyncOperation<GattCommunicationStatus>sender, AsyncStatus status)
+                                        {
+                                            post("write config sync status %d: %d", (int)status, (int)sender.GetResults());
+                                            
+                                        });                                    
+                                }                                
+                            }
+                        });
+                }
+                else
+                {
+                    this->didFailToConnectPeripheral();
+                }
+            });
+    }
+}
 //--------------------------------------------------------------------------------------------
+
+BluetoothLEAdvertisementReceivedEventArgs* WinBleCentral::getDeviceAtIndex(int i)
+{
+    if (i < discoveredPeripherals.size())
+        return &discoveredPeripherals[i];
+    
+    post("Device Index %d is out of range", i);
+    return nullptr;
+}
+
 std::string WinBleCentral::winrtGuidToString(winrt::guid uuid)
 {
     char uuidCStr[34];
@@ -231,7 +346,7 @@ void WinBleCentral::discoverCharacteristicsForService(GattDeviceService service)
         });
 }
 
-void WinBleCentral::readValueForCharacteristic(GattCharacteristic characteristic)
+void WinBleCentral::readValueForCharacteristic(GattCharacteristic& characteristic)
 {
     characteristic.ReadValueAsync().Completed(
         [this, characteristic](IAsyncOperation<GattReadResult> sender, AsyncStatus status)
@@ -277,7 +392,19 @@ void WinBleCentral::didCancelScanning()
 
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didConnectPeripheral(BluetoothLEDevice& device)
-{
+{    
+    device.ConnectionStatusChanged([this](BluetoothLEDevice device, IInspectable const&sender) 
+        {
+            switch (device.ConnectionStatus())
+            {
+            case BluetoothConnectionStatus::Connected:
+                break;
+            case BluetoothConnectionStatus::Disconnected:
+                // attempt reconnect if keep alive
+                break;
+            }
+        });
+
     if (shouldReport) object_post((t_object*)maxObjectRef, "Connected to: %s <%ls>", bluetoothAddressToString(device.BluetoothAddress()).c_str(), device.Name().c_str());
     discoverServices(device);
 }
@@ -396,6 +523,29 @@ bool WinBleCentral::isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs ev
     return (discoveredPeripheralUUIDs.empty() || !(std::find(discoveredPeripheralUUIDs.begin(), discoveredPeripheralUUIDs.end(), eventArgs.BluetoothAddress()) != discoveredPeripheralUUIDs.end()));
 }
 
+
+void WinBleCentral::forCharacteristicOfServiceOfDevicePerformCallback(winrt::guid charGUID, winrt::guid serviceGUID, BluetoothLEDevice& device, std::function<void(IAsyncOperation<GattCharacteristicsResult>, AsyncStatus)>callback)
+{
+    device.GetGattServicesForUuidAsync(serviceGUID).Completed(
+        [&](IAsyncOperation<GattDeviceServicesResult>sender, AsyncStatus status)
+        {
+            if (GattDeviceServicesResult result = sender.get(); result && status == winrt::Windows::Foundation::AsyncStatus::Completed)
+            {
+                post("got services");
+                for (auto& service : result.Services())
+                {
+                    service.GetCharacteristicsForUuidAsync(charGUID).Completed(
+                        callback
+                    );                    
+                }
+            }
+            else
+            {
+                this->didFailToDiscoverServices();
+            }
+        }
+    );
+}
 //--------------------------------------------------------------------------------------------
 void WinBleCentral::didDisconnectPeripheral() {}
 

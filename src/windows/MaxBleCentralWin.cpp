@@ -76,24 +76,26 @@ void bleCentralCSetReporting(MaxBleCentral* t, bool shouldReport)
 
 void bleCentralCShouldKeepDeviceAtIndexAlive(MaxBleCentral* t, int deviceIndex, bool shouldKeepAlive) 
 {
+    ((WinBleCentral*)t)->setDeviceShouldKeepAlive(deviceIndex, shouldKeepAlive);
 }
 void bleCentralCReadCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid, const char* suuid, const char* cuuid) 
 {
 }
 void bleCentralCReadCharacteristicWithDeviceAtIndex(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid) 
 {
+    ((WinBleCentral*)t)->getValueOfCharacteristicOfServiceOfDeviceAtIndex(cuuid, suuid, deviceIndex);
 }
 void bleCentralCReadAllCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid) 
 {
+    ((WinBleCentral*)t)->connectToDeviceWithUUID(duuid);
 }
 void bleCentralCReadAllCharacteristicWithDeviceAtIndex(MaxBleCentral* t, int deviceIndex) 
 {
 }
 
-
 void bleCentralCSubscribeToCharacteristic(MaxBleCentral* t, int deviceIndex, const char* suuid, const char* cuuid)
 {
-    ((WinBleCentral*)t)->subscribeToCharacteristic(cuuid, suuid, deviceIndex);
+    ((WinBleCentral*)t)->subscribeToCharacteristicOfServiceOfDeviceAtIndex(cuuid, suuid, deviceIndex);
 }
 
 void bleCentralCSubscribeToCharacteristicWithDeviceUUID(MaxBleCentral* t, const char* duuid, const char* suuid, const char* cuuid)

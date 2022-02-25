@@ -2,9 +2,11 @@
 // Windows BLE Interface
 #include "pch.h"
 #include <iostream>
+
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <functional>
 #include "ext.h"
 #include "..\common\MaxObject.h"
 
@@ -63,6 +65,15 @@ public:
     /// @brief
     /// @param rssiSensitivity
     void setRssiSensitivity(int rssiSensitivity);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="charGUID"></param>
+    /// <param name="serviceGUID"></param>
+    /// <param name="function"></param>
+    /// <param name=""></param>
+    void forCharacteristicOfServiceOfDevicePerformCallback(winrt::guid charGUID, winrt::guid serviceGUID, BluetoothLEDevice& device, std::function<void(IAsyncOperation<GattCharacteristicsResult>, AsyncStatus)>);
+
     /// @brief
     /// @param shouldIgnore
     void setIgnoreiPhone(bool shouldIgnore);
@@ -71,10 +82,22 @@ public:
     void subscribeToCharacteristic(const char* cuuid,
         const char* suuid,
         int deviceIndex);
+    /// 
+    /// 
+    /// @brief
+    /// 
+    void setDeviceShouldKeepAlive(int index, bool shouldKeepAlive);
     /// @brief
     /// @param extObjRef
     void setMaxObjectRef(MaxExternalObject* extObjRef);
+
+    void getValueOfCharacteristicOfServiceOfDeviceAtIndex(const char* cuuid, const char* duuid, int deviceIndex);
+    void subscribeToCharacteristicOfServiceOfDeviceAtIndex(const char* cuuid, const char* suuid, int deviceIndex);
+
 private:
+
+    BluetoothLEAdvertisementReceivedEventArgs* getDeviceAtIndex(int i);
+
     /// @brief
     /// @param
     /// @return
@@ -92,7 +115,7 @@ private:
     void discoverCharacteristicsForService(GattDeviceService service);
     /// @brief
     /// @param characteristic
-    void readValueForCharacteristic(GattCharacteristic characteristic);
+    void readValueForCharacteristic(GattCharacteristic& characteristic);
     /// @brief
     /// @param watcher
     /// @param eventArgs
@@ -143,6 +166,8 @@ private:
     /// @return
     bool isPeripheralNew(BluetoothLEAdvertisementReceivedEventArgs);
 
+    //void readServiceCallback(IAsyncOperation<GattDeviceServicesResult>sender, AsyncStatus status);
+    //void readCharacteristicCallback(IAsyncOperation<GattCharacteristicsResult>sender, AsyncStatus status);
     /// @brief
     /// @param maxObjectPtr
     /// @param index
@@ -155,6 +180,7 @@ private:
     /// @param  reference to stream to be printed
     /// @param  GattCommunicationStatus from Async operation
     void appendGattCommunicationStatus(std::stringstream&, GattCommunicationStatus);
+
 private:
     /// @brief
     std::vector<uint64_t> discoveredPeripheralUUIDs;
