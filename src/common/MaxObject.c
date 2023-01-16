@@ -4,27 +4,10 @@
 
 void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
 {
-    atom_setsym(maxObjectPtr->outputList + 0, gensym(duuid));
-    atom_setsym(maxObjectPtr->outputList + 1, gensym(suuid));
-    atom_setsym(maxObjectPtr->outputList + 2, gensym(cuuid));
-    
-    if (numBytes > (maxObjectPtr->maxListSize - 2))
-    {
-        numBytes = maxObjectPtr->maxListSize - 2;
-        post("Bytes Truncated\n");
-    }
-    
-    for (short i = 0; i < numBytes; i++)
-        atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
-    
-    outlet_list(maxObjectPtr->read_event_outlet1, 0L, numBytes + 3, maxObjectPtr->outputList);
-}
-
-void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
-{
-    atom_setsym(maxObjectPtr->outputList + 0, gensym(duuid));
-    atom_setsym(maxObjectPtr->outputList + 1, gensym(suuid));
-    atom_setsym(maxObjectPtr->outputList + 2, gensym(cuuid));
+    atom_setsym (maxObjectPtr->outputList + 0, gensym("read"));
+    atom_setsym (maxObjectPtr->outputList + 1, gensym(duuid));
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(suuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(cuuid));
     
     if (numBytes > (maxObjectPtr->maxListSize - 1))
     {
@@ -33,18 +16,19 @@ void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, cons
     }
     
     for (short i = 0; i < numBytes; i++)
-        atom_setlong(maxObjectPtr->outputList + 3 + i, (t_atom_long) byteArray[i]);
+        atom_setlong(maxObjectPtr->outputList + 4 + i, (t_atom_long) byteArray[i]);
     
-    outlet_list(maxObjectPtr->notify_event_outlet2, 0L, numBytes + 3, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, numBytes + 4, maxObjectPtr->outputList);
 }
 
-void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi)
+void onCharacteristicWrite(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid)
 {
-    atom_setlong(maxObjectPtr->outputList + 0, (t_atom_long)index);
-    atom_setsym (maxObjectPtr->outputList + 1, gensym(uuid));
-    atom_setsym (maxObjectPtr->outputList + 2, gensym(name));
-    atom_setlong(maxObjectPtr->outputList + 3, (t_atom_long) rssi);
-    outlet_list(maxObjectPtr->device_discovery_outlet4, 0L, 4, maxObjectPtr->outputList);
+    atom_setsym (maxObjectPtr->outputList + 0, gensym("write"));
+    atom_setsym (maxObjectPtr->outputList + 1, gensym(duuid));
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(suuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(cuuid));
+    
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, 4, maxObjectPtr->outputList);
 }
 
 void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, bool connected)
@@ -53,14 +37,52 @@ void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned lon
     atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)index);
     atom_setsym (maxObjectPtr->outputList + 2, gensym(uuid));
     atom_setsym (maxObjectPtr->outputList + 3, gensym(name));
-    outlet_list(maxObjectPtr->device_status_outlet3, 0L, 4, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, 4, maxObjectPtr->outputList);
 }
 
+void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
+{
+    atom_setsym (maxObjectPtr->outputList + 0, gensym("notifying"));
+    atom_setsym (maxObjectPtr->outputList + 1, gensym(duuid));
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(suuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(cuuid));
+    
+    if (numBytes > (maxObjectPtr->maxListSize - 1))
+    {
+        numBytes = maxObjectPtr->maxListSize - 1;
+        post("Bytes Truncated\n");
+    }
+    
+    for (short i = 0; i < numBytes; i++)
+        atom_setlong(maxObjectPtr->outputList + 4 + i, (t_atom_long) byteArray[i]);
+    
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, numBytes + 4, maxObjectPtr->outputList);
+}
 
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi)
 {
-    atom_setsym (maxObjectPtr->outputList + 0, gensym(uuid));
-    atom_setsym (maxObjectPtr->outputList + 1, gensym("rssi"));
+    atom_setsym (maxObjectPtr->outputList + 0, gensym("rssi"));
+    atom_setsym (maxObjectPtr->outputList + 1, gensym(uuid));
     atom_setlong(maxObjectPtr->outputList + 2, (t_atom_long) rssi);
-    outlet_list (maxObjectPtr->read_event_outlet1, 0L, 3, maxObjectPtr->outputList);
+    outlet_list (maxObjectPtr->ble_event_outlet, 0L, 3, maxObjectPtr->outputList);
+}
+
+void onDeviceFound(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi)
+{
+    atom_setsym (maxObjectPtr->outputList + 0, gensym("found"));
+    atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)index);
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(uuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(name));
+    atom_setlong(maxObjectPtr->outputList + 4, (t_atom_long) rssi);
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, 5, maxObjectPtr->outputList);
+}
+
+
+void onSubscriptionChange(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, bool subscribed)
+{
+    atom_setsym (maxObjectPtr->outputList + 0, gensym(( (subscribed) ? "subscribed" : "unsubscribed" )) );
+    atom_setsym (maxObjectPtr->outputList + 1, gensym(duuid));
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(suuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(cuuid));
+    outlet_list(maxObjectPtr->ble_event_outlet, 0L, 4, maxObjectPtr->outputList);
 }

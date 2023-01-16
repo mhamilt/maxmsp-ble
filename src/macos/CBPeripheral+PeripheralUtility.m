@@ -11,7 +11,7 @@
 - (CBService *)getServiceWithUUID:(CBUUID *)serviceUUID
 {
     for (CBService* service in [self services])
-    {
+    {     
         if ([service.UUID isEqual:serviceUUID])
             return service;
     }

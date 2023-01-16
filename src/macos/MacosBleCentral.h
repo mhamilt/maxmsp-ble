@@ -36,6 +36,7 @@
     int rssiSensitivity;
     const char* noNameString;
     NSDictionary* avertisementDataFunctions;
+    NSString* currentDeviceUUID;
 }
 //------------------------------------------------------------------------------
 - (instancetype)init;
@@ -93,5 +94,6 @@
                 OfFoundDevice: (int)    deviceIndex
                     withBytes: (void*)  values
                      ofLength: (size_t) numBytes;
+- (void)printTaskQueue;
 //------------------------------------------------------------------------------
 @end

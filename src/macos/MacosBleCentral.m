@@ -82,11 +82,11 @@
         
         [orderedDeviceDict addObject:devices[aPeripheral.identifier.UUIDString]];
         
-        outputFoundDeviceList(maxObjectRef,
-                              deviceIndex,
-                              aPeripheral.identifier.UUIDString.UTF8String,
-                              (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
-                              RSSI.intValue);
+        onDeviceFound(maxObjectRef,
+                      deviceIndex,
+                      aPeripheral.identifier.UUIDString.UTF8String,
+                      (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
+                      RSSI.intValue);
     }
 }
 
@@ -110,37 +110,6 @@
     
     PeripheralConnectionManager* connectionManager = devices[aPeripheral.identifier.UUIDString];
     connectionManager.connectionAttempts = 0;
-    
-    if (connectionManager.tasks.count)
-    {
-        for (PeripheralTask* task in connectionManager.tasks)
-        {
-            switch (task.type)
-            {
-                case BLEPeripheralRead:
-                    if(task.service && task.characteristic)
-                       [self readCharacteristic:task.characteristic.UUIDString.UTF8String
-                                      OfService:task.service.UUIDString.UTF8String
-                               ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String];
-                    else
-                        [self readAllCharacteristicsOfDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String];
-                    break;
-                case BLEPeripheralSubscribe:
-                    [self subscribeToCharacteristic:task.characteristic.UUIDString.UTF8String
-                                          OfService:task.service.UUIDString.UTF8String
-                                   ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String
-                                    shouldSubscribe:YES];
-                    break;
-                case BLEPeripheralWrite:
-                    [self writeToCharacteristic:task.characteristic
-                                      OfService:task.service
-                                  OfFoundDevice:aPeripheral
-                                       withData:task.dataToWrite];
-                    break;
-            }
-            [connectionManager.tasks removeObject:task];
-        }
-    }
     
     [aPeripheral setDelegate:self];
     [aPeripheral discoverServices:nil];
@@ -385,11 +354,11 @@ didFailToConnectPeripheral:(CBPeripheral *)aPeripheral
                  device.name.UTF8String,
                  rssi.intValue);
         
-        outputFoundDeviceList(maxObjectRef,
-                              index,
-                              device.identifier.UUIDString.UTF8String,
-                              (device.name) ? device.name.UTF8String : noNameString,
-                              rssi.intValue);
+        onDeviceFound(maxObjectRef,
+                      index,
+                      device.identifier.UUIDString.UTF8String,
+                      (device.name) ? device.name.UTF8String : noNameString,
+                      rssi.intValue);
     }
 }
 
@@ -457,6 +426,9 @@ didDiscoverServices: (NSError *)error
 - (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service
               error: (NSError *)error
 {
+    
+    
+    
     if(error || (service.characteristics.count == 0))
     {
         post((error) ? error.localizedDescription.UTF8String : "No matching characteristics found");
@@ -560,6 +532,8 @@ didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic
 /// @param characteristic <#characteristic description#>
 - (void) postCharacteristicDescription: (CBCharacteristic *)characteristic
 {
+    [self checkTaskQueueForCharacteristic:characteristic];
+    
     NSString* valueString = nil;
     if (characteristic.value)
     {
@@ -602,7 +576,18 @@ didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic
               error:(NSError *)error
 {
     if (error)
+    {
         post(error.localizedDescription.UTF8String);
+    }
+    else
+    {
+        onSubscriptionChange(maxObjectRef,
+                             peripheral.identifier.UUIDString.UTF8String,
+                             characteristic.service.UUID.UUIDString.UTF8String,
+                             characteristic.UUID.UUIDString.UTF8String,
+                             characteristic.isNotifying);
+        
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -662,22 +647,22 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 /// @param device device to blacklist
 - (void)blacklistDevice: (CBPeripheral*) device
 {
-//    [manager cancelPeripheralConnection:device];
-//    NSUInteger index = [discoveredPeripherals indexOfObject:device];
-//    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
-//    [discoveredPeripherals removeObject:device];
-//    [blacklistPeripherals addObject:device];
-//
-//    for(CBPeripheral* device in discoveredPeripherals)
-//    {
-//        NSUInteger index = [discoveredPeripherals indexOfObject:device];
-//        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
-        
-//        outputFoundDeviceList(maxObjectRef,
-//                              index,
-//                              device.identifier.UUIDString.UTF8String,
-//                              rssi.intValue);
-//    }
+    //    [manager cancelPeripheralConnection:device];
+    //    NSUInteger index = [discoveredPeripherals indexOfObject:device];
+    //    [discoveredPeripheralsRSSIs removeObjectAtIndex:index];
+    //    [discoveredPeripherals removeObject:device];
+    //    [blacklistPeripherals addObject:device];
+    //
+    //    for(CBPeripheral* device in discoveredPeripherals)
+    //    {
+    //        NSUInteger index = [discoveredPeripherals indexOfObject:device];
+    //        NSNumber*  rssi  = discoveredPeripheralsRSSIs[index];
+    
+    //        onDeviceFound(maxObjectRef,
+    //                              index,
+    //                              device.identifier.UUIDString.UTF8String,
+    //                              rssi.intValue);
+    //    }
 }
 
 //------------------------------------------------------------------------------
@@ -799,12 +784,12 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                performBlock:^(CBUUID *charUUID, CBUUID *serviceUUID, CBPeripheral *device)
      {
         if (device.state != CBPeripheralStateConnected) {
-            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
-            
-            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
-                                                                      serviceCBUUID:serviceUUID
-                                                               characteristicCBUUID:charUUID
-                                                                            andData:nil]];
+            //            PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
+            //            self->devices[device.identifier.UUIDString];
+            //            [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralRead
+            //                                                                      serviceCBUUID:serviceUUID
+            //                                                               characteristicCBUUID:charUUID
+            //                                                                            andData:nil]];
             if (device.state != CBPeripheralStateConnecting)
                 [self->manager connectPeripheral:device options:nil];
         }
@@ -816,7 +801,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                 [device readValueForCharacteristic:characteristic];
         }
     }
-    ];
+     ];
 }
 
 //------------------------------------------------------------------------------
@@ -915,11 +900,12 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
                                                               forServiceWithUUID:serviceUUID];
             if(characteristic)
             {
-                post("%s %s: %s\n",
-                     (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
-                     serviceUUID.UUIDString.UTF8String,
-                     charUUID.UUIDString.UTF8String);
-                
+                if (self->shouldReport) {
+                    post("%s %s: %s\n",
+                         (shouldSubscribe) ? "Subscribe to" : "Unsubscribe from",
+                         serviceUUID.UUIDString.UTF8String,
+                         charUUID.UUIDString.UTF8String);
+                }
                 [device setNotifyValue:shouldSubscribe
                      forCharacteristic:characteristic];
             }
@@ -952,7 +938,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
         else
         {
             CBCharacteristic* characteristic = [device getCharacteristicWithUUID:charUUID
-                                                              forServiceWithUUID:serviceUUID];            
+                                                              forServiceWithUUID:serviceUUID];
             if(characteristic)
             {
                 post("%s %s: %s\n",
@@ -1018,13 +1004,15 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
      {
         if (device.state != CBPeripheralStateConnected) {
             PeripheralConnectionManager* connectionManager = self->devices[device.identifier.UUIDString];
-            
+            self->currentDeviceUUID = device.identifier.UUIDString;
             [connectionManager.tasks addObject:[[PeripheralTask alloc] initWithType:BLEPeripheralWrite
                                                                       serviceCBUUID:serviceUUID
                                                                characteristicCBUUID:charUUID
                                                                             andData:dataToWrite]];
-            if (device.state != CBPeripheralStateConnecting)
-                [self->manager connectPeripheral:device options:nil];
+            //            if (device.state != CBPeripheralStateConnecting)
+            //            {
+            //                [self->manager connectPeripheral:device options:nil];
+            //            }
         }
         else
         {
@@ -1082,7 +1070,7 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
     } @catch (NSException *exception) {
         post("%s is not a valid UUID", UUIDString.UTF8String);
     }
-
+    
     return validCBUUID;
 }
 
@@ -1117,4 +1105,50 @@ didWriteValueForCharacteristic:(CBCharacteristic *)characteristic
 }
 //------------------------------------------------------------------------------
 
+-(void) printTaskQueue
+{
+    post("%s", self->currentDeviceUUID.UTF8String);
+    
+    if (currentDeviceUUID)
+    {
+        PeripheralConnectionManager* connectionManager = self->devices[currentDeviceUUID];
+        post("Tasks: %d", connectionManager.tasks.count);
+    }
+}
+
+-(void) checkTaskQueueForCharacteristic: (CBCharacteristic*) characteristic
+{
+    PeripheralConnectionManager* connectionManager = devices[characteristic.service.peripheral.identifier.UUIDString];
+    if(connectionManager.tasks.count) // if D UUID queue is non-zero
+    {
+        CBPeripheral* aPeripheral = characteristic.service.peripheral;
+        for (PeripheralTask* task in connectionManager.tasks)
+        {
+            if ([characteristic.service.UUID isEqual:task.service] && [characteristic.UUID isEqual:task.characteristic])
+            {
+                switch (task.type)
+                {
+                    case BLEPeripheralRead:
+                        [self readCharacteristic:task.characteristic.UUIDString.UTF8String
+                                       OfService:task.service.UUIDString.UTF8String
+                                ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String];
+                        break;
+                    case BLEPeripheralSubscribe:
+                        [self subscribeToCharacteristic:task.characteristic.UUIDString.UTF8String
+                                              OfService:task.service.UUIDString.UTF8String
+                                       ofDeviceWithUUID:aPeripheral.identifier.UUIDString.UTF8String
+                                        shouldSubscribe:YES];
+                        break;
+                    case BLEPeripheralWrite:
+                        [self writeToCharacteristic:task.characteristic
+                                          OfService:task.service
+                                      OfFoundDevice:aPeripheral
+                                           withData:task.dataToWrite];
+                        break;
+                }
+                [connectionManager.tasks removeObject:task];
+            }
+        }
+    }
+}
 @end

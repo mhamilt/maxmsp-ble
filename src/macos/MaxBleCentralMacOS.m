@@ -168,75 +168,56 @@ void bleCentralCScanForServices (MaxBleCentral *t, t_atom* argv, long argc)
     [(__bridge MacosBleCentral *)t scanForService:argv count:argc];
 }
 
-void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc)
+void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc, void* writeBuffer)
 {
     const char* suuid = atom_getsym(argv + 1)->s_name;
     const char* cuuid = atom_getsym(argv + 2)->s_name;
     
     size_t numBytes = 0;
+    void* bytes = writeBuffer;
     
     for (int i = 3; i < argc; i++)
     {
         switch (atom_gettype(argv + i)) {
             case A_SYM:
+            {
+                memcpy((void*)(bytes + numBytes),
+                       atom_getsym(argv + i)->s_name,
+                       strlen(atom_getsym(argv + i)->s_name));
                 numBytes += strlen(atom_getsym(argv + i)->s_name);
                 break;
+            }
             case A_LONG:
+            {
                 if(!(atom_getlong(argv + i) >> 8))
+                {
+                    uint8_t value = (uint8_t)atom_getlong(argv + i);
+                    memcpy((void*)(bytes + numBytes), &value, sizeof(uint8_t));
                     numBytes += sizeof(uint8_t);
+                }
                 else if(!(atom_getlong(argv + i) >> 16))
+                {
+                    int16_t value = (int16_t)atom_getlong(argv + i);
+                    memcpy((void*)(bytes + numBytes), &value, sizeof(int16_t));
                     numBytes += sizeof(int16_t);
+                }
                 else
+                {
+                    int value = (int)atom_getlong(argv + i);
+                    memcpy((void*)(bytes + numBytes), &value, sizeof(int));
                     numBytes += sizeof(int);
+                }
                 break;
+            }
             case A_FLOAT:
+            {
+                float floatValue = atom_getfloat(argv + i);
+                memcpy((void*)(bytes + numBytes), &floatValue, sizeof(float));
                 numBytes += sizeof(float);
                 break;
+            }
             default:
                 break;
-        }
-    }
-    
-    void* bytes = malloc(numBytes);
-    numBytes = 0;
-    
-    
-    
-    for (int i = 3; i < argc; i++)
-    {
-        if(atom_gettype(argv + i) == A_SYM)
-        {
-            memcpy((void*)(bytes + numBytes),
-                   atom_getsym(argv + i)->s_name,
-                   strlen(atom_getsym(argv + i)->s_name));
-            numBytes += strlen(atom_getsym(argv + i)->s_name);
-        }
-        else if(atom_gettype(argv + i) == A_FLOAT)
-        {
-            float floatValue = atom_getfloat(argv + i);
-            memcpy((void*)(bytes + numBytes), &floatValue, sizeof(float));
-            numBytes += sizeof(float);
-        }
-        else if(atom_gettype(argv + i) == A_LONG)
-        {
-            if(!(atom_getlong(argv + i) >> 8))
-            {
-                uint8_t value = (uint8_t)atom_getlong(argv + i);
-                memcpy((void*)(bytes + numBytes), &value, sizeof(uint8_t));
-                numBytes += sizeof(uint8_t);
-            }
-            else if(!(atom_getlong(argv + i) >> 16))
-            {
-                int16_t value = (int16_t)atom_getlong(argv + i);
-                memcpy((void*)(bytes + numBytes), &value, sizeof(int16_t));
-                numBytes += sizeof(int16_t);
-            }
-            else
-            {
-                int value = (int)atom_getlong(argv + i);
-                memcpy((void*)(bytes + numBytes), &value, sizeof(int));
-                numBytes += sizeof(int);
-            }
         }
     }
     
@@ -260,10 +241,15 @@ void bleCentralCWriteToCharactaristic (MaxBleCentral *t, t_atom* argv, long argc
                                                     withBytes: bytes
                                                      ofLength: numBytes];
     }
-    free(bytes);
 }
 
 void bleCentralCBlacklistStalledDevices (MaxBleCentral *t)
 {
     [(__bridge MacosBleCentral *)t blacklistDevicesStillConnecting];
+}
+
+
+void bleCentralCPrintTaskQueue (MaxBleCentral *t)
+{
+    [(__bridge MacosBleCentral *)t printTaskQueue];
 }

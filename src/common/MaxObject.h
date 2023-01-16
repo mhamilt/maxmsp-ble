@@ -13,10 +13,7 @@ typedef struct MaxExternalObject
     t_pxobject x_obj;
     t_symbol*  x_arrayname;
     MaxBleCentralRef* bleCentral;
-    void*   read_event_outlet1;
-    void*   notify_event_outlet2;
-    void*   device_discovery_outlet4;
-    void*   device_status_outlet3;
+    void*   ble_event_outlet;
     size_t  maxListSize;
     t_atom* outputList;
     long listSize;
@@ -27,10 +24,16 @@ typedef struct MaxExternalObject
 ///
 void onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
 ///
-void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
-///
-void outputFoundDeviceList(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi);
+void onCharacteristicWrite(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid);
 ///
 void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, bool connected);
 ///
+void onError(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, const char* error);
+///
+void onNotificationRead(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes);
+///
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi);
+///
+void onSubscriptionChange(MaxExternalObject* maxObjectPtr, const char* duuid, const char* suuid, const char* cuuid, bool subscribed);
+///
+void onDeviceFound(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, int rssi);
