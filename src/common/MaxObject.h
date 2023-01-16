@@ -5,12 +5,14 @@
 #include "z_dsp.h"
 #include "buffer.h"
 //------------------------------------------------------------------------------
-typedef void MacosBleCentralRef;
-typedef struct _MaxExternalObject
+#define MAXBLEWRITEBUFFERSIZE 512
+#define MAXBLELISTSIZE 512
+typedef void MaxBleCentralRef;
+typedef struct MaxExternalObject
 {
     t_pxobject x_obj;
     t_symbol*  x_arrayname;
-    MacosBleCentralRef* bleCentral;
+    MaxBleCentralRef* bleCentral;
     void*   read_event_outlet1;
     void*   notify_event_outlet2;
     void*   device_discovery_outlet4;
@@ -19,6 +21,7 @@ typedef struct _MaxExternalObject
     t_atom* outputList;
     long listSize;
     char listAllocSuccess;
+    char writeBuffer[MAXBLEWRITEBUFFERSIZE];
 } MaxExternalObject;
 
 ///

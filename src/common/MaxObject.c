@@ -59,7 +59,7 @@ void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned lon
 
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi)
 {
-    atom_setsym (maxObjectPtr->outputList,     gensym(uuid));
+    atom_setsym (maxObjectPtr->outputList + 0, gensym(uuid));
     atom_setsym (maxObjectPtr->outputList + 1, gensym("rssi"));
     atom_setlong(maxObjectPtr->outputList + 2, (t_atom_long) rssi);
     outlet_list (maxObjectPtr->read_event_outlet1, 0L, 3, maxObjectPtr->outputList);
