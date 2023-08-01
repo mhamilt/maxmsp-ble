@@ -14,13 +14,13 @@ PRODUCT_VERSION = 1.0.0
 PRODUCT_BUNDLE_IDENTIFIER = com.cycling74.$(PRODUCT_NAME)
 ARCHS = $(ARCHS_STANDARD)
 
-// Paths
+/// Paths
 C74SUPPORT = max-sdk-base/c74support
 HEADER_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
 FRAMEWORK_SEARCH_PATHS = "$(C74SUPPORT)/max-includes" "$(C74SUPPORT)/msp-includes" "$(C74SUPPORT)/jit-includes"
-DSTROOT = max-package/max-ble/externals/
+
 // (This next path is relative to DSTROOT)
-INSTALL_PATH = /
+INSTALL_PATH = max-package/max-ble/externals/
 
 // Special Files
 GCC_PREFIX_HEADER = "$(C74SUPPORT)/max-includes/macho-prefix.pch"
