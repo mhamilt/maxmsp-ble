@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -138,11 +138,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 58F0AC01242E3110004FE028 /* Build configuration list for PBXNativeTarget "max-ble" */;
 			buildPhases = (
-				58F0ABFB242E3110004FE028 /* ShellScript */,
+				58F0ABFB242E3110004FE028 /* Check Max SDK Script */,
 				58F0ABFC242E3110004FE028 /* Sources */,
 				58F0AC00242E3110004FE028 /* Rez */,
 				58F0AC0C242E3238004FE028 /* Frameworks */,
-				58E51D25266AE63000497992 /* Post Script */,
+				58E51D25266AE63000497992 /* Install Script */,
 			);
 			buildRules = (
 			);
@@ -196,8 +196,9 @@
 /* End PBXRezBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		58E51D25266AE63000497992 /* Post Script */ = {
+		58E51D25266AE63000497992 /* Install Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -205,17 +206,18 @@
 			);
 			inputPaths = (
 			);
-			name = "Post Script";
+			name = "Install Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "codesign --force --deep -s \"Developer ID Application: Matthew Hamilton (XZ388CS8AV)\" \"${DSTROOT}/${WRAPPER_NAME}\"\ncd \"${DSTROOT}/../..\"\nzip -r max-ble.zip max-ble -x \"*.DS_Store\"\ncp -r \"max-ble\" \"${HOME}/Documents/Max 8/Packages/\"\n";
+			shellScript = "zip -r max-package/max-ble.zip max-package/max-ble -x \"*.DS_Store\"\ncp -r \"max-package/max-ble\" \"${HOME}/Documents/Max 8/Packages/\"\n";
 		};
-		58F0ABFB242E3110004FE028 /* ShellScript */ = {
+		58F0ABFB242E3110004FE028 /* Check Max SDK Script */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -223,9 +225,11 @@
 			);
 			inputPaths = (
 			);
+			name = "Check Max SDK Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(DERIVED_FILE_DIR)/newOutputFile",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -330,7 +334,7 @@
 			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
@@ -362,7 +366,7 @@
 					JitterAPI,
 					"$(C74_SYM_LINKER_FLAGS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mhamilt.max-ble";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.max-ble";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
@@ -374,7 +378,7 @@
 			baseConfigurationReference = 58B9212E27BD92310074582D /* maxmspsdk.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
+				ARCHS = "$(ARCHS_STANDARD)";
 				C74_SYM_LINKER_FLAGS = "@$(C74SUPPORT)/max-includes/c74_linker_flags.txt\"";
 				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
 				CLANG_CXX_LIBRARY = "compiler-default";
@@ -405,7 +409,7 @@
 					JitterAPI,
 					"$(C74_SYM_LINKER_FLAGS)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "com.mhamilt.max-ble";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.cycling74.max-ble";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
