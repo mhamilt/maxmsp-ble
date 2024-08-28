@@ -56,6 +56,12 @@ public:
     /// @param name
     void connectToDeviceWithName(const char* name);
     /// @brief
+    /// @param deviceIndex
+    void disconnectFromFoundDevice(int deviceIndex);
+    /// @brief
+    /// @param uuid
+    void disconnectFromDeviceWithUUID(const char* uuid);
+    /// @brief
     void clearDicoveredPeripherals();
     /// @brief
     /// @param deviceIndex
@@ -194,6 +200,8 @@ private:
     int rssiSensitivity = 127;
     ///
     BluetoothLEAdvertisementWatcher bleWatcher;
+    /// HC: 
+    TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> subscriptionHandler;
     /// @brief
     bool connecting = false;
     /// @brief pointer to max object that own the WinBleCentral object

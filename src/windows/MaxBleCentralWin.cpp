@@ -37,6 +37,14 @@ void bleCentralCConnectToDeviceWithName(MaxBleCentral* t, const char* name)
     ((WinBleCentral*)t)->connectToDeviceWithName(name);
 }
 
+void bleCentralCDisconnectFromFoundDevice(MaxBleCentral* t, int deviceIndex) {
+    ((WinBleCentral*)t)->disconnectFromFoundDevice(deviceIndex);
+}
+
+void bleCentralCDisconnectFromDeviceWithUUID(MaxBleCentral* t, const char* uuid) {
+    ((WinBleCentral*)t)->disconnectFromDeviceWithUUID(uuid);
+}
+
 void bleCentralCSetMaxObjRef(MaxBleCentral* t, MaxExternalObject* maxObjRef)
 {
     ((WinBleCentral*)t)->setMaxObjectRef(maxObjRef);
