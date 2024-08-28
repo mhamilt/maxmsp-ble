@@ -83,6 +83,18 @@ void WinBleCentral::connectToDeviceWithName(const char* name)
 }
 
 //--------------------------------------------------------------------------------------------
+void WinBleCentral::disconnectFromFoundDevice(int deviceIndex)
+{
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
+}
+
+//--------------------------------------------------------------------------------------------
+void WinBleCentral::disconnectFromDeviceWithUUID(const char* uuid)
+{
+    if (shouldReport) object_post((t_object*)maxObjectRef, "Not yet implemented on Windows");
+}
+
+//--------------------------------------------------------------------------------------------
 void WinBleCentral::clearDicoveredPeripherals()
 {
     if (shouldReport) object_post((t_object*)maxObjectRef, "Device List Cleared");
@@ -189,7 +201,7 @@ void WinBleCentral::getValueOfCharacteristicOfServiceOfDeviceAtIndex(const char*
 }
 
 
-void WinBleCentral::    (const char* cuuid, const char* suuid, int deviceIndex)
+void WinBleCentral::subscribeToCharacteristicOfServiceOfDeviceAtIndex(const char* cuuid, const char* suuid, int deviceIndex)
 {
     
     post("subscribe to %s", cuuid);
@@ -573,7 +585,7 @@ void WinBleCentral::outputFoundDevice(MaxExternalObject* maxObjectPtr, unsigned 
 {
     atom_setsym(maxObjectPtr->outputList + 0, gensym(uuid));
     atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)rssi);
-    outlet_list(maxObjectPtr->list_outlet3, 0L, 2, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->device_status_outlet3, 0L, 2, maxObjectPtr->outputList);
 }
 
 void WinBleCentral::onCharacteristicRead(MaxExternalObject* maxObjectPtr, const char* suuid, const char* cuuid, uint8_t* byteArray, size_t numBytes)
@@ -590,7 +602,7 @@ void WinBleCentral::onCharacteristicRead(MaxExternalObject* maxObjectPtr, const 
     for (short i = 0; i < numBytes; i++)
         atom_setlong(maxObjectPtr->outputList + 2 + i, (t_atom_long)byteArray[i]);
 
-    outlet_list(maxObjectPtr->list_outlet1, 0L, numBytes + 2, maxObjectPtr->outputList);
+    outlet_list(maxObjectPtr->read_event_outlet1, 0L, numBytes + 2, maxObjectPtr->outputList);
 }
 
 
