@@ -56,6 +56,16 @@ void onDeviceConnectionStateChange(MaxExternalObject* maxObjectPtr, unsigned lon
     outlet_list(maxObjectPtr->device_status_outlet3, 0L, 4, maxObjectPtr->outputList);
 }
 
+void onCharacteristicDiscovery(MaxExternalObject* maxObjectPtr, unsigned long index, const char* uuid, const char* name, const char* suuid, const char* cuuid)
+{
+    atom_setsym(maxObjectPtr->outputList + 0, gensym("discovered"));
+    atom_setlong(maxObjectPtr->outputList + 1, (t_atom_long)index);
+    atom_setsym (maxObjectPtr->outputList + 2, gensym(uuid));
+    atom_setsym (maxObjectPtr->outputList + 3, gensym(name));
+    atom_setsym (maxObjectPtr->outputList + 4, gensym(suuid));
+    atom_setsym (maxObjectPtr->outputList + 5, gensym(cuuid));
+    outlet_list(maxObjectPtr->device_status_outlet3, 0L, 6, maxObjectPtr->outputList);
+}
 
 void onRSSIRead(MaxExternalObject* maxObjectPtr, const char* uuid, int rssi)
 {

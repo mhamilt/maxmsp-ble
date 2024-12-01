@@ -454,7 +454,8 @@ didDiscoverServices: (NSError *)error
 //------------------------------------------------------------------------------
 // Invoked upon completion of a -[discoverCharacteristics:forService:] request.
 // Perform appropriate operations on interested characteristics
-- (void) peripheral: (CBPeripheral *)aPeripheral didDiscoverCharacteristicsForService:(CBService *)service
+- (void) peripheral: (CBPeripheral *)aPeripheral
+didDiscoverCharacteristicsForService:(CBService *)service
               error: (NSError *)error
 {
     if(error || (service.characteristics.count == 0))
@@ -466,6 +467,13 @@ didDiscoverServices: (NSError *)error
         for (CBCharacteristic *aChar in service.characteristics)
         {
             [self postCharacteristicDescription:aChar];
+            onCharacteristicDiscovery(maxObjectRef,
+                                      [self getIndexOfDevice:aPeripheral],
+                                      aPeripheral.identifier.UUIDString.UTF8String,
+                                      (aPeripheral.name) ? aPeripheral.name.UTF8String : noNameString,
+                                      aChar.service.UUID.UUIDString.UTF8String,
+                                      aChar.UUID.UUIDString.UTF8String);
+
         }
     }
 }
