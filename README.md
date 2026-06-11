@@ -4,23 +4,48 @@ A BLE Object for Max
 
 ## Install
 
-Add [the package folder](https://github.com/mhamilt/maxmsp-ble/releases/download/0.1-alpha.6/max-ble.zip) to `~/Documents/Max 8/Packages`
+Download [the latest release](https://github.com/mhamilt/maxmsp-ble/releases) and add the `max-ble` package folder to your Max Packages directory, for example:
+
+- `~/Documents/Max 8/Packages/`
+- `~/Documents/Max 9/Packages/`
+
+The package must include `externals/max-ble.mxo`. If you only copied the examples or docs from the git repository, Max will report `No such object`.
+
+### Apple Silicon (M1/M2/M3 Macs)
+
+The current release archive (`0.1-alpha.6`) ships an **Intel (x86_64)** external. On Apple Silicon you will see `incorrect architecture` unless you build from source (see below).
+
+After building locally, macOS may also block the external with `system security policy` until it is ad-hoc signed. The Xcode post-build script handles this automatically; for a manual install:
+
+```sh
+xattr -cr ~/Documents/Max\ 9/Packages/max-ble
+codesign --force --deep --sign - ~/Documents/Max\ 9/Packages/max-ble/externals/max-ble.mxo
+```
+
+Grant Bluetooth access when prompted (System Settings → Privacy & Security → Bluetooth). Max may be bundled inside Ableton Live rather than installed as a standalone app in `/Applications`.
 
 ## Building
 
 ### Xcode
 
-All things being well, you should be able to [open and build the Xcode project directly from this repo](xcode://clone?repo=https%3A%2F%2Fgithub.com%2Fmhamilt%2Fmaxmsp-ble)
+Clone with submodules, then open and build the Xcode project:
 
-The Xcode project performs a couple of extra steps under the hood. These steps live in different locations and are listed below
+```sh
+git clone --recursive https://github.com/mhamilt/maxmsp-ble.git
+# or, after a plain clone:
+git submodule update --init --recursive
+```
 
--   The `.mxo` builds to `max-package/max-ble/externals` which lives in this repository
-    -   `max-package/max-ble/externals` is contain in the environment `$DSTROOT`
-    -   `$DSTROOT` is defined within [`src/maxmspsdk.xcconfig`](src/maxmspsdk.xcconfig)
--   A post-build script in Build Phases performs the folowing steps
--   `.mxo` is signed
--   the package in [`max-package`](max-package/) is copied to the user max directory `~/Documents/Max 8/Packages/`
--   the package in [`max-package`](max-package/) is zipped in the same directory ready for upload as a release or for distribution.
+[Open the project in Xcode](xcode://clone?repo=https%3A%2F%2Fgithub.com%2Fmhamilt%2Fmaxmsp-ble) and build the `max-ble` scheme.
+
+The Xcode project performs a couple of extra steps under the hood:
+
+-   The `.mxo` builds under `$DSTROOT` (default: `/tmp/max-ble.dst/max-package/max-ble/externals/`)
+-   [`scripts/postbuild-macos.sh`](scripts/postbuild-macos.sh) then:
+    -   copies the external into [`max-package`](max-package/)
+    -   ad-hoc signs the `.mxo`
+    -   zips the package to `max-package/max-ble.zip`
+    -   installs into `~/Documents/Max 8/Packages/` and/or `~/Documents/Max 9/Packages/` when those folders exist
 
 ### Visual Studio
 
