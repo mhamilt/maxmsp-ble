@@ -213,7 +213,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "zip -r max-package/max-ble.zip max-package/max-ble -x \"*.DS_Store\"\ncp -r \"max-package/max-ble\" \"${HOME}/Documents/Max 8/Packages/\"\n";
+			shellScript = "\"${SRCROOT}/scripts/postbuild-macos.sh\"\n";
 		};
 		58F0ABFB242E3110004FE028 /* Check Max SDK Script */ = {
 			isa = PBXShellScriptBuildPhase;

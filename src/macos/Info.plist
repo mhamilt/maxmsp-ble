@@ -26,5 +26,7 @@
 	<true/>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Connect to Bluetooth Low Energy peripherals.</string>
 </dict>
 </plist>
